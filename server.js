@@ -11,6 +11,10 @@ const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://buenosairesampy563_db_user:congcong2012@cluster0.aaks5du.mongodb.net/?appName=Cluster0';
 const JWT_SECRET = process.env.JWT_SECRET || 'CORP_TASK_SECURE_AUTH_KEY_2026_SECRET';
 
+// Render Environment Variable for Site Access Gate
+const SITE_GATE_PASSWORD = process.env.SITE_GATE_PASSWORD || 'congcong2012';
+const GATE_SECRET = process.env.GATE_SECRET || 'CORP_GATE_AUTH_SIGNING_KEY_2026';
+
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
@@ -24,8 +28,6 @@ mongoose.connect(MONGODB_URI)
 // ==========================================
 // SCHEMAS (Service-Specific Namespaces)
 // ==========================================
-
-// Dedicated schema for this application to avoid collision with other apps
 const CorporateEmployeeAccountSchema = new mongoose.Schema({
   staff_id: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
@@ -49,7 +51,7 @@ const CorporateApplicationRequestSchema = new mongoose.Schema({
 const CorporateTaskSchema = new mongoose.Schema({
   task_title: { type: String, required: true },
   task_description: { type: String, required: true },
-  assigned_to_username: { type: String, required: true }, // Targeted user
+  assigned_to_username: { type: String, required: true },
   priority: { type: String, enum: ['Low', 'Normal', 'High', 'Urgent'], default: 'Normal' },
   status: { type: String, enum: ['Assigned', 'Claimed', 'In Progress', 'Completed'], default: 'Assigned' },
   claimed_at: { type: Date, default: null },
@@ -61,89 +63,129 @@ const EmployeeRequest = mongoose.model('CorporateApplicationRequest', CorporateA
 const TaskItem = mongoose.model('CorporateTask', CorporateTaskSchema);
 
 // ==========================================
-// AUTHENTICATION MIDDLEWARE
+// SITE ACCESS GATE VERIFICATION (Render Env)
+// ==========================================
+app.post('/api/gate/verify', (req, res) => {
+  const { password } = req.body;
+  if (!password || password !== SITE_GATE_PASSWORD) {
+    return res.status(401).json({ success: false, message: '访问密码错误，无法进入系统。' });
+  }
+
+  // Generate temporary gate session token
+  const token = jwt.sign({ gatePassed: true }, GATE_SECRET, { expiresIn: '8h' });
+  res.cookie('corp_site_gate_pass', token, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 8 * 60 * 60 * 1000
+  });
+
+  res.json({ success: true, message: '环境通行密码验证成功。' });
+});
+
+// Guard Middleware for Gate Access
+const checkGateAccess = (req, res, next) => {
+  const gateToken = req.cookies.corp_site_gate_pass;
+  if (!gateToken) {
+    return res.status(403).json({ success: false, gateLocked: true, message: '需要先输入站点通行密码。' });
+  }
+  jwt.verify(gateToken, GATE_SECRET, (err) => {
+    if (err) {
+      return res.status(403).json({ success: false, gateLocked: true, message: '站点密码已过期，请重新输入。' });
+    }
+    next();
+  });
+};
+
+// ==========================================
+// AUTHENTICATION MIDDLEWARES
 // ==========================================
 const authenticateEmployeeToken = (req, res, next) => {
   const token = req.cookies.corp_auth_token;
   if (!token) {
-    return res.status(401).json({ success: false, message: 'Authentication required. No session found.' });
+    return res.status(401).json({ success: false, message: '未检测到员工登录状态。' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
     if (err) {
-      return res.status(403).json({ success: false, message: 'Session expired or invalid.' });
+      return res.status(403).json({ success: false, message: '员工登录状态已失效。' });
     }
     req.user = decodedUser;
     next();
   });
 };
 
-// ==========================================
-// API ROUTES
-// ==========================================
+const authenticateAdminToken = (req, res, next) => {
+  const token = req.cookies.corp_admin_auth_token;
+  if (!token) {
+    return res.status(401).json({ success: false, message: '未检测到管理员登录状态。' });
+  }
 
-// 1. Authentication Route (Login Only - No Public Register)
-app.post('/api/auth/login', async (req, res) => {
+  jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
+    if (err || decodedUser.role !== 'admin') {
+      return res.status(403).json({ success: false, message: '权限不足，拒绝访问管理端。' });
+    }
+    req.admin = decodedUser;
+    next();
+  });
+};
+
+// ==========================================
+// EMPLOYEE APIS
+// ==========================================
+app.post('/api/auth/login', checkGateAccess, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    return res.status(400).json({ success: false, message: 'Username and password are required.' });
+    return res.status(400).json({ success: false, message: '用户名与密码为必填项。' });
   }
 
   try {
-    const employee = await EmployeeAccount.findOne({ username: username.trim() });
+    const employee = await EmployeeAccount.findOne({ username: username.trim(), role: 'employee' });
     if (!employee) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials. Account not found.' });
+      return res.status(401).json({ success: false, message: '员工账号不存在。' });
     }
 
     const isMatch = await bcrypt.compare(password, employee.password_hash);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials. Incorrect password.' });
+      return res.status(401).json({ success: false, message: '账号或密码错误。' });
     }
 
     const payload = {
       staff_id: employee.staff_id,
       username: employee.username,
       full_name: employee.full_name,
-      department: employee.department
+      department: employee.department,
+      role: 'employee'
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
 
-    // Store JWT securely into Cookie
     res.cookie('corp_auth_token', token, {
-      httpOnly: false, // Accessible by script for display handling if required, or pure HTTP header
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 8 * 60 * 60 * 1000 // 8 Hours
+      maxAge: 8 * 60 * 60 * 1000
     });
 
-    res.json({
-      success: true,
-      message: 'Login successful',
-      user: payload
-    });
+    res.json({ success: true, message: '登录成功', user: payload });
   } catch (error) {
-    console.error('Login Error:', error);
-    res.status(500).json({ success: false, message: 'Internal server error during authentication.' });
+    res.status(500).json({ success: false, message: '登录处理失败。' });
   }
 });
 
-// 2. Session Check
-app.get('/api/auth/session', authenticateEmployeeToken, (req, res) => {
+app.get('/api/auth/session', checkGateAccess, authenticateEmployeeToken, (req, res) => {
   res.json({ success: true, user: req.user });
 });
 
-// 3. Logout Route
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('corp_auth_token');
-  res.json({ success: true, message: 'Logged out successfully.' });
+  res.json({ success: true, message: '已安全登出。' });
 });
 
-// 4. Submit Employee Application Request
-app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => {
+app.post('/api/requests/submit', checkGateAccess, authenticateEmployeeToken, async (req, res) => {
   const { title, body } = req.body;
   if (!title || !body) {
-    return res.status(400).json({ success: false, message: 'Title and content are required.' });
+    return res.status(400).json({ success: false, message: '申请标题与正文不可为空。' });
   }
 
   try {
@@ -156,79 +198,265 @@ app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => 
     });
 
     await newRequest.save();
-    res.json({ success: true, message: 'Request submitted successfully to database.', data: newRequest });
+    res.json({ success: true, message: '申请已成功提交至 MongoDB。', data: newRequest });
   } catch (error) {
-    console.error('Request Submission Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to record application to MongoDB.' });
+    res.status(500).json({ success: false, message: '提交申请失败。' });
   }
 });
 
-// 5. Get User History Requests
-app.get('/api/requests/mine', authenticateEmployeeToken, async (req, res) => {
+app.get('/api/requests/mine', checkGateAccess, authenticateEmployeeToken, async (req, res) => {
   try {
     const list = await EmployeeRequest.find({ applicant_username: req.user.username }).sort({ submitted_at: -1 });
     res.json({ success: true, data: list });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to fetch requests.' });
+    res.status(500).json({ success: false, message: '获取申请记录失败。' });
   }
 });
 
-// 6. Get User Tasks
-app.get('/api/tasks/list', authenticateEmployeeToken, async (req, res) => {
+app.get('/api/tasks/list', checkGateAccess, authenticateEmployeeToken, async (req, res) => {
   try {
     const tasks = await TaskItem.find({ assigned_to_username: req.user.username }).sort({ created_at: -1 });
     res.json({ success: true, data: tasks });
   } catch (error) {
-    console.error('Fetch Task Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to retrieve tasks from database.' });
+    res.status(500).json({ success: false, message: '获取任务失败。' });
   }
 });
 
-// 7. Claim Task (Sync status and timestamp to MongoDB)
-app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => {
-  const taskId = req.params.id;
-
+app.post('/api/tasks/claim/:id', checkGateAccess, authenticateEmployeeToken, async (req, res) => {
   try {
-    const task = await TaskItem.findOne({ _id: taskId, assigned_to_username: req.user.username });
+    const task = await TaskItem.findOne({ _id: req.params.id, assigned_to_username: req.user.username });
     if (!task) {
-      return res.status(404).json({ success: false, message: 'Task not found or access denied.' });
+      return res.status(404).json({ success: false, message: '任务不存在或无权领取。' });
     }
 
     if (task.status !== 'Assigned') {
-      return res.status(400).json({ success: false, message: 'This task is already claimed or resolved.' });
+      return res.status(400).json({ success: false, message: '该任务已被领取或已处理。' });
     }
 
     task.status = 'Claimed';
     task.claimed_at = new Date();
     await task.save();
 
-    res.json({ success: true, message: 'Task claimed successfully!', data: task });
+    res.json({ success: true, message: '任务领取成功，状态已同步！', data: task });
   } catch (error) {
-    console.error('Claim Task Error:', error);
-    res.status(500).json({ success: false, message: 'Internal server error while claiming task.' });
+    res.status(500).json({ success: false, message: '领取任务失败。' });
   }
 });
 
-// Fallback to Serve Index
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// ==========================================
+// ADMIN APIS
+// ==========================================
+app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: '请输入管理员账号及密码。' });
+  }
+
+  try {
+    const adminUser = await EmployeeAccount.findOne({ username: username.trim(), role: 'admin' });
+    if (!adminUser) {
+      return res.status(401).json({ success: false, message: '管理员账号不存在。' });
+    }
+
+    const isMatch = await bcrypt.compare(password, adminUser.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: '管理员密码错误。' });
+    }
+
+    const payload = {
+      staff_id: adminUser.staff_id,
+      username: adminUser.username,
+      full_name: adminUser.full_name,
+      department: adminUser.department,
+      role: 'admin'
+    };
+
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
+    res.cookie('corp_admin_auth_token', token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 8 * 60 * 60 * 1000
+    });
+
+    res.json({ success: true, message: '管理员认证通过', user: payload });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '服务器验证异常。' });
+  }
 });
 
-// Seed an initial demo account if empty
-async function initSeed() {
-  const count = await EmployeeAccount.countDocuments();
-  if (count === 0) {
+app.get('/api/admin/auth/session', checkGateAccess, authenticateAdminToken, (req, res) => {
+  res.json({ success: true, user: req.admin });
+});
+
+app.post('/api/admin/auth/logout', (req, res) => {
+  res.clearCookie('corp_admin_auth_token');
+  res.json({ success: true, message: '管理员已安全退出。' });
+});
+
+app.get('/api/admin/employees/list', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  try {
+    const list = await EmployeeAccount.find({ role: 'employee' }).sort({ created_at: -1 });
+    res.json({ success: true, data: list });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '读取员工账号列表失败。' });
+  }
+});
+
+app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  const { staff_id, username, password, full_name, department } = req.body;
+  if (!staff_id || !username || !password || !full_name || !department) {
+    return res.status(400).json({ success: false, message: '请完整填写所有员工字段。' });
+  }
+
+  try {
+    const existing = await EmployeeAccount.findOne({
+      $or: [{ username: username.trim() }, { staff_id: staff_id.trim() }]
+    });
+    if (existing) {
+      return res.status(409).json({ success: false, message: '工号或用户名已存在。' });
+    }
+
     const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash('Employee@2026', salt);
+    const password_hash = await bcrypt.hash(password, salt);
+
+    const newStaff = new EmployeeAccount({
+      staff_id: staff_id.trim(),
+      username: username.trim(),
+      password_hash,
+      full_name: full_name.trim(),
+      department: department.trim(),
+      role: 'employee'
+    });
+
+    await newStaff.save();
+    res.json({ success: true, message: '新员工账号注册成功并已写入 MongoDB。' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '注册员工失败。' });
+  }
+});
+
+app.delete('/api/admin/employees/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  try {
+    const target = await EmployeeAccount.findByIdAndDelete(req.params.id);
+    if (!target) {
+      return res.status(404).json({ success: false, message: '未找到指定员工账号。' });
+    }
+    res.json({ success: true, message: '员工账号已成功注销并从 MongoDB 物理删除。' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '注销员工失败。' });
+  }
+});
+
+app.get('/api/admin/tasks/all', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  try {
+    const tasks = await TaskItem.find().sort({ created_at: -1 });
+    res.json({ success: true, data: tasks });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '获取任务汇总失败。' });
+  }
+});
+
+app.post('/api/admin/tasks/create', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  const { title, description, assigned_to_username, priority } = req.body;
+  if (!title || !description || !assigned_to_username) {
+    return res.status(400).json({ success: false, message: '任务标题、描述与执行人必填。' });
+  }
+
+  try {
+    const newTask = new TaskItem({
+      task_title: title.trim(),
+      task_description: description.trim(),
+      assigned_to_username: assigned_to_username.trim(),
+      priority: priority || 'Normal',
+      status: 'Assigned'
+    });
+    await newTask.save();
+    res.json({ success: true, message: '任务已成功派发并存储至数据库。', data: newTask });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '派发任务失败。' });
+  }
+});
+
+app.delete('/api/admin/tasks/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  try {
+    const result = await TaskItem.findByIdAndDelete(req.params.id);
+    if (!result) {
+      return res.status(404).json({ success: false, message: '任务不存在或已删除。' });
+    }
+    res.json({ success: true, message: '任务已撤销并从 MongoDB 彻底删除。' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '撤销任务失败。' });
+  }
+});
+
+app.get('/api/admin/requests/all', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  try {
+    const requests = await EmployeeRequest.find().sort({ submitted_at: -1 });
+    res.json({ success: true, data: requests });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '获取申请列表失败。' });
+  }
+});
+
+app.patch('/api/admin/requests/status/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  const { status } = req.body;
+  if (!['approved', 'rejected', 'pending'].includes(status)) {
+    return res.status(400).json({ success: false, message: '非法的审批状态。' });
+  }
+
+  try {
+    const updated = await EmployeeRequest.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    res.json({ success: true, message: '申请状态已同步更新。', data: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '更新审批状态失败。' });
+  }
+});
+
+app.delete('/api/admin/requests/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  try {
+    await EmployeeRequest.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: '申请记录已从 MongoDB 彻底清除。' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '删除申请失败。' });
+  }
+});
+
+// Seed Initial Accounts
+async function initSeed() {
+  const salt = await bcrypt.genSalt(10);
+
+  const empCount = await EmployeeAccount.countDocuments({ role: 'employee' });
+  if (empCount === 0) {
+    const empHash = await bcrypt.hash('Employee@2026', salt);
     await EmployeeAccount.create({
       staff_id: 'EMP-9081',
       username: 'corp_employee',
-      password_hash: hash,
+      password_hash: empHash,
       full_name: 'Alex Vance',
       department: 'Infrastructure Operations',
       role: 'employee'
     });
-    console.log('Seed account created: username: "corp_employee" / password: "Employee@2026"');
+    console.log('Default employee created: corp_employee / Employee@2026');
+  }
+
+  const adminCount = await EmployeeAccount.countDocuments({ role: 'admin' });
+  if (adminCount === 0) {
+    const adminHash = await bcrypt.hash('Admin@2026', salt);
+    await EmployeeAccount.create({
+      staff_id: 'ADM-0001',
+      username: 'corp_admin',
+      password_hash: adminHash,
+      full_name: 'Lead Operations Executive',
+      department: 'Headquarters System Control',
+      role: 'admin'
+    });
+    console.log('Default admin created: corp_admin / Admin@2026');
   }
 }
 mongoose.connection.once('open', initSeed);
