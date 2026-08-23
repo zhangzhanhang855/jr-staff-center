@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>企业协同管理控制台 - 管理员端</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --admin-navy: #0f172a;
+      --admin-slate: #1e293b;
+      --primary-accent: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --bg-canvas: #f1f5f9;
+      --surface-white: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      --sidebar-width: 260px;
+      --bottom-nav-height: 64px;
+      --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --transition-fast: 0.18s ease;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    input, select, textarea, button {
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      border: none;
+    }
+
+    /* Toast Notification */
+    #toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .toast-item {
+      pointer-events: auto;
+      min-width: 280px;
+      max-width: 420px;
+      background: var(--surface-white);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-left: 4px solid var(--primary-accent);
+      transform: translateX(120%);
+      opacity: 0;
+      transition: all 0.28s ease;
+    }
+
+    .toast-item.show { transform: translateX(0); opacity: 1; }
+    .toast-item.success { border-left-color: var(--success); }
+    .toast-item.error { border-left-color: var(--danger); }
+    .toast-item.warning { border-left-color: var(--warning); }
+
+    /* GATE MODAL VIEW */
+    #gate-view-container {
+      position: fixed;
+      inset: 0;
+      z-index: 90000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+      padding: 20px;
+    }
+
+    .gate-box {
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 36px 30px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      text-align: center;
+    }
+
+    .gate-box h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .gate-box p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+    }
+
+    /* Admin Login Card */
+    #admin-login-view {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(circle at top right, #1e293b, #0f172a);
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface-white);
+      border-radius: 16px;
+      padding: 40px 32px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .login-header-icon {
+      width: 52px;
+      height: 52px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: #ffffff;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-admin-submit {
+      width: 100%;
+      padding: 12px;
+      background: var(--admin-slate);
+      color: #ffffff;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background var(--transition-fast);
+    }
+
+    .btn-admin-submit:hover {
+      background: var(--admin-navy);
+    }
+
+    /* Workspace Shell */
+    #admin-app-container {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .app-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: var(--admin-slate);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-brand-badge {
+      background: var(--primary-accent);
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all var(--transition-fast);
+    }
+
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.06);
+      color: #ffffff;
+    }
+
+    .nav-btn.active {
+      background: var(--primary-accent);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .app-main-viewport {
+      margin-left: var(--sidebar-width);
+      padding: 32px 40px;
+      min-height: 100vh;
+      max-width: 1400px;
+    }
+
+    .mobile-bottom-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--bottom-nav-height);
+      background: var(--admin-slate);
+      z-index: 100;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .mobile-nav-btn {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: none;
+      color: #94a3b8;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .mobile-nav-btn.active {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Views */
+    .view-section {
+      display: none;
+      animation: fadeIn 0.2s ease forwards;
+    }
+
+    .view-section.active-view {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .content-card {
+      background: var(--surface-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .custom-table-container {
+      overflow-x: auto;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    .custom-table th {
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    .custom-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text-main);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 9999px;
+    }
+
+    .badge-assigned { background: #e0f2fe; color: #0369a1; }
+    .badge-claimed { background: #dcfce7; color: #15803d; }
+    .badge-pending { background: #fef3c7; color: #b45309; }
+    .badge-approved { background: #d1fae5; color: #047857; }
+    .badge-rejected { background: #fee2e2; color: #b91c1c; }
+
+    /* Action Buttons */
+    .btn-action-delete {
+      padding: 6px 10px;
+      background: #fee2e2;
+      color: var(--danger);
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background var(--transition-fast);
+    }
+
+    .btn-action-delete:hover { background: #fecaca; }
+
+    .btn-action-approve {
+      padding: 6px 10px;
+      background: #d1fae5;
+      color: #047857;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .btn-action-reject {
+      padding: 6px 10px;
+      background: #fef3c7;
+      color: #b45309;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .btn-primary {
+      padding: 10px 18px;
+      background: var(--primary-accent);
+      color: #ffffff;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 520px;
+      background: var(--surface-white);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .app-sidebar { display: none; }
+      .mobile-bottom-bar { display: flex; }
+      .app-main-viewport {
+        margin-left: 0;
+        padding: 20px 16px calc(var(--bottom-nav-height) + 24px) 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toast-container"></div>
+
+  <!-- ==========================================================================
+       1. MANDATORY SITE GATE VIEW (Render Environment Password Check)
+       ========================================================================== -->
+  <section id="gate-view-container">
+    <div class="gate-box">
+      <div style="font-size: 42px; margin-bottom: 10px;">🔐</div>
+      <h2>系统安全验证</h2>
+      <p>请输入环境通行密码以进入管理控制台</p>
+      <form id="gate-auth-form">
+        <div class="form-group">
+          <input type="password" id="gate-input-password" class="form-control" placeholder="输入访问口令" style="text-align: center; letter-spacing: 2px;" required autofocus>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; padding: 12px;">验证并进入</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       2. ADMIN ACCOUNT LOGIN VIEW
+       ========================================================================== -->
+  <section id="admin-login-view">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-header-icon">🛡️</div>
+        <h2>管理控制台登录</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">管理员专属特权鉴权门户</p>
+      </div>
+
+      <form id="admin-login-form">
+        <div class="form-group">
+          <label for="admin-user">管理员账号</label>
+          <input type="text" id="admin-user" class="form-control" placeholder="输入管理员用户名" required>
+        </div>
+        <div class="form-group">
+          <label for="admin-pass">管理员密码</label>
+          <input type="password" id="admin-pass" class="form-control" placeholder="输入密码" required>
+        </div>
+        <button type="submit" class="btn-admin-submit">登 录</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       3. ADMIN MAIN DASHBOARD
+       ========================================================================== -->
+  <div id="admin-app-container">
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <strong>企业管治后台</strong>
+        <span class="sidebar-brand-badge">ADMIN</span>
+      </div>
+
+      <ul class="nav-list">
+        <li>
+          <button class="nav-btn active" data-target="sec-tasks">
+            <span>📌 任务统筹与撤销</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-target="sec-requests">
+            <span>📥 员工申请审核</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" data-target="sec-employees">
+            <span>👥 员工账号管理</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <span style="font-size: 12px; color: #94a3b8;" id="admin-display-name">Admin</span>
+        <button id="btn-admin-logout" style="background: none; color: #ef4444; font-size: 12px; cursor: pointer; font-weight: 600;">退出</button>
+      </div>
+    </aside>
+
+    <nav class="mobile-bottom-bar">
+      <button class="mobile-nav-btn active" data-target="sec-tasks">
+        <span>📌</span>
+        <span>任务统筹</span>
+      </button>
+      <button class="mobile-nav-btn" data-target="sec-requests">
+        <span>📥</span>
+        <span>申请审核</span>
+      </button>
+      <button class="mobile-nav-btn" data-target="sec-employees">
+        <span>👥</span>
+        <span>账号管理</span>
+      </button>
+    </nav>
+
+    <main class="app-main-viewport">
+
+      <!-- SECTION 1: 任务统筹与撤销 -->
+      <section id="sec-tasks" class="view-section active-view">
+        <div class="page-header">
+          <div>
+            <h2>员工任务统筹</h2>
+            <p style="font-size: 13.5px; color: var(--text-muted);">布置工作任务、跟踪员工领取进度，或直接撤销并彻底删除 MongoDB 记录。</p>
+          </div>
+          <button class="btn-primary" id="btn-open-task-modal">+ 布置新任务</button>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header-bar">
+            <h3>全量任务跟踪列表</h3>
+          </div>
+          <div class="custom-table-container">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>任务名称</th>
+                  <th>指派员工</th>
+                  <th>状态</th>
+                  <th>发布时间</th>
+                  <th>领取时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="tasks-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: 员工申请审核 -->
+      <section id="sec-requests" class="view-section">
+        <div class="page-header">
+          <div>
+            <h2>员工事务申请流转</h2>
+            <p style="font-size: 13.5px; color: var(--text-muted);">查看员工提交的审批与申请，执行核准、驳回或从数据库物理删除记录。</p>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header-bar">
+            <h3>申请工单列表</h3>
+          </div>
+          <div class="custom-table-container">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>申请主题</th>
+                  <th>申请人</th>
+                  <th>部门</th>
+                  <th>正文说明</th>
+                  <th>状态</th>
+                  <th>提交时间</th>
+                  <th>流转 / 删除操作</th>
+                </tr>
+              </thead>
+              <tbody id="requests-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: 员工账号注册与注销 -->
+      <section id="sec-employees" class="view-section">
+        <div class="page-header">
+          <div>
+            <h2>员工账户与权限管理</h2>
+            <p style="font-size: 13.5px; color: var(--text-muted);">为新员工注册专属凭证，或注销（删除）离职员工账号。</p>
+          </div>
+          <button class="btn-primary" id="btn-open-employee-modal">+ 注册新员工账号</button>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header-bar">
+            <h3>活跃员工账号花名册</h3>
+          </div>
+          <div class="custom-table-container">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>工号 (Staff ID)</th>
+                  <th>登录用户名</th>
+                  <th>真实姓名</th>
+                  <th>所属部门</th>
+                  <th>创建时间</th>
+                  <th>账号注销</th>
+                </tr>
+              </thead>
+              <tbody id="employees-table-body">
+                <!-- Dynamic Content -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       MODALS
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-task">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>布置新任务</h3>
+        <button id="btn-close-task-modal" style="background:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <form id="form-create-task">
+        <div class="form-group">
+          <label>任务标题</label>
+          <input type="text" id="task-in-title" class="form-control" placeholder="如：系统安全日志审计" required>
+        </div>
+        <div class="form-group">
+          <label>指派员工 (用户名)</label>
+          <select id="task-in-assignee" class="form-control" required></select>
+        </div>
+        <div class="form-group">
+          <label>任务详细要求与标准</label>
+          <textarea id="task-in-desc" class="form-control" style="min-height: 100px;" placeholder="详述该任务的具体执行目标与验收指标..." required></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">确认发布任务并同步至数据库</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-employee">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>注册新员工账号</h3>
+        <button id="btn-close-employee-modal" style="background:none; font-size:18px; cursor:pointer;">✕</button>
+      </div>
+      <form id="form-create-employee">
+        <div class="form-group">
+          <label>员工工号 (Staff ID)</label>
+          <input type="text" id="emp-in-staffid" class="form-control" placeholder="如：EMP-202601" required>
+        </div>
+        <div class="form-group">
+          <label>登录用户名</label>
+          <input type="text" id="emp-in-username" class="form-control" placeholder="用于员工端登录" required>
+        </div>
+        <div class="form-group">
+          <label>初始密码</label>
+          <input type="password" id="emp-in-password" class="form-control" placeholder="设置认证密码" required>
+        </div>
+        <div class="form-group">
+          <label>真实姓名</label>
+          <input type="text" id="emp-in-fullname" class="form-control" placeholder="姓名" required>
+        </div>
+        <div class="form-group">
+          <label>所属部门</label>
+          <input type="text" id="emp-in-dept" class="form-control" placeholder="如：研发中心 / 运营部" required>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">注册员工账号</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT APPLICATION ENGINE
+       ========================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const State = {
+        adminUser: null,
+        employees: [],
+        tasks: [],
+        requests: []
+      };
+
+      const DOM = {
+        toastContainer: document.getElementById('toast-container'),
+        gateView: document.getElementById('gate-view-container'),
+        gateForm: document.getElementById('gate-auth-form'),
+        gateInput: document.getElementById('gate-input-password'),
+        loginView: document.getElementById('admin-login-view'),
+        appView: document.getElementById('admin-app-container'),
+        loginForm: document.getElementById('admin-login-form'),
+        adminUserIn: document.getElementById('admin-user'),
+        adminPassIn: document.getElementById('admin-pass'),
+        adminDisplayName: document.getElementById('admin-display-name'),
+        btnLogout: document.getElementById('btn-admin-logout'),
+        navButtons: document.querySelectorAll('.nav-btn, .mobile-nav-btn'),
+        sections: document.querySelectorAll('.view-section'),
+        // Tasks
+        tasksTbody: document.getElementById('tasks-table-body'),
+        modalTask: document.getElementById('modal-task'),
+        btnOpenTaskModal: document.getElementById('btn-open-task-modal'),
+        btnCloseTaskModal: document.getElementById('btn-close-task-modal'),
+        formCreateTask: document.getElementById('form-create-task'),
+        taskInAssignee: document.getElementById('task-in-assignee'),
+        // Requests
+        requestsTbody: document.getElementById('requests-table-body'),
+        // Employees
+        employeesTbody: document.getElementById('employees-table-body'),
+        modalEmployee: document.getElementById('modal-employee'),
+        btnOpenEmpModal: document.getElementById('btn-open-employee-modal'),
+        btnCloseEmpModal: document.getElementById('btn-close-employee-modal'),
+        formCreateEmployee: document.getElementById('form-create-employee')
+      };
+
+      function showToast(msg, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast-item ${type}`;
+        toast.innerHTML = `<span>${type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️')}</span><span>${msg}</span>`;
+        DOM.toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3200);
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return '--';
+        return new Date(dateStr).toLocaleString('zh-CN', {
+          month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+        });
+      }
+
+      function switchTab(targetId) {
+        DOM.navButtons.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-target') === targetId);
+        });
+        DOM.sections.forEach(sec => {
+          sec.classList.toggle('active-view', sec.id === targetId);
+        });
+
+        if (targetId === 'sec-tasks') loadTasks();
+        if (targetId === 'sec-requests') loadRequests();
+        if (targetId === 'sec-employees') loadEmployees();
+      }
+
+      async function checkSession() {
+        try {
+          const res = await fetch('/api/admin/auth/session');
+          const data = await res.json();
+
+          if (data.gateLocked) {
+            DOM.gateView.style.display = 'flex';
+            DOM.loginView.style.display = 'none';
+            DOM.appView.style.display = 'none';
+            return;
+          }
+
+          DOM.gateView.style.display = 'none';
+
+          if (res.ok && data.success) {
+            handleLoginSuccess(data.user);
+          } else {
+            DOM.loginView.style.display = 'flex';
+            DOM.appView.style.display = 'none';
+          }
+        } catch (e) {
+          DOM.gateView.style.display = 'flex';
+          DOM.loginView.style.display = 'none';
+          DOM.appView.style.display = 'none';
+        }
+      }
+
+      function handleLoginSuccess(user) {
+        State.adminUser = user;
+        DOM.gateView.style.display = 'none';
+        DOM.loginView.style.display = 'none';
+        DOM.appView.style.display = 'block';
+        DOM.adminDisplayName.textContent = user.full_name || user.username;
+        loadEmployees();
+        switchTab('sec-tasks');
+      }
+
+      // --- TASKS ENGINE ---
+      async function loadTasks() {
+        try {
+          const res = await fetch('/api/admin/tasks/all');
+          const data = await res.json();
+          if (data.success) {
+            State.tasks = data.data;
+            renderTasks(data.data);
+          }
+        } catch (e) {
+          showToast('无法读取任务列表', 'error');
+        }
+      }
+
+      function renderTasks(tasks) {
+        DOM.tasksTbody.innerHTML = '';
+        if (!tasks.length) {
+          DOM.tasksTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">暂无派发的任务</td></tr>';
+          return;
+        }
+
+        tasks.forEach(t => {
+          const isClaimed = t.status !== 'Assigned';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${escapeHtml(t.task_title)}</strong></td>
+            <td>${escapeHtml(t.assigned_to_username)}</td>
+            <td><span class="badge ${isClaimed ? 'badge-claimed' : 'badge-assigned'}">${isClaimed ? '已领取' : '待领取'}</span></td>
+            <td>${formatDate(t.created_at)}</td>
+            <td>${formatDate(t.claimed_at)}</td>
+            <td>
+              <button class="btn-action-delete" data-task-id="${t._id}">撤销并删除</button>
+            </td>
+          `;
+
+          tr.querySelector('.btn-action-delete').addEventListener('click', () => revokeTask(t._id));
+          DOM.tasksTbody.appendChild(tr);
+        });
+      }
+
+      async function revokeTask(taskId) {
+        if (!confirm('确定要从 MongoDB 撤销并物理删除该任务吗？此操作不可逆。')) return;
+
+        try {
+          const res = await fetch(`/api/admin/tasks/delete/${taskId}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            showToast('任务已成功撤销并自数据库移除', 'success');
+            loadTasks();
+          } else {
+            showToast(data.message || '撤销失败', 'error');
+          }
+        } catch (e) {
+          showToast('网络错误，撤销失败', 'error');
+        }
+      }
+
+      // --- REQUESTS ENGINE ---
+      async function loadRequests() {
+        try {
+          const res = await fetch('/api/admin/requests/all');
+          const data = await res.json();
+          if (data.success) {
+            State.requests = data.data;
+            renderRequests(data.data);
+          }
+        } catch (e) {
+          showToast('无法读取申请工单', 'error');
+        }
+      }
+
+      function renderRequests(reqs) {
+        DOM.requestsTbody.innerHTML = '';
+        if (!reqs.length) {
+          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">暂无员工申请单</td></tr>';
+          return;
+        }
+
+        reqs.forEach(r => {
+          const tr = document.createElement('tr');
+          const badgeClass = r.status === 'approved' ? 'badge-approved' : (r.status === 'rejected' ? 'badge-rejected' : 'badge-pending');
+          const statusText = r.status === 'approved' ? '已批准' : (r.status === 'rejected' ? '已驳回' : '待处理');
+
+          tr.innerHTML = `
+            <td><strong>${escapeHtml(r.request_title)}</strong></td>
+            <td>${escapeHtml(r.applicant_name)} (${escapeHtml(r.applicant_username)})</td>
+            <td>${escapeHtml(r.department)}</td>
+            <td style="max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(r.request_body)}</td>
+            <td><span class="badge ${badgeClass}">${statusText}</span></td>
+            <td>${formatDate(r.submitted_at)}</td>
+            <td style="white-space: nowrap;">
+              <button class="btn-action-approve" data-id="${r._id}">批准</button>
+              <button class="btn-action-reject" data-id="${r._id}">驳回</button>
+              <button class="btn-action-delete" data-id="${r._id}">删除数据</button>
+            </td>
+          `;
+
+          tr.querySelector('.btn-action-approve').addEventListener('click', () => updateRequestStatus(r._id, 'approved'));
+          tr.querySelector('.btn-action-reject').addEventListener('click', () => updateRequestStatus(r._id, 'rejected'));
+          tr.querySelector('.btn-action-delete').addEventListener('click', () => deleteRequestRecord(r._id));
+
+          DOM.requestsTbody.appendChild(tr);
+        });
+      }
+
+      async function updateRequestStatus(id, status) {
+        try {
+          const res = await fetch(`/api/admin/requests/status/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+          });
+          const data = await res.json();
+          if (data.success) {
+            showToast('状态已更新', 'success');
+            loadRequests();
+          }
+        } catch (e) {
+          showToast('状态更新失败', 'error');
+        }
+      }
+
+      async function deleteRequestRecord(id) {
+        if (!confirm('确定将该申请记录从 MongoDB 物理删除？')) return;
+        try {
+          const res = await fetch(`/api/admin/requests/delete/${id}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            showToast('申请数据已删除', 'success');
+            loadRequests();
+          }
+        } catch (e) {
+          showToast('删除失败', 'error');
+        }
+      }
+
+      // --- EMPLOYEES ENGINE ---
+      async function loadEmployees() {
+        try {
+          const res = await fetch('/api/admin/employees/list');
+          const data = await res.json();
+          if (data.success) {
+            State.employees = data.data;
+            renderEmployees(data.data);
+            populateAssigneeSelect(data.data);
+          }
+        } catch (e) {
+          showToast('无法读取员工花名册', 'error');
+        }
+      }
+
+      function renderEmployees(emps) {
+        DOM.employeesTbody.innerHTML = '';
+        if (!emps.length) {
+          DOM.employeesTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">暂无注册员工</td></tr>';
+          return;
+        }
+
+        emps.forEach(emp => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><code>${escapeHtml(emp.staff_id)}</code></td>
+            <td><strong>${escapeHtml(emp.username)}</strong></td>
+            <td>${escapeHtml(emp.full_name)}</td>
+            <td>${escapeHtml(emp.department)}</td>
+            <td>${formatDate(emp.created_at)}</td>
+            <td>
+              <button class="btn-action-delete" data-emp-id="${emp._id}">注销账号</button>
+            </td>
+          `;
+
+          tr.querySelector('.btn-action-delete').addEventListener('click', () => deregisterEmployee(emp._id, emp.full_name));
+          DOM.employeesTbody.appendChild(tr);
+        });
+      }
+
+      function populateAssigneeSelect(emps) {
+        DOM.taskInAssignee.innerHTML = '';
+        emps.forEach(emp => {
+          const opt = document.createElement('option');
+          opt.value = emp.username;
+          opt.textContent = `${emp.full_name} (${emp.username}) - ${emp.department}`;
+          DOM.taskInAssignee.appendChild(opt);
+        });
+      }
+
+      async function deregisterEmployee(empId, name) {
+        if (!confirm(`警告：确定要注销并删除员工 [${name}] 的账号吗？该员工将无法再登录。`)) return;
+
+        try {
+          const res = await fetch(`/api/admin/employees/delete/${empId}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.success) {
+            showToast('员工账号已成功注销', 'success');
+            loadEmployees();
+          } else {
+            showToast(data.message || '注销失败', 'error');
+          }
+        } catch (e) {
+          showToast('操作网络异常', 'error');
+        }
+      }
+
+      // --- LISTENERS ---
+      function setupListeners() {
+        // Gate Form Submit
+        DOM.gateForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const pass = DOM.gateInput.value.trim();
+          try {
+            const res = await fetch('/api/gate/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ password: pass })
+            });
+            const data = await res.json();
+            if (data.success) {
+              showToast('通行口令验证通过', 'success');
+              DOM.gateView.style.display = 'none';
+              checkSession();
+            } else {
+              showToast(data.message || '通行口令错误', 'error');
+              DOM.gateInput.value = '';
+            }
+          } catch (e) {
+            showToast('验证请求失败', 'error');
+          }
+        });
+
+        DOM.navButtons.forEach(btn => {
+          btn.addEventListener('click', () => switchTab(btn.getAttribute('data-target')));
+        });
+
+        // Admin Login
+        DOM.loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          try {
+            const res = await fetch('/api/admin/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: DOM.adminUserIn.value.trim(),
+                password: DOM.adminPassIn.value
+              })
+            });
+            const data = await res.json();
+            if (data.success) {
+              handleLoginSuccess(data.user);
+            } else {
+              showToast(data.message || '登录失败', 'error');
+            }
+          } catch (e) {
+            showToast('无法连接鉴权网关', 'error');
+          }
+        });
+
+        // Logout
+        DOM.btnLogout.addEventListener('click', async () => {
+          await fetch('/api/admin/auth/logout', { method: 'POST' });
+          DOM.loginView.style.display = 'flex';
+          DOM.appView.style.display = 'none';
+          showToast('管理会话已注销', 'info');
+        });
+
+        // Modals
+        DOM.btnOpenTaskModal.addEventListener('click', () => DOM.modalTask.classList.add('open'));
+        DOM.btnCloseTaskModal.addEventListener('click', () => DOM.modalTask.classList.remove('open'));
+
+        DOM.btnOpenEmpModal.addEventListener('click', () => DOM.modalEmployee.classList.add('open'));
+        DOM.btnCloseEmpModal.addEventListener('click', () => DOM.modalEmployee.classList.remove('open'));
+
+        // Form Submit: Create Task
+        DOM.formCreateTask.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const payload = {
+            title: document.getElementById('task-in-title').value.trim(),
+            assigned_to_username: DOM.taskInAssignee.value,
+            description: document.getElementById('task-in-desc').value.trim()
+          };
+
+          try {
+            const res = await fetch('/api/admin/tasks/create', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              showToast('任务已成功派发并存入数据库！', 'success');
+              DOM.modalTask.classList.remove('open');
+              DOM.formCreateTask.reset();
+              loadTasks();
+            } else {
+              showToast(data.message || '发布失败', 'error');
+            }
+          } catch (e) {
+            showToast('派发异常', 'error');
+          }
+        });
+
+        // Form Submit: Register Employee
+        DOM.formCreateEmployee.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const payload = {
+            staff_id: document.getElementById('emp-in-staffid').value.trim(),
+            username: document.getElementById('emp-in-username').value.trim(),
+            password: document.getElementById('emp-in-password').value,
+            full_name: document.getElementById('emp-in-fullname').value.trim(),
+            department: document.getElementById('emp-in-dept').value.trim()
+          };
+
+          try {
+            const res = await fetch('/api/admin/employees/create', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+              showToast('员工账号注册成功！', 'success');
+              DOM.modalEmployee.classList.remove('open');
+              DOM.formCreateEmployee.reset();
+              loadEmployees();
+            } else {
+              showToast(data.message || '注册失败', 'error');
+            }
+          } catch (e) {
+            showToast('注册网络异常', 'error');
+          }
+        });
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(str).replace(/[&<>"']/g, m => map[m]);
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        setupListeners();
+        checkSession();
+      });
+    })();
+  </script>
+</body>
+</html>
