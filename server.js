@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,13 +21,23 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Configure Multer in Memory: max 10MB per file, max 5 files
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB Limit
+    files: 5 // Max 5 files
+  }
+});
+
 // Database Connection
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('MongoDB Connected Successfully to Corporate Cluster'))
   .catch(err => console.error('MongoDB Connection Error:', err));
 
 // ==========================================
-// SCHEMAS (Dedicated Service-Specific Namespaces)
+// SCHEMAS
 // ==========================================
 const CorporateEmployeeAccountSchema = new mongoose.Schema({
   staff_id: { type: String, required: true, unique: true },
@@ -48,12 +59,20 @@ const CorporateApplicationRequestSchema = new mongoose.Schema({
   submitted_at: { type: Date, default: Date.now }
 }, { collection: 'corp_app_staff_requests' });
 
+const TaskAttachmentSchema = new mongoose.Schema({
+  filename: { type: String, required: true },
+  mimetype: { type: String, required: true },
+  size: { type: Number, required: true },
+  data: { type: Buffer, required: true }
+});
+
 const CorporateTaskSchema = new mongoose.Schema({
   task_title: { type: String, required: true },
   task_description: { type: String, required: true },
   assigned_to_username: { type: String, required: true },
   priority: { type: String, enum: ['Low', 'Normal', 'High', 'Urgent'], default: 'Normal' },
   status: { type: String, enum: ['Assigned', 'Claimed', 'In Progress', 'Completed'], default: 'Assigned' },
+  attachments: [TaskAttachmentSchema],
   claimed_at: { type: Date, default: null },
   created_at: { type: Date, default: Date.now }
 }, { collection: 'corp_app_tasks' });
@@ -71,7 +90,6 @@ app.post('/api/gate/verify', (req, res) => {
     return res.status(401).json({ success: false, message: '管理通行密码错误，拒绝访问。' });
   }
 
-  // Generate temporary gate session token for Admin console
   const token = jwt.sign({ adminGatePassed: true }, GATE_SECRET, { expiresIn: '8h' });
   res.cookie('corp_site_gate_pass', token, {
     httpOnly: false,
@@ -83,7 +101,6 @@ app.post('/api/gate/verify', (req, res) => {
   res.json({ success: true, message: '环境通行密码验证成功。' });
 });
 
-// Guard Middleware for Admin Gate Access (Used ONLY for Admin routes)
 const checkGateAccess = (req, res, next) => {
   const gateToken = req.cookies.corp_site_gate_pass;
   if (!gateToken) {
@@ -131,10 +148,9 @@ const authenticateAdminToken = (req, res, next) => {
 };
 
 // ==========================================================================
-// 1. EMPLOYEE CLIENT APIS (No Gate Password Required - Direct Staff Login)
+// 1. EMPLOYEE CLIENT APIS
 // ==========================================================================
 
-// Employee Login
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -175,18 +191,15 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Employee Session Check
 app.get('/api/auth/session', authenticateEmployeeToken, (req, res) => {
   res.json({ success: true, user: req.user });
 });
 
-// Employee Logout
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('corp_auth_token');
   res.json({ success: true, message: '已安全登出。' });
 });
 
-// Employee Submit Application Request
 app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => {
   const { title, body } = req.body;
   if (!title || !body) {
@@ -209,7 +222,6 @@ app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => 
   }
 });
 
-// Employee View Submitted Requests
 app.get('/api/requests/mine', authenticateEmployeeToken, async (req, res) => {
   try {
     const list = await EmployeeRequest.find({ applicant_username: req.user.username }).sort({ submitted_at: -1 });
@@ -219,17 +231,45 @@ app.get('/api/requests/mine', authenticateEmployeeToken, async (req, res) => {
   }
 });
 
-// Employee View Assigned Tasks
+// Employee View Tasks (Attachments metadata projected without heavy binary data)
 app.get('/api/tasks/list', authenticateEmployeeToken, async (req, res) => {
   try {
-    const tasks = await TaskItem.find({ assigned_to_username: req.user.username }).sort({ created_at: -1 });
+    const tasks = await TaskItem.find(
+      { assigned_to_username: req.user.username },
+      { 'attachments.data': 0 } // Exclude buffer data in list view for performance
+    ).sort({ created_at: -1 });
+
     res.json({ success: true, data: tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: '获取任务失败。' });
   }
 });
 
-// Employee Claim Task (Sync status and timestamp to MongoDB)
+// Employee Download Attachment
+app.get('/api/tasks/:taskId/attachment/:fileId', authenticateEmployeeToken, async (req, res) => {
+  try {
+    const task = await TaskItem.findOne({
+      _id: req.params.taskId,
+      assigned_to_username: req.user.username
+    });
+
+    if (!task) {
+      return res.status(404).json({ success: false, message: '任务不存在或无权访问。' });
+    }
+
+    const attachment = task.attachments.id(req.params.fileId);
+    if (!attachment) {
+      return res.status(404).json({ success: false, message: '附件不存在。' });
+    }
+
+    res.setHeader('Content-Type', attachment.mimetype);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(attachment.filename)}`);
+    res.send(attachment.data);
+  } catch (error) {
+    res.status(500).json({ success: false, message: '附件下载失败。' });
+  }
+});
+
 app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => {
   try {
     const task = await TaskItem.findOne({ _id: req.params.id, assigned_to_username: req.user.username });
@@ -252,10 +292,9 @@ app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => 
 });
 
 // ==========================================================================
-// 2. ADMIN APIS (Strictly Protected by checkGateAccess & Admin Auth)
-// ==========================================
+// 2. ADMIN APIS
+// ==========================================================================
 
-// Admin Login (Requires Gate Password Check First)
 app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -296,18 +335,15 @@ app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
   }
 });
 
-// Admin Session Check
 app.get('/api/admin/auth/session', checkGateAccess, authenticateAdminToken, (req, res) => {
   res.json({ success: true, user: req.admin });
 });
 
-// Admin Logout
 app.post('/api/admin/auth/logout', (req, res) => {
   res.clearCookie('corp_admin_auth_token');
   res.json({ success: true, message: '管理员已安全退出。' });
 });
 
-// Admin: List All Employee Accounts
 app.get('/api/admin/employees/list', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const list = await EmployeeAccount.find({ role: 'employee' }).sort({ created_at: -1 });
@@ -317,7 +353,6 @@ app.get('/api/admin/employees/list', checkGateAccess, authenticateAdminToken, as
   }
 });
 
-// Admin: Register a New Employee Account
 app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken, async (req, res) => {
   const { staff_id, username, password, full_name, department } = req.body;
   if (!staff_id || !username || !password || !full_name || !department) {
@@ -351,7 +386,6 @@ app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken,
   }
 });
 
-// Admin: Delete / Deregister an Employee Account
 app.delete('/api/admin/employees/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const target = await EmployeeAccount.findByIdAndDelete(req.params.id);
@@ -364,52 +398,58 @@ app.delete('/api/admin/employees/delete/:id', checkGateAccess, authenticateAdmin
   }
 });
 
-// Admin: View All Tasks
 app.get('/api/admin/tasks/all', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
-    const tasks = await TaskItem.find().sort({ created_at: -1 });
+    const tasks = await TaskItem.find({}, { 'attachments.data': 0 }).sort({ created_at: -1 });
     res.json({ success: true, data: tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: '获取任务汇总失败。' });
   }
 });
 
-// Admin: Create & Dispatch Task
-app.post('/api/admin/tasks/create', checkGateAccess, authenticateAdminToken, async (req, res) => {
+// Admin: Create & Dispatch Task with Multer File Uploads
+app.post('/api/admin/tasks/create', checkGateAccess, authenticateAdminToken, upload.array('attachments', 5), async (req, res) => {
   const { title, description, assigned_to_username, priority } = req.body;
   if (!title || !description || !assigned_to_username) {
     return res.status(400).json({ success: false, message: '任务标题、描述与执行人必填。' });
   }
 
   try {
+    const fileAttachments = (req.files || []).map(f => ({
+      filename: Buffer.from(f.originalname, 'latin1').toString('utf8'), // Fix UTF-8 encoding
+      mimetype: f.mimetype,
+      size: f.size,
+      data: f.buffer
+    }));
+
     const newTask = new TaskItem({
       task_title: title.trim(),
       task_description: description.trim(),
       assigned_to_username: assigned_to_username.trim(),
       priority: priority || 'Normal',
-      status: 'Assigned'
+      status: 'Assigned',
+      attachments: fileAttachments
     });
+
     await newTask.save();
-    res.json({ success: true, message: '任务已成功派发并存储至数据库。', data: newTask });
+    res.json({ success: true, message: '任务与附件已成功派发并存储至 MongoDB！', data: newTask });
   } catch (error) {
-    res.status(500).json({ success: false, message: '派发任务失败。' });
+    res.status(500).json({ success: false, message: '派发任务或上传附件失败。' });
   }
 });
 
-// Admin: Revoke and Delete Task from MongoDB
 app.delete('/api/admin/tasks/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const result = await TaskItem.findByIdAndDelete(req.params.id);
     if (!result) {
       return res.status(404).json({ success: false, message: '任务不存在或已删除。' });
     }
-    res.json({ success: true, message: '任务已撤销并从 MongoDB 彻底删除。' });
+    res.json({ success: true, message: '任务及附件已撤销并从 MongoDB 彻底删除。' });
   } catch (error) {
     res.status(500).json({ success: false, message: '撤销任务失败。' });
   }
 });
 
-// Admin: View All Requests
 app.get('/api/admin/requests/all', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const requests = await EmployeeRequest.find().sort({ submitted_at: -1 });
@@ -419,7 +459,6 @@ app.get('/api/admin/requests/all', checkGateAccess, authenticateAdminToken, asyn
   }
 });
 
-// Admin: Update Request Status (Approve / Reject)
 app.patch('/api/admin/requests/status/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   const { status } = req.body;
   if (!['approved', 'rejected', 'pending'].includes(status)) {
@@ -438,7 +477,6 @@ app.patch('/api/admin/requests/status/:id', checkGateAccess, authenticateAdminTo
   }
 });
 
-// Admin: Delete Request Record from MongoDB
 app.delete('/api/admin/requests/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     await EmployeeRequest.findByIdAndDelete(req.params.id);
@@ -448,13 +486,10 @@ app.delete('/api/admin/requests/delete/:id', checkGateAccess, authenticateAdminT
   }
 });
 
-// ==========================================
-// SEED INITIAL DEMO ACCOUNTS
-// ==========================================
+// Seed Initial Accounts
 async function initSeed() {
   const salt = await bcrypt.genSalt(10);
 
-  // 1. Default Employee Account
   const empCount = await EmployeeAccount.countDocuments({ role: 'employee' });
   if (empCount === 0) {
     const empHash = await bcrypt.hash('Employee@2026', salt);
@@ -469,7 +504,6 @@ async function initSeed() {
     console.log('Default employee created: corp_employee / Employee@2026');
   }
 
-  // 2. Default Admin Account
   const adminCount = await EmployeeAccount.countDocuments({ role: 'admin' });
   if (adminCount === 0) {
     const adminHash = await bcrypt.hash('Admin@2026', salt);
@@ -486,7 +520,6 @@ async function initSeed() {
 }
 mongoose.connection.once('open', initSeed);
 
-// Fallback Route for Single Page Apps
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
