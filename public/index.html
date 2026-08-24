@@ -2,11 +2,88 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>企业协同办公系统 - 员工端</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>企业协同办公系统 - 员工工作台</title>
   <style>
     /* ==========================================================================
-       RESET & BASE STYLES
+       1. DESIGN SYSTEM & CSS VARIABLES
+       ========================================================================== */
+    :root {
+      --color-primary-50: #eff6ff;
+      --color-primary-100: #dbeafe;
+      --color-primary-200: #bfdbfe;
+      --color-primary-300: #93c5fd;
+      --color-primary-400: #60a5fa;
+      --color-primary-500: #3b82f6;
+      --color-primary-600: #2563eb;
+      --color-primary-700: #1d4ed8;
+      --color-primary-800: #1e40af;
+      --color-primary-900: #1e3a8a;
+      --color-primary-950: #172554;
+
+      --color-slate-50: #f8fafc;
+      --color-slate-100: #f1f5f9;
+      --color-slate-200: #e2e8f0;
+      --color-slate-300: #cbd5e1;
+      --color-slate-400: #94a3b8;
+      --color-slate-500: #64748b;
+      --color-slate-600: #475569;
+      --color-slate-700: #334155;
+      --color-slate-800: #1e293b;
+      --color-slate-900: #0f172a;
+
+      --color-success-50: #ecfdf5;
+      --color-success-100: #d1fae5;
+      --color-success-500: #10b981;
+      --color-success-600: #059669;
+      --color-success-700: #047857;
+
+      --color-warning-50: #fffbeb;
+      --color-warning-100: #fef3c7;
+      --color-warning-500: #f59e0b;
+      --color-warning-600: #d97706;
+      --color-warning-700: #b45309;
+
+      --color-danger-50: #fef2f2;
+      --color-danger-100: #fee2e2;
+      --color-danger-500: #ef4444;
+      --color-danger-600: #dc2626;
+      --color-danger-700: #b91c1c;
+
+      --color-surface-white: #ffffff;
+      --color-surface-card: #ffffff;
+      --color-surface-subtle: #f8fafc;
+      --color-border-subtle: #e2e8f0;
+      --color-border-hover: #cbd5e1;
+
+      --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+      --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+
+      --sidebar-width: 270px;
+      --bottom-nav-height: 64px;
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ==========================================================================
+       2. RESET & BASE STYLES
        ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -15,77 +92,63 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    :root {
-      --primary-color: #1e3a8a;
-      --primary-hover: #172554;
-      --primary-accent: #3b82f6;
-      --primary-light: #eff6ff;
-      --success: #10b981;
-      --success-dark: #047857;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --bg-canvas: #f8fafc;
-      --surface-white: #ffffff;
-      --surface-card: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --text-sub: #94a3b8;
-      --border-color: #e2e8f0;
-      --border-focus: #93c5fd;
-      --sidebar-width: 260px;
-      --bottom-nav-height: 64px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
-      --transition-fast: 0.18s ease;
-      --transition-normal: 0.28s ease;
+    html, body {
+      height: 100%;
+      width: 100%;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--bg-canvas);
-      color: var(--text-main);
+      font-family: var(--font-family-sans);
+      background-color: var(--color-slate-100);
+      color: var(--color-slate-900);
+      font-size: 14px;
       line-height: 1.5;
-      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
     }
 
-    input, textarea, button {
+    input, textarea, button, select {
       font-family: inherit;
-      font-size: 14px;
+      font-size: inherit;
+      line-height: inherit;
       border: none;
       outline: none;
+      background: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
     /* ==========================================================================
-       TOAST NOTIFICATIONS
+       3. NOTIFICATION SYSTEM (TOASTS)
        ========================================================================== */
     #toast-container {
       position: fixed;
-      top: 24px;
-      right: 24px;
-      z-index: 99999;
+      top: 20px;
+      right: 20px;
+      z-index: 100000;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       pointer-events: none;
+      max-width: calc(100vw - 40px);
     }
 
     .toast-item {
       pointer-events: auto;
-      min-width: 280px;
-      max-width: 420px;
-      background: var(--surface-white);
+      min-width: 300px;
+      max-width: 440px;
+      background-color: var(--color-surface-white);
       border-radius: var(--radius-md);
       padding: 14px 18px;
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-xl);
+      border-left: 4px solid var(--color-primary-500);
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
-      border-left: 4px solid var(--primary-accent);
       transform: translateX(120%);
       opacity: 0;
       transition: transform var(--transition-normal), opacity var(--transition-normal);
@@ -96,140 +159,203 @@
       opacity: 1;
     }
 
-    .toast-item.success { border-left-color: var(--success); }
-    .toast-item.error { border-left-color: var(--danger); }
-    .toast-item.warning { border-left-color: var(--warning); }
+    .toast-item.toast-success {
+      border-left-color: var(--color-success-500);
+    }
+
+    .toast-item.toast-error {
+      border-left-color: var(--color-danger-500);
+    }
+
+    .toast-item.toast-warning {
+      border-left-color: var(--color-warning-500);
+    }
 
     .toast-icon {
-      font-size: 18px;
-      line-height: 1;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-slate-900);
+      margin-bottom: 2px;
     }
 
     .toast-message {
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--text-main);
+      font-size: 12.5px;
+      color: var(--color-slate-600);
+      line-height: 1.4;
     }
 
     /* ==========================================================================
-       LOGIN VIEW
+       4. AUTHENTICATION VIEW (LOGIN)
        ========================================================================== */
     #login-view-container {
+      position: fixed;
+      inset: 0;
+      z-index: 50000;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      background: radial-gradient(circle at 10% 20%, #1e3a8a 0%, #0f172a 90%);
+      padding: 24px;
+      overflow-y: auto;
     }
 
-    .login-card {
+    .login-wrapper {
       width: 100%;
       max-width: 440px;
-      background: var(--surface-white);
+      background: var(--color-surface-white);
       border-radius: var(--radius-lg);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       padding: 40px 36px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      position: relative;
     }
 
-    .login-brand {
+    .login-brand-box {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
     }
 
-    .login-brand-icon {
-      width: 52px;
-      height: 52px;
-      background: var(--primary-light);
-      color: var(--primary-color);
-      border-radius: 14px;
+    .login-brand-icon-wrapper {
+      width: 60px;
+      height: 60px;
+      background: var(--color-primary-50);
+      color: var(--color-primary-700);
+      border-radius: var(--radius-md);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .login-brand h1 {
+    .login-brand-icon-wrapper svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .login-brand-title {
       font-size: 22px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--color-slate-900);
+      letter-spacing: -0.3px;
     }
 
-    .login-brand p {
+    .login-brand-desc {
       font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
+      color: var(--color-slate-500);
+      margin-top: 6px;
     }
 
     .form-group {
       margin-bottom: 20px;
     }
 
-    .form-group label {
+    .form-label {
       display: block;
       font-size: 13px;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--color-slate-700);
       margin-bottom: 8px;
     }
 
     .input-wrapper {
       position: relative;
+      display: flex;
+      align-items: center;
     }
 
-    .form-control {
+    .input-icon-left {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      color: var(--color-slate-400);
+      pointer-events: none;
+    }
+
+    .form-control-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 16px 0 42px;
+      background-color: var(--color-slate-50);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--color-slate-900);
+      font-size: 14px;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .form-control-input:focus {
+      background-color: var(--color-surface-white);
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    .form-control-textarea {
       width: 100%;
       padding: 12px 16px;
+      background-color: var(--color-slate-50);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-sm);
-      border: 1px solid var(--border-color);
-      background: #fdfdfd;
-      color: var(--text-main);
-      transition: all var(--transition-fast);
+      color: var(--color-slate-900);
+      font-size: 14px;
+      resize: vertical;
+      min-height: 120px;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
     }
 
-    .form-control:focus {
-      background: #ffffff;
-      border-color: var(--primary-accent);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    .form-control-textarea:focus {
+      background-color: var(--color-surface-white);
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
     }
 
-    .login-submit-btn {
+    .btn-submit-login {
       width: 100%;
-      padding: 13px 20px;
-      background: var(--primary-color);
-      color: #ffffff;
+      height: 46px;
+      background-color: var(--color-primary-900);
+      color: var(--color-surface-white);
       font-weight: 600;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      transition: background var(--transition-fast), transform 0.1s ease;
+      gap: 10px;
       margin-top: 10px;
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
     }
 
-    .login-submit-btn:hover {
-      background: var(--primary-hover);
+    .btn-submit-login:hover {
+      background-color: var(--color-primary-950);
     }
 
-    .login-submit-btn:active {
+    .btn-submit-login:active {
       transform: scale(0.99);
     }
 
-    .login-footer-notice {
-      margin-top: 24px;
-      padding-top: 18px;
-      border-top: 1px dashed var(--border-color);
+    .login-footer-disclaimer {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--color-border-subtle);
       text-align: center;
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--color-slate-400);
       line-height: 1.6;
     }
 
     /* ==========================================================================
-       MAIN APP LAYOUT
+       5. MAIN APPLICATION LAYOUT STRUCTURE
        ========================================================================== */
     #app-container {
       display: none;
@@ -237,209 +363,219 @@
       position: relative;
     }
 
-    /* Left Sidebar (Desktop) */
-    .app-sidebar {
+    /* Left Sidebar for Desktop */
+    .app-desktop-sidebar {
       position: fixed;
       top: 0;
       left: 0;
       bottom: 0;
       width: var(--sidebar-width);
-      background: var(--surface-white);
-      border-right: 1px solid var(--border-color);
+      background-color: var(--color-surface-white);
+      border-right: 1px solid var(--color-border-subtle);
       display: flex;
       flex-direction: column;
       z-index: 100;
     }
 
-    .sidebar-header {
+    .sidebar-header-brand {
       padding: 24px 20px;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--color-border-subtle);
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .sidebar-logo {
-      width: 38px;
-      height: 38px;
-      background: var(--primary-color);
-      color: #ffffff;
+    .sidebar-brand-avatar {
+      width: 40px;
+      height: 40px;
+      background-color: var(--color-primary-900);
+      color: var(--color-surface-white);
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .sidebar-title-box h2 {
+    .sidebar-brand-text h2 {
       font-size: 15px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--color-slate-900);
+      letter-spacing: -0.2px;
     }
 
-    .sidebar-title-box span {
+    .sidebar-brand-text span {
       font-size: 11px;
-      color: var(--text-muted);
+      font-weight: 600;
+      color: var(--color-slate-400);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
 
-    .nav-list {
+    .sidebar-nav-menu {
       list-style: none;
       padding: 20px 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       flex: 1;
+      overflow-y: auto;
     }
 
-    .nav-item-btn {
+    .nav-link-btn {
       width: 100%;
+      height: 46px;
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 12px 16px;
+      padding: 0 16px;
       border-radius: var(--radius-sm);
-      background: transparent;
-      color: var(--text-muted);
+      color: var(--color-slate-600);
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
-      transition: all var(--transition-fast);
+      transition: background-color var(--transition-fast), color var(--transition-fast);
     }
 
-    .nav-item-btn:hover {
-      background: var(--primary-light);
-      color: var(--primary-color);
+    .nav-link-btn:hover {
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-900);
     }
 
-    .nav-item-btn.active {
-      background: var(--primary-light);
-      color: var(--primary-color);
+    .nav-link-btn.active {
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-800);
       font-weight: 600;
     }
 
-    .nav-icon {
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .nav-link-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
     }
 
-    .sidebar-user-footer {
-      padding: 16px;
-      border-top: 1px solid var(--border-color);
+    .sidebar-user-card {
+      padding: 16px 20px;
+      border-top: 1px solid var(--color-border-subtle);
+      background-color: var(--color-slate-50);
       display: flex;
       align-items: center;
       gap: 12px;
-      background: #fafafa;
     }
 
-    .avatar-circle {
+    .user-avatar-circle {
       width: 38px;
       height: 38px;
-      background: #e2e8f0;
-      color: var(--text-main);
-      border-radius: 50%;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary-200);
+      color: var(--color-primary-900);
+      font-weight: 700;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      font-size: 14px;
+      flex-shrink: 0;
     }
 
-    .user-mini-meta {
+    .user-info-text {
       flex: 1;
-      overflow: hidden;
+      min-width: 0;
     }
 
-    .user-mini-name {
+    .user-display-name {
       font-size: 13px;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--color-slate-900);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .user-mini-dept {
+    .user-display-dept {
       font-size: 11.5px;
-      color: var(--text-muted);
+      color: var(--color-slate-500);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* Main Content Area */
-    .app-main-viewport {
-      margin-left: var(--sidebar-width);
-      padding: 32px 40px;
-      min-height: 100vh;
-      max-width: 1300px;
-    }
-
-    /* Bottom Navigation Bar (Mobile) */
-    .mobile-bottom-bar {
+    /* Bottom Navigation Bar for Mobile */
+    .app-mobile-navbar {
       display: none;
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       height: var(--bottom-nav-height);
-      background: var(--surface-white);
-      border-top: 1px solid var(--border-color);
+      background-color: var(--color-surface-white);
+      border-top: 1px solid var(--color-border-subtle);
       z-index: 100;
       box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
       justify-content: space-around;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 4px;
     }
 
-    .mobile-nav-btn {
+    .mobile-nav-item {
       flex: 1;
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      background: none;
-      color: var(--text-muted);
+      gap: 3px;
+      color: var(--color-slate-500);
       font-size: 11px;
       cursor: pointer;
       transition: color var(--transition-fast);
     }
 
-    .mobile-nav-btn.active {
-      color: var(--primary-accent);
+    .mobile-nav-item.active {
+      color: var(--color-primary-600);
       font-weight: 600;
     }
 
-    .mobile-nav-btn .mobile-icon {
-      font-size: 20px;
+    .mobile-nav-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* Main Viewport */
+    .app-main-content {
+      margin-left: var(--sidebar-width);
+      padding: 36px 44px;
+      min-height: 100vh;
+      max-width: 1400px;
     }
 
     /* ==========================================================================
-       SECTION VIEWS
+       6. VIEW SECTIONS & COMPONENTS
        ========================================================================== */
-    .view-section {
+    .view-content-pane {
       display: none;
-      animation: fadeIn 0.25s ease forwards;
+      animation: fadeInView var(--transition-normal) forwards;
     }
 
-    .view-section.active-view {
+    .view-content-pane.active-pane {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeInView {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .page-header {
-      margin-bottom: 24px;
+    .view-header-titlebar {
+      margin-bottom: 28px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
@@ -447,274 +583,365 @@
       gap: 16px;
     }
 
-    .page-header h2 {
+    .view-header-titlebar h1 {
       font-size: 24px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--color-slate-900);
+      letter-spacing: -0.4px;
     }
 
-    .page-header p {
+    .view-header-titlebar p {
       font-size: 13.5px;
-      color: var(--text-muted);
+      color: var(--color-slate-500);
       margin-top: 4px;
     }
 
-    /* Cards */
-    .content-card {
-      background: var(--surface-card);
-      border: 1px solid var(--border-color);
+    .btn-action-primary {
+      height: 40px;
+      padding: 0 20px;
+      background-color: var(--color-primary-600);
+      color: var(--color-surface-white);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: var(--shadow-xs);
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-action-primary:hover {
+      background-color: var(--color-primary-700);
+    }
+
+    .btn-action-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Card Panels */
+    .card-panel {
+      background-color: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 24px;
+      box-shadow: var(--shadow-xs);
+      padding: 26px;
       margin-bottom: 24px;
     }
 
-    .card-header-bar {
+    .card-panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
-    .card-header-bar h3 {
+    .card-panel-header h2 {
       font-size: 16px;
       font-weight: 600;
-      color: var(--text-main);
+      color: var(--color-slate-900);
     }
 
-    /* Account Center Details */
-    .profile-grid {
+    /* Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+    }
+
+    .badge-assigned {
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-800);
+    }
+
+    .badge-claimed {
+      background-color: var(--color-success-100);
+      color: var(--color-success-700);
+    }
+
+    .badge-pending {
+      background-color: var(--color-warning-100);
+      color: var(--color-warning-700);
+    }
+
+    .badge-approved {
+      background-color: var(--color-success-100);
+      color: var(--color-success-700);
+    }
+
+    .badge-rejected {
+      background-color: var(--color-danger-100);
+      color: var(--color-danger-700);
+    }
+
+    /* Task Stream Styles */
+    .tasks-grid-layout {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 24px;
     }
 
-    .profile-meta-item {
-      padding: 16px;
-      background: var(--bg-canvas);
+    .task-interactive-card {
+      background-color: var(--color-surface-white);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .task-interactive-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      border-color: var(--color-border-hover);
+    }
+
+    .task-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    .task-title-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-slate-900);
+      line-height: 1.4;
+    }
+
+    .task-description-body {
+      font-size: 13.5px;
+      color: var(--color-slate-600);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Attachments Container */
+    .task-attachments-panel {
+      margin: 12px 0 16px 0;
+      padding: 12px 14px;
+      background-color: var(--color-slate-50);
+      border: 1px dashed var(--color-border-subtle);
       border-radius: var(--radius-sm);
-      border: 1px solid var(--border-color);
     }
 
-    .profile-meta-item .meta-label {
+    .attachment-header-title {
       font-size: 12px;
       font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .profile-meta-item .meta-value {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-top: 4px;
-    }
-
-    .logout-danger-btn {
-      padding: 12px 24px;
-      background: #fee2e2;
-      color: var(--danger);
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all var(--transition-fast);
-      margin-top: 10px;
-    }
-
-    .logout-danger-btn:hover {
-      background: #fecaca;
-    }
-
-    /* Request Form */
-    .textarea-control {
-      min-height: 140px;
-      resize: vertical;
-    }
-
-    .form-actions-row {
+      color: var(--color-slate-500);
+      margin-bottom: 8px;
       display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-top: 16px;
+      align-items: center;
+      gap: 6px;
     }
 
-    .btn-primary {
-      padding: 11px 24px;
-      background: var(--primary-accent);
-      color: #ffffff;
+    .attachment-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 12.5px;
+      border-bottom: 1px solid var(--color-slate-200);
+      gap: 8px;
+    }
+
+    .attachment-row-item:last-child {
+      border-bottom: none;
+    }
+
+    .attachment-file-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .attachment-name {
+      font-weight: 500;
+      color: var(--color-slate-800);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .attachment-size {
+      font-size: 11px;
+      color: var(--color-slate-400);
+      flex-shrink: 0;
+    }
+
+    .btn-download-attachment {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-700);
+      border-radius: var(--radius-xs);
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast);
+    }
+
+    .btn-download-attachment:hover {
+      background-color: var(--color-primary-100);
+    }
+
+    .task-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--color-slate-100);
+      font-size: 12px;
+      color: var(--color-slate-400);
+    }
+
+    .btn-claim-action {
+      padding: 8px 18px;
+      background-color: var(--color-success-600);
+      color: var(--color-surface-white);
       font-weight: 600;
       border-radius: var(--radius-sm);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: background var(--transition-fast);
+      gap: 6px;
+      transition: background-color var(--transition-fast);
     }
 
-    .btn-primary:hover {
-      background: var(--primary-color);
+    .btn-claim-action:hover {
+      background-color: var(--color-success-700);
     }
 
-    /* Requests History Table */
-    .custom-table-container {
+    .btn-claim-action:disabled {
+      background-color: var(--color-slate-300);
+      cursor: not-allowed;
+    }
+
+    /* Requests Tables */
+    .data-table-scroller {
       overflow-x: auto;
     }
 
-    .custom-table {
+    .data-table-main {
       width: 100%;
       border-collapse: collapse;
       font-size: 13.5px;
       text-align: left;
     }
 
-    .custom-table th {
-      background: #f8fafc;
-      padding: 12px 16px;
+    .data-table-main th {
+      background-color: var(--color-slate-50);
+      padding: 14px 16px;
       font-weight: 600;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border-color);
+      color: var(--color-slate-600);
+      border-bottom: 1px solid var(--color-border-subtle);
       white-space: nowrap;
     }
 
-    .custom-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-main);
+    .data-table-main td {
+      padding: 16px;
+      border-bottom: 1px solid var(--color-border-subtle);
+      color: var(--color-slate-800);
     }
 
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      font-size: 11.5px;
-      font-weight: 600;
-      border-radius: 9999px;
-    }
-
-    .badge-pending { background: #fef3c7; color: #92400e; }
-    .badge-approved { background: #d1fae5; color: #065f46; }
-    .badge-rejected { background: #fee2e2; color: #991b1b; }
-    .badge-assigned { background: #e0f2fe; color: #075985; }
-    .badge-claimed { background: #dcfce7; color: #166534; }
-
-    /* Task Cards Stream */
-    .task-card-list {
+    /* Account Grid */
+    .account-meta-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
     }
 
-    .task-card {
-      background: var(--surface-white);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    .account-meta-box {
+      padding: 18px;
+      background-color: var(--color-slate-50);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-sm);
     }
 
-    .task-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-
-    .task-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-      gap: 8px;
-    }
-
-    .task-card-header h4 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .task-desc {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      margin-bottom: 18px;
-      line-height: 1.6;
-      flex: 1;
-    }
-
-    .task-footer-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-color);
+    .account-meta-label {
       font-size: 12px;
-      color: var(--text-sub);
+      font-weight: 600;
+      color: var(--color-slate-500);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .claim-btn {
-      padding: 8px 16px;
-      background: var(--success);
-      color: #ffffff;
+    .account-meta-val {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-slate-900);
+      margin-top: 6px;
+    }
+
+    .btn-danger-logout {
+      padding: 12px 24px;
+      background-color: var(--color-danger-50);
+      color: var(--color-danger-600);
       font-weight: 600;
       border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: background var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      transition: background-color var(--transition-fast);
     }
 
-    .claim-btn:hover {
-      background: var(--success-dark);
+    .btn-danger-logout:hover {
+      background-color: var(--color-danger-100);
     }
 
-    .claim-btn:disabled {
-      background: #cbd5e1;
-      cursor: not-allowed;
-    }
-
-    .empty-state {
+    /* Empty States */
+    .empty-placeholder-box {
       text-align: center;
-      padding: 48px 20px;
-      color: var(--text-muted);
+      padding: 48px 24px;
+      color: var(--color-slate-400);
     }
 
-    .empty-state-icon {
-      font-size: 40px;
-      margin-bottom: 12px;
-      display: block;
+    .empty-placeholder-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 14px auto;
+      color: var(--color-slate-300);
     }
 
-    /* ==========================================================================
-       RESPONSIVE BREAKPOINTS (Mobile < 768px)
-       ========================================================================== */
+    /* Responsive Queries */
     @media (max-width: 768px) {
-      .app-sidebar {
+      .app-desktop-sidebar {
         display: none;
       }
 
-      .mobile-bottom-bar {
+      .app-mobile-navbar {
         display: flex;
       }
 
-      .app-main-viewport {
+      .app-main-content {
         margin-left: 0;
         padding: 20px 16px calc(var(--bottom-nav-height) + 24px) 16px;
       }
 
-      .task-card-list {
+      .tasks-grid-layout {
         grid-template-columns: 1fr;
       }
 
-      .page-header h2 {
-        font-size: 20px;
-      }
-
-      .login-card {
-        padding: 28px 20px;
+      .login-wrapper {
+        padding: 30px 24px;
       }
     }
   </style>
@@ -722,161 +949,215 @@
 <body>
 
   <!-- Toast Notification Dock -->
-  <div id="toast-container"></div>
+  <div id="toast-container" aria-live="polite"></div>
 
   <!-- ==========================================================================
-       VIEW: LOGIN PORTAL (Single Entry, No Register)
+       LOGIN VIEW REGION
        ========================================================================== -->
   <section id="login-view-container">
-    <div class="login-card">
-      <div class="login-brand">
-        <div class="login-brand-icon">🏢</div>
-        <h1>员工协同办公中心</h1>
-        <p>安全认证与内网业务协同系统</p>
+    <div class="login-wrapper">
+      <div class="login-brand-box">
+        <div class="login-brand-icon-wrapper">
+          <!-- Corporate Building Icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path>
+            <path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path>
+            <path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path>
+            <path d="M16 14h.01"></path>
+          </svg>
+        </div>
+        <h1 class="login-brand-title">企业协同办公系统</h1>
+        <p class="login-brand-desc">内网员工统一身份认证通道</p>
       </div>
 
-      <form id="login-form">
+      <form id="login-form-element" autocomplete="on">
         <div class="form-group">
-          <label for="login-username">系统员工账号</label>
+          <label class="form-label" for="login-username-input">员工账号 / 工号</label>
           <div class="input-wrapper">
-            <input type="text" id="login-username" class="form-control" placeholder="输入您的工号 / 登录名" autocomplete="username" required>
+            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <input type="text" id="login-username-input" class="form-control-input" placeholder="输入您的内网登录用户名" autocomplete="username" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="login-password">身份认证密码</label>
+          <label class="form-label" for="login-password-input">访问密码</label>
           <div class="input-wrapper">
-            <input type="password" id="login-password" class="form-control" placeholder="输入您的内网访问密码" autocomplete="current-password" required>
+            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input type="password" id="login-password-input" class="form-control-input" placeholder="输入身份认证密码" autocomplete="current-password" required>
           </div>
         </div>
 
-        <button type="submit" id="btn-login-submit" class="login-submit-btn">
+        <button type="submit" id="btn-login-action" class="btn-submit-login">
           <span>安全登录</span>
+          <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </button>
       </form>
 
-      <div class="login-footer-notice">
-        <span>🔒 本系统采用独立专属存储库，不开放外网注册。<br>新员工入职请联系系统管理员分配权限。</span>
+      <div class="login-footer-disclaimer">
+        <span>🔒 本系统采用独立命名空间数据存储，不开放外网自主注册。<br>新入职员工请联系综合运维管理员统一分配工号。</span>
       </div>
     </div>
   </section>
 
   <!-- ==========================================================================
-       VIEW: APPLICATION INTERFACE
+       MAIN WORKSPACE APPLICATION REGION
        ========================================================================== -->
   <div id="app-container">
     <!-- Desktop Left Sidebar -->
-    <aside class="app-sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">CP</div>
-        <div class="sidebar-title-box">
-          <h2>企业内网协作</h2>
+    <aside class="app-desktop-sidebar">
+      <div class="sidebar-header-brand">
+        <div class="sidebar-brand-avatar">CP</div>
+        <div class="sidebar-brand-text">
+          <h2>企业内网协同</h2>
           <span>WORKSPACE 2026</span>
         </div>
       </div>
 
-      <ul class="nav-list">
+      <ul class="sidebar-nav-menu">
         <li>
-          <button class="nav-item-btn active" data-target="section-tasks">
-            <span class="nav-icon">📋</span>
+          <button type="button" class="nav-link-btn active" data-view-target="pane-task-overview">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
             <span>任务查看</span>
           </button>
         </li>
         <li>
-          <button class="nav-item-btn" data-target="section-request">
-            <span class="nav-icon">📝</span>
+          <button type="button" class="nav-link-btn" data-view-target="pane-request-submission">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
             <span>提交申请</span>
           </button>
         </li>
         <li>
-          <button class="nav-item-btn" data-target="section-account">
-            <span class="nav-icon">👤</span>
+          <button type="button" class="nav-link-btn" data-view-target="pane-account-profile">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
             <span>账户中心</span>
           </button>
         </li>
       </ul>
 
-      <div class="sidebar-user-footer">
-        <div class="avatar-circle" id="sidebar-avatar-initial">U</div>
-        <div class="user-mini-meta">
-          <div class="user-mini-name" id="sidebar-user-name">加载中...</div>
-          <div class="user-mini-dept" id="sidebar-user-dept">--</div>
+      <div class="sidebar-user-card">
+        <div class="user-avatar-circle" id="sidebar-user-avatar-letter">U</div>
+        <div class="user-info-text">
+          <div class="user-display-name" id="sidebar-user-fullname">加载中...</div>
+          <div class="user-display-dept" id="sidebar-user-deptname">--</div>
         </div>
       </div>
     </aside>
 
-    <!-- Mobile Bottom Bar -->
-    <nav class="mobile-bottom-bar">
-      <button class="mobile-nav-btn active" data-target="section-tasks">
-        <span class="mobile-icon">📋</span>
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="app-mobile-navbar">
+      <button type="button" class="mobile-nav-item active" data-view-target="pane-task-overview">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"></path>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
         <span>任务查看</span>
       </button>
-      <button class="mobile-nav-btn" data-target="section-request">
-        <span class="mobile-icon">📝</span>
+      <button type="button" class="mobile-nav-item" data-view-target="pane-request-submission">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
         <span>提交申请</span>
       </button>
-      <button class="mobile-nav-btn" data-target="section-account">
-        <span class="mobile-icon">👤</span>
+      <button type="button" class="mobile-nav-item" data-view-target="pane-account-profile">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
         <span>账户中心</span>
       </button>
     </nav>
 
     <!-- Main Dynamic Content Region -->
-    <main class="app-main-viewport">
+    <main class="app-main-content">
 
-      <!-- SECTION 1: 任务查看 (Task Overview & Claiming) -->
-      <section id="section-tasks" class="view-section active-view">
-        <div class="page-header">
+      <!-- PANE 1: 任务查看 (Task Overview & Claiming) -->
+      <section id="pane-task-overview" class="view-content-pane active-pane">
+        <div class="view-header-titlebar">
           <div>
-            <h2>待办与任务协同</h2>
-            <p>查看管理员派发至本账户的工作任务，点击领取后状态将自动同步至云端。</p>
+            <h1>待办与任务协同</h1>
+            <p>查看管理员派发至本账户的工作任务，可直接下载附件，并在完成后领取确认。</p>
           </div>
-          <button class="btn-primary" id="btn-refresh-tasks" style="padding: 8px 16px; font-size: 13px;">
-            <span>🔄 刷新任务池</span>
+          <button type="button" class="btn-action-primary" id="btn-refresh-task-pool">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>刷新任务池</span>
           </button>
         </div>
 
-        <div id="tasks-container" class="task-card-list">
-          <!-- Dynamically populated -->
+        <div id="tasks-stream-container" class="tasks-grid-layout">
+          <!-- Dynamically Rendered Tasks -->
         </div>
       </section>
 
-      <!-- SECTION 2: 提交申请 (Submit Requests) -->
-      <section id="section-request" class="view-section">
-        <div class="page-header">
+      <!-- PANE 2: 提交申请 (Submit Requests & Audit Logs) -->
+      <section id="pane-request-submission" class="view-content-pane">
+        <div class="view-header-titlebar">
           <div>
-            <h2>提交办公申请</h2>
-            <p>撰写您的业务需求、资源审批或行政申请，数据将直接沉淀至 MongoDB。</p>
+            <h1>提交办公申请</h1>
+            <p>撰写您的业务需求、资源审批或行政请示，数据将沉淀至云端存储。</p>
           </div>
         </div>
 
-        <div class="content-card">
-          <div class="card-header-bar">
-            <h3>新建申请单据</h3>
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>新建申请单据</h2>
           </div>
-          <form id="request-submit-form">
+          <form id="application-form-element">
             <div class="form-group">
-              <label for="req-title">申请主题 / 标题</label>
-              <input type="text" id="req-title" class="form-control" placeholder="例：关于申请购置第二季度服务器算力资源的请示" required>
+              <label class="form-label" for="input-request-title">申请主题 / 标题</label>
+              <input type="text" id="input-request-title" class="form-control-input" placeholder="例：关于申请购置第二季度服务器算力资源的请示" required>
             </div>
             <div class="form-group">
-              <label for="req-body">详细说明 / 申请正文</label>
-              <textarea id="req-body" class="form-control textarea-control" placeholder="请详述申请原因、涉及预算、推进计划及期望交付节点..." required></textarea>
+              <label class="form-label" for="input-request-body">详细说明 / 申请正文</label>
+              <textarea id="input-request-body" class="form-control-textarea" placeholder="请详述申请原因、预算规模、实施计划与期望交付节点..." required></textarea>
             </div>
-            <div class="form-actions-row">
-              <button type="submit" id="btn-submit-req" class="btn-primary">
-                <span>🚀 提交申请至数据库</span>
+            <div style="display:flex; justify-content:flex-end;">
+              <button type="submit" id="btn-submit-request-action" class="btn-action-primary">
+                <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                <span>提交申请至数据库</span>
               </button>
             </div>
           </form>
         </div>
 
-        <div class="content-card">
-          <div class="card-header-bar">
-            <h3>我提交的历史申请</h3>
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>我提交的历史申请</h2>
           </div>
-          <div class="custom-table-container">
-            <table class="custom-table">
+          <div class="data-table-scroller">
+            <table class="data-table-main">
               <thead>
                 <tr>
                   <th>申请标题</th>
@@ -884,56 +1165,61 @@
                   <th>当前流转状态</th>
                 </tr>
               </thead>
-              <tbody id="my-requests-tbody">
-                <!-- Dynamically populated -->
+              <tbody id="my-requests-table-body">
+                <!-- Dynamically Rendered History -->
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 3: 账户中心 (Account Center & Logout) -->
-      <section id="section-account" class="view-section">
-        <div class="page-header">
+      <!-- PANE 3: 账户中心 (Account Center & Logout) -->
+      <section id="pane-account-profile" class="view-content-pane">
+        <div class="view-header-titlebar">
           <div>
-            <h2>个人账户中心</h2>
+            <h1>个人账户中心</h1>
             <p>查看当前已验证登录的身份凭证与所属组织单元架构信息。</p>
           </div>
         </div>
 
-        <div class="content-card">
-          <div class="card-header-bar">
-            <h3>身份基础信息</h3>
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>身份基础信息</h2>
           </div>
-          <div class="profile-grid">
-            <div class="profile-meta-item">
-              <div class="meta-label">员工编号 (Staff ID)</div>
-              <div class="meta-value" id="profile-staff-id">--</div>
+          <div class="account-meta-grid">
+            <div class="account-meta-box">
+              <div class="account-meta-label">员工编号 (Staff ID)</div>
+              <div class="account-meta-val" id="profile-display-staffid">--</div>
             </div>
-            <div class="profile-meta-item">
-              <div class="meta-label">系统登录名</div>
-              <div class="meta-value" id="profile-username">--</div>
+            <div class="account-meta-box">
+              <div class="account-meta-label">系统登录名</div>
+              <div class="account-meta-val" id="profile-display-username">--</div>
             </div>
-            <div class="profile-meta-item">
-              <div class="meta-label">真实姓名</div>
-              <div class="meta-value" id="profile-fullname">--</div>
+            <div class="account-meta-box">
+              <div class="account-meta-label">真实姓名</div>
+              <div class="account-meta-val" id="profile-display-fullname">--</div>
             </div>
-            <div class="profile-meta-item">
-              <div class="meta-label">所属部门</div>
-              <div class="meta-value" id="profile-department">--</div>
+            <div class="account-meta-box">
+              <div class="account-meta-label">所属部门</div>
+              <div class="account-meta-val" id="profile-display-dept">--</div>
             </div>
           </div>
         </div>
 
-        <div class="content-card">
-          <div class="card-header-bar">
-            <h3>安全会话与登出</h3>
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>安全会话与登出</h2>
           </div>
-          <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 16px;">
+          <p style="font-size:13.5px; color:var(--color-slate-500); margin-bottom:16px;">
             注销后将销毁当前设备上的认证 Cookie，下次访问需重新输入员工凭证。
           </p>
-          <button id="btn-account-logout" class="logout-danger-btn">
-            <span>🚪 安全登出系统</span>
+          <button type="button" id="btn-logout-session-action" class="btn-danger-logout">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>安全登出系统</span>
           </button>
         </div>
       </section>
@@ -942,386 +1228,579 @@
   </div>
 
   <!-- ==========================================================================
-       FRONTEND CLIENT CONTROLLER JAVASCRIPT
+       7. CLIENT JAVASCRIPT CONTROLLER ARCHITECTURE
        ========================================================================== -->
   <script>
-    (function () {
+    /**
+     * Corporate Employee Portal Client Application
+     * Modular Architecture with State Management, Reactive UI Rendering, and API Layer
+     */
+    (function (window, document) {
       'use strict';
 
-      // --- STATE STORE ---
-      const AppState = {
-        currentUser: null,
-        currentTab: 'section-tasks',
-        tasks: [],
-        requests: []
+      // ------------------------------------------------------------------------
+      // APPLICATION STATE STORE
+      // ------------------------------------------------------------------------
+      const AppStore = {
+        state: {
+          currentUser: null,
+          currentViewId: 'pane-task-overview',
+          tasks: [],
+          requests: [],
+          isLoadingTasks: false,
+          isLoadingRequests: false
+        },
+
+        listeners: [],
+
+        subscribe(listener) {
+          if (typeof listener === 'function') {
+            this.listeners.push(listener);
+          }
+        },
+
+        setState(newState) {
+          this.state = Object.assign({}, this.state, newState);
+          for (let i = 0; i < this.listeners.length; i++) {
+            this.listeners[i](this.state);
+          }
+        },
+
+        getState() {
+          return this.state;
+        }
       };
 
-      // --- DOM REFS ---
+      // ------------------------------------------------------------------------
+      // DOM ELEMENT CACHE
+      // ------------------------------------------------------------------------
       const DOM = {
         toastContainer: document.getElementById('toast-container'),
-        loginView: document.getElementById('login-view-container'),
-        appView: document.getElementById('app-container'),
-        loginForm: document.getElementById('login-form'),
-        loginUsername: document.getElementById('login-username'),
-        loginPassword: document.getElementById('login-password'),
-        navButtons: document.querySelectorAll('.nav-item-btn, .mobile-nav-btn'),
-        sections: document.querySelectorAll('.view-section'),
-        // Account Center
-        profileStaffId: document.getElementById('profile-staff-id'),
-        profileUsername: document.getElementById('profile-username'),
-        profileFullname: document.getElementById('profile-fullname'),
-        profileDept: document.getElementById('profile-department'),
-        sidebarInitial: document.getElementById('sidebar-avatar-initial'),
-        sidebarName: document.getElementById('sidebar-user-name'),
-        sidebarDept: document.getElementById('sidebar-user-dept'),
-        btnLogout: document.getElementById('btn-account-logout'),
-        // Requests
-        requestForm: document.getElementById('request-submit-form'),
-        reqTitle: document.getElementById('req-title'),
-        reqBody: document.getElementById('req-body'),
-        requestsTbody: document.getElementById('my-requests-tbody'),
-        // Tasks
-        tasksContainer: document.getElementById('tasks-container'),
-        btnRefreshTasks: document.getElementById('btn-refresh-tasks')
+        loginContainer: document.getElementById('login-view-container'),
+        appContainer: document.getElementById('app-container'),
+        loginForm: document.getElementById('login-form-element'),
+        loginUsernameInput: document.getElementById('login-username-input'),
+        loginPasswordInput: document.getElementById('login-password-input'),
+        btnLoginSubmit: document.getElementById('btn-login-action'),
+        sidebarAvatarLetter: document.getElementById('sidebar-user-avatar-letter'),
+        sidebarUserFullName: document.getElementById('sidebar-user-fullname'),
+        sidebarUserDeptName: document.getElementById('sidebar-user-deptname'),
+        profileStaffId: document.getElementById('profile-display-staffid'),
+        profileUsername: document.getElementById('profile-display-username'),
+        profileFullname: document.getElementById('profile-display-fullname'),
+        profileDept: document.getElementById('profile-display-dept'),
+        btnLogout: document.getElementById('btn-logout-session-action'),
+        navButtons: document.querySelectorAll('.nav-link-btn, .mobile-nav-item'),
+        viewPanes: document.querySelectorAll('.view-content-pane'),
+        btnRefreshTasks: document.getElementById('btn-refresh-task-pool'),
+        tasksStreamContainer: document.getElementById('tasks-stream-container'),
+        requestForm: document.getElementById('application-form-element'),
+        reqTitleInput: document.getElementById('input-request-title'),
+        reqBodyInput: document.getElementById('input-request-body'),
+        btnSubmitRequest: document.getElementById('btn-submit-request-action'),
+        myRequestsTableBody: document.getElementById('my-requests-table-body')
       };
 
-      // --- UTILITIES ---
-      function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast-item ${type}`;
+      // ------------------------------------------------------------------------
+      // UTILITY HELPERS
+      // ------------------------------------------------------------------------
+      const Utils = {
+        escapeHtml(str) {
+          if (!str) return '';
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        },
 
-        const icons = {
-          success: '✅',
-          error: '❌',
-          warning: '⚠️',
-          info: 'ℹ️'
-        };
+        formatDate(dateString) {
+          if (!dateString) return '--';
+          const d = new Date(dateString);
+          if (isNaN(d.getTime())) return '--';
+          const pad = (n) => (n < 10 ? '0' + n : n);
+          return (
+            d.getFullYear() + '-' +
+            pad(d.getMonth() + 1) + '-' +
+            pad(d.getDate()) + ' ' +
+            pad(d.getHours()) + ':' +
+            pad(d.getMinutes())
+          );
+        },
 
-        toast.innerHTML = `
-          <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
-          <span class="toast-message">${message}</span>
-        `;
+        formatFileSize(bytes) {
+          if (typeof bytes !== 'number' || bytes === 0) return '0 B';
+          const k = 1024;
+          const sizes = ['B', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        },
 
-        DOM.toastContainer.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
+        showToast(message, type, duration) {
+          type = type || 'info';
+          duration = duration || 3400;
 
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => toast.remove(), 300);
-        }, 3600);
-      }
+          const toast = document.createElement('div');
+          toast.className = 'toast-item toast-' + type;
 
-      function formatDate(dateStr) {
-        if (!dateStr) return '--';
-        const d = new Date(dateStr);
-        return d.toLocaleString('zh-CN', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-      }
-
-      // --- VIEW ROUTING ---
-      function switchTab(targetSectionId) {
-        AppState.currentTab = targetSectionId;
-
-        // Update Desktop & Mobile Nav active classes
-        DOM.navButtons.forEach(btn => {
-          if (btn.getAttribute('data-target') === targetSectionId) {
-            btn.classList.add('active');
+          let iconSvg = '';
+          if (type === 'success') {
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-success-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+          } else if (type === 'error') {
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-danger-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
           } else {
-            btn.classList.remove('active');
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-primary-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
           }
-        });
 
-        // Toggle Section Visibility
-        DOM.sections.forEach(sec => {
-          if (sec.id === targetSectionId) {
-            sec.classList.add('active-view');
-          } else {
-            sec.classList.remove('active-view');
+          toast.innerHTML = (
+            iconSvg +
+            '<div class="toast-content">' +
+            '  <div class="toast-title">' + (type === 'success' ? '操作成功' : (type === 'error' ? '提示错误' : '系统提示')) + '</div>' +
+            '  <div class="toast-message">' + Utils.escapeHtml(message) + '</div>' +
+            '</div>'
+          );
+
+          DOM.toastContainer.appendChild(toast);
+
+          window.setTimeout(function () {
+            toast.classList.add('show');
+          }, 10);
+
+          window.setTimeout(function () {
+            toast.classList.remove('show');
+            window.setTimeout(function () {
+              if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+              }
+            }, 300);
+          }, duration);
+        }
+      };
+
+      // ------------------------------------------------------------------------
+      // HTTP API SERVICE CLIENT
+      // ------------------------------------------------------------------------
+      const ApiService = {
+        async request(endpoint, options) {
+          options = options || {};
+          options.headers = options.headers || {};
+
+          try {
+            const response = await fetch(endpoint, options);
+            const data = await response.json();
+            return { ok: response.ok, status: response.status, data: data };
+          } catch (err) {
+            console.error('Network Request Error:', err);
+            return { ok: false, status: 0, data: { success: false, message: '网络请求异常，无法连接至业务网关' } };
           }
-        });
+        },
 
-        // Trigger Data Refreshes
-        if (targetSectionId === 'section-tasks') loadTasks();
-        if (targetSectionId === 'section-request') loadMyRequests();
-      }
+        async checkSession() {
+          return await this.request('/api/auth/session', { method: 'GET' });
+        },
 
-      // --- API COMMUNICATIONS ---
-      async function checkSession() {
-        try {
-          const res = await fetch('/api/auth/session');
-          if (res.ok) {
-            const data = await res.json();
-            if (data.success) {
-              handleLoginSuccess(data.user, false);
-              return;
+        async login(username, password) {
+          return await this.request('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username, password: password })
+          });
+        },
+
+        async logout() {
+          return await this.request('/api/auth/logout', { method: 'POST' });
+        },
+
+        async fetchTasks() {
+          return await this.request('/api/tasks/list', { method: 'GET' });
+        },
+
+        async claimTask(taskId) {
+          return await this.request('/api/tasks/claim/' + encodeURIComponent(taskId), { method: 'POST' });
+        },
+
+        async fetchMyRequests() {
+          return await this.request('/api/requests/mine', { method: 'GET' });
+        },
+
+        async submitRequest(title, body) {
+          return await this.request('/api/requests/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: title, body: body })
+          });
+        }
+      };
+
+      // ------------------------------------------------------------------------
+      // UI RENDERERS & VIEW ROUTER
+      // ------------------------------------------------------------------------
+      const ViewRenderer = {
+        switchView(targetPaneId) {
+          AppStore.setState({ currentViewId: targetPaneId });
+
+          for (let i = 0; i < DOM.navButtons.length; i++) {
+            const btn = DOM.navButtons[i];
+            if (btn.getAttribute('data-view-target') === targetPaneId) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
             }
           }
-          showLoginView();
-        } catch (e) {
-          showLoginView();
+
+          for (let j = 0; j < DOM.viewPanes.length; j++) {
+            const pane = DOM.viewPanes[j];
+            if (pane.id === targetPaneId) {
+              pane.classList.add('active-pane');
+            } else {
+              pane.classList.remove('active-pane');
+            }
+          }
+
+          if (targetPaneId === 'pane-task-overview') {
+            TaskController.loadTasks();
+          } else if (targetPaneId === 'pane-request-submission') {
+            RequestController.loadHistoryRequests();
+          }
+        },
+
+        renderUserProfile(user) {
+          if (!user) return;
+          const initial = (user.full_name || user.username || 'U').charAt(0).toUpperCase();
+
+          DOM.sidebarAvatarLetter.textContent = initial;
+          DOM.sidebarUserFullName.textContent = user.full_name || user.username;
+          DOM.sidebarUserDeptName.textContent = user.department || '未分配部门';
+
+          DOM.profileStaffId.textContent = user.staff_id || 'N/A';
+          DOM.profileUsername.textContent = user.username || 'N/A';
+          DOM.profileFullname.textContent = user.full_name || 'N/A';
+          DOM.profileDept.textContent = user.department || 'N/A';
+        },
+
+        renderTasksGrid(tasks) {
+          DOM.tasksStreamContainer.innerHTML = '';
+
+          if (!tasks || tasks.length === 0) {
+            DOM.tasksStreamContainer.innerHTML = (
+              '<div class="empty-placeholder-box" style="grid-column:1/-1;">' +
+              '  <svg class="empty-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' +
+              '  <p style="font-size:14px; font-weight:500;">暂无分配给您的工作协同任务</p>' +
+              '  <span style="font-size:12px; margin-top:4px; display:block;">管理员下发新任务后将在此处实时呈现</span>' +
+              '</div>'
+            );
+            return;
+          }
+
+          for (let i = 0; i < tasks.length; i++) {
+            const task = tasks[i];
+            const isClaimed = task.status !== 'Assigned';
+
+            const card = document.createElement('div');
+            card.className = 'task-interactive-card';
+
+            let attachmentsMarkup = '';
+            if (task.attachments && task.attachments.length > 0) {
+              let rows = '';
+              for (let a = 0; a < task.attachments.length; a++) {
+                const att = task.attachments[a];
+                rows += (
+                  '<div class="attachment-row-item">' +
+                  '  <div class="attachment-file-meta">' +
+                  '    <svg style="width:14px;height:14px;color:var(--color-primary-600);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' +
+                  '    <span class="attachment-name">' + Utils.escapeHtml(att.filename) + '</span>' +
+                  '    <span class="attachment-size">(' + Utils.formatFileSize(att.size) + ')</span>' +
+                  '  </div>' +
+                  '  <a class="btn-download-attachment" href="/api/tasks/' + encodeURIComponent(task._id) + '/attachment/' + encodeURIComponent(att._id) + '" target="_blank" download>' +
+                  '    <svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>' +
+                  '    <span>下载</span>' +
+                  '  </a>' +
+                  '</div>'
+                );
+              }
+
+              attachmentsMarkup = (
+                '<div class="task-attachments-panel">' +
+                '  <div class="attachment-header-title">' +
+                '    <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>' +
+                '    <span>任务相关附件 (' + task.attachments.length + ' 个):</span>' +
+                '  </div>' +
+                rows +
+                '</div>'
+              );
+            }
+
+            card.innerHTML = (
+              '<div>' +
+              '  <div class="task-header-row">' +
+              '    <h3 class="task-title-text">' + Utils.escapeHtml(task.task_title) + '</h3>' +
+              '    <span class="status-badge ' + (isClaimed ? 'badge-claimed' : 'badge-assigned') + '">' +
+              (isClaimed
+                ? '<svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> 已领取'
+                : '<svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"></circle></svg> 待领取') +
+              '    </span>' +
+              '  </div>' +
+              '  <div class="task-description-body">' + Utils.escapeHtml(task.task_description) + '</div>' +
+              attachmentsMarkup +
+              '</div>' +
+              '<div class="task-card-footer">' +
+              '  <span>派发于: ' + Utils.formatDate(task.created_at) + '</span>' +
+              '  <button type="button" class="btn-claim-action" data-task-id="' + Utils.escapeHtml(task._id) + '" ' + (isClaimed ? 'disabled' : '') + '>' +
+              (isClaimed
+                ? '<span>✓ 已确认领取</span>'
+                : '<span>立即领取</span><svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>') +
+              '  </button>' +
+              '</div>'
+            );
+
+            const claimBtn = card.querySelector('.btn-claim-action');
+            if (!isClaimed) {
+              claimBtn.addEventListener('click', (function (tId, btnElement) {
+                return function () {
+                  TaskController.handleClaimTask(tId, btnElement);
+                };
+              })(task._id, claimBtn));
+            }
+
+            DOM.tasksStreamContainer.appendChild(card);
+          }
+        },
+
+        renderRequestsHistory(requests) {
+          DOM.myRequestsTableBody.innerHTML = '';
+
+          if (!requests || requests.length === 0) {
+            DOM.myRequestsTableBody.innerHTML = (
+              '<tr>' +
+              '  <td colspan="3" style="text-align:center; color:var(--color-slate-400); padding:32px;">暂无提交的事务审批申请记录</td>' +
+              '</tr>'
+            );
+            return;
+          }
+
+          for (let i = 0; i < requests.length; i++) {
+            const req = requests[i];
+            const tr = document.createElement('tr');
+
+            let badgeClass = 'badge-pending';
+            let badgeLabel = '审批流转中';
+
+            if (req.status === 'approved') {
+              badgeClass = 'badge-approved';
+              badgeLabel = '已核准通过';
+            } else if (req.status === 'rejected') {
+              badgeClass = 'badge-rejected';
+              badgeLabel = '已予以驳回';
+            }
+
+            tr.innerHTML = (
+              '<td><strong style="color:var(--color-slate-900);">' + Utils.escapeHtml(req.request_title) + '</strong></td>' +
+              '<td>' + Utils.formatDate(req.submitted_at) + '</td>' +
+              '<td><span class="status-badge ' + badgeClass + '">' + badgeLabel + '</span></td>'
+            );
+
+            DOM.myRequestsTableBody.appendChild(tr);
+          }
         }
-      }
+      };
 
-      function showLoginView() {
-        DOM.appView.style.display = 'none';
-        DOM.loginView.style.display = 'flex';
-      }
-
-      function handleLoginSuccess(user, notify = true) {
-        AppState.currentUser = user;
-        DOM.loginView.style.display = 'none';
-        DOM.appView.style.display = 'block';
-
-        // Render User Meta
-        DOM.profileStaffId.textContent = user.staff_id || 'N/A';
-        DOM.profileUsername.textContent = user.username || 'N/A';
-        DOM.profileFullname.textContent = user.full_name || 'N/A';
-        DOM.profileDept.textContent = user.department || 'N/A';
-
-        DOM.sidebarName.textContent = user.full_name || user.username;
-        DOM.sidebarDept.textContent = user.department || '员工';
-        DOM.sidebarInitial.textContent = (user.full_name || user.username).charAt(0).toUpperCase();
-
-        if (notify) {
-          showToast(`欢迎回来，${user.full_name || user.username}！`, 'success');
-        }
-
-        switchTab('section-tasks');
-      }
-
-      // --- TASKS ENGINE ---
-      async function loadTasks() {
-        try {
-          const res = await fetch('/api/tasks/list');
-          const result = await res.json();
-          if (result.success) {
-            AppState.tasks = result.data;
-            renderTasksList(result.data);
+      // ------------------------------------------------------------------------
+      // BUSINESS DOMAIN CONTROLLERS
+      // ------------------------------------------------------------------------
+      const AuthController = {
+        async initSession() {
+          const res = await ApiService.checkSession();
+          if (res.ok && res.data && res.data.success) {
+            this.handleAuthSuccess(res.data.user, false);
           } else {
-            showToast(result.message || '获取任务失败', 'error');
+            this.showLoginView();
           }
-        } catch (err) {
-          showToast('无法连接任务接口', 'error');
-        }
-      }
+        },
 
-      function renderTasksList(tasks) {
-        DOM.tasksContainer.innerHTML = '';
+        showLoginView() {
+          DOM.appContainer.style.display = 'none';
+          DOM.loginContainer.style.display = 'flex';
+        },
 
-        if (!tasks || tasks.length === 0) {
-          DOM.tasksContainer.innerHTML = `
-            <div class="empty-state" style="grid-column: 1 / -1;">
-              <span class="empty-state-icon">📭</span>
-              <p>暂无分配给您的工作任务</p>
-            </div>
-          `;
-          return;
-        }
+        handleAuthSuccess(user, isInteractive) {
+          AppStore.setState({ currentUser: user });
+          DOM.loginContainer.style.display = 'none';
+          DOM.appContainer.style.display = 'block';
 
-        tasks.forEach(t => {
-          const isClaimed = t.status !== 'Assigned';
-          const card = document.createElement('div');
-          card.className = 'task-card';
-          card.innerHTML = `
-            <div>
-              <div class="task-card-header">
-                <h4>${escapeHtml(t.task_title)}</h4>
-                <span class="badge ${isClaimed ? 'badge-claimed' : 'badge-assigned'}">
-                  ${t.status === 'Assigned' ? '待领取' : '已领取'}
-                </span>
-              </div>
-              <p class="task-desc">${escapeHtml(t.task_description)}</p>
-            </div>
-            <div>
-              <div class="task-footer-meta">
-                <span>发布: ${formatDate(t.created_at)}</span>
-                <button 
-                  class="claim-btn" 
-                  data-id="${t._id}" 
-                  ${isClaimed ? 'disabled' : ''}
-                >
-                  ${isClaimed ? '✓ 任务已就绪' : '立即领取'}
-                </button>
-              </div>
-            </div>
-          `;
+          ViewRenderer.renderUserProfile(user);
 
-          const claimBtn = card.querySelector('.claim-btn');
-          if (!isClaimed) {
-            claimBtn.addEventListener('click', () => claimTask(t._id, claimBtn));
+          if (isInteractive) {
+            Utils.showToast('欢迎登录协同办公平台，' + (user.full_name || user.username), 'success');
           }
 
-          DOM.tasksContainer.appendChild(card);
-        });
-      }
+          ViewRenderer.switchView('pane-task-overview');
+        },
 
-      async function claimTask(taskId, btnEl) {
-        btnEl.disabled = true;
-        btnEl.textContent = '同步中...';
+        async performLogin(username, password) {
+          DOM.btnLoginSubmit.disabled = true;
+          DOM.btnLoginSubmit.innerHTML = '<span>认证中...</span>';
 
-        try {
-          const res = await fetch(`/api/tasks/claim/${taskId}`, { method: 'POST' });
-          const data = await res.json();
-          if (data.success) {
-            showToast('任务已成功领取并同步至云端！', 'success');
-            loadTasks();
+          const res = await ApiService.login(username, password);
+
+          DOM.btnLoginSubmit.disabled = false;
+          DOM.btnLoginSubmit.innerHTML = (
+            '<span>安全登录</span>' +
+            '<svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '  <line x1="5" y1="12" x2="19" y2="12"></line>' +
+            '  <polyline points="12 5 19 12 12 19"></polyline>' +
+            '</svg>'
+          );
+
+          if (res.ok && res.data && res.data.success) {
+            this.handleAuthSuccess(res.data.user, true);
           } else {
-            showToast(data.message || '领取失败', 'error');
-            btnEl.disabled = false;
-            btnEl.textContent = '立即领取';
+            const msg = (res.data && res.data.message) ? res.data.message : '身份凭据校验失败，请重试';
+            Utils.showToast(msg, 'error');
           }
-        } catch (e) {
-          showToast('网络错误，同步失败', 'error');
-          btnEl.disabled = false;
-          btnEl.textContent = '立即领取';
-        }
-      }
+        },
 
-      // --- REQUESTS ENGINE ---
-      async function loadMyRequests() {
-        try {
-          const res = await fetch('/api/requests/mine');
-          const result = await res.json();
-          if (result.success) {
-            AppState.requests = result.data;
-            renderRequestsTable(result.data);
+        async performLogout() {
+          await ApiService.logout();
+          AppStore.setState({ currentUser: null, tasks: [], requests: [] });
+          this.showLoginView();
+          Utils.showToast('您已成功安全登出系统', 'info');
+        }
+      };
+
+      const TaskController = {
+        async loadTasks() {
+          AppStore.setState({ isLoadingTasks: true });
+          const res = await ApiService.fetchTasks();
+          AppStore.setState({ isLoadingTasks: false });
+
+          if (res.ok && res.data && res.data.success) {
+            AppStore.setState({ tasks: res.data.data });
+            ViewRenderer.renderTasksGrid(res.data.data);
+          } else {
+            Utils.showToast('无法同步任务列表，请检查网络', 'error');
           }
-        } catch (e) {
-          showToast('无法加载历史申请记录', 'error');
+        },
+
+        async handleClaimTask(taskId, btnElement) {
+          btnElement.disabled = true;
+          btnElement.innerHTML = '<span>状态同步中...</span>';
+
+          const res = await ApiService.claimTask(taskId);
+
+          if (res.ok && res.data && res.data.success) {
+            Utils.showToast('任务已成功领取，状态已更新至云端！', 'success');
+            this.loadTasks();
+          } else {
+            const msg = (res.data && res.data.message) ? res.data.message : '领取任务失败';
+            Utils.showToast(msg, 'error');
+            btnElement.disabled = false;
+            btnElement.innerHTML = '<span>立即领取</span>';
+          }
         }
-      }
+      };
 
-      function renderRequestsTable(reqs) {
-        DOM.requestsTbody.innerHTML = '';
-        if (!reqs || reqs.length === 0) {
-          DOM.requestsTbody.innerHTML = `
-            <tr>
-              <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 24px;">暂无提交的申请记录</td>
-            </tr>
-          `;
-          return;
+      const RequestController = {
+        async loadHistoryRequests() {
+          AppStore.setState({ isLoadingRequests: true });
+          const res = await ApiService.fetchMyRequests();
+          AppStore.setState({ isLoadingRequests: false });
+
+          if (res.ok && res.data && res.data.success) {
+            AppStore.setState({ requests: res.data.data });
+            ViewRenderer.renderRequestsHistory(res.data.data);
+          } else {
+            Utils.showToast('获取历史申请单据失败', 'error');
+          }
+        },
+
+        async handleFormSubmit(title, body) {
+          DOM.btnSubmitRequest.disabled = true;
+          DOM.btnSubmitRequest.innerHTML = '<span>正在持久化写入...</span>';
+
+          const res = await ApiService.submitRequest(title, body);
+
+          DOM.btnSubmitRequest.disabled = false;
+          DOM.btnSubmitRequest.innerHTML = (
+            '<svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>' +
+            '<span>提交申请至数据库</span>'
+          );
+
+          if (res.ok && res.data && res.data.success) {
+            Utils.showToast('申请单据已成功提交并写入数据库！', 'success');
+            DOM.reqTitleInput.value = '';
+            DOM.reqBodyInput.value = '';
+            this.loadHistoryRequests();
+          } else {
+            const msg = (res.data && res.data.message) ? res.data.message : '提交申请失败';
+            Utils.showToast(msg, 'error');
+          }
         }
+      };
 
-        reqs.forEach(r => {
-          const tr = document.createElement('tr');
-          const badgeClass = r.status === 'approved' ? 'badge-approved' : (r.status === 'rejected' ? 'badge-rejected' : 'badge-pending');
-          const statusText = r.status === 'approved' ? '已批准' : (r.status === 'rejected' ? '已驳回' : '审批中');
-
-          tr.innerHTML = `
-            <td><strong>${escapeHtml(r.request_title)}</strong></td>
-            <td>${formatDate(r.submitted_at)}</td>
-            <td><span class="badge ${badgeClass}">${statusText}</span></td>
-          `;
-          DOM.requestsTbody.appendChild(tr);
-        });
-      }
-
-      // --- EVENT HANDLERS ---
-      function setupListeners() {
-        // Tab switching
-        DOM.navButtons.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const target = btn.getAttribute('data-target');
-            if (target) switchTab(target);
+      // ------------------------------------------------------------------------
+      // EVENT BUS & BINDINGS
+      // ------------------------------------------------------------------------
+      function bindEventListeners() {
+        // Navigation Buttons
+        for (let i = 0; i < DOM.navButtons.length; i++) {
+          DOM.navButtons[i].addEventListener('click', function () {
+            const target = this.getAttribute('data-view-target');
+            if (target) {
+              ViewRenderer.switchView(target);
+            }
           });
+        }
+
+        // Login Form
+        DOM.loginForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const username = DOM.loginUsernameInput.value.trim();
+          const password = DOM.loginPasswordInput.value;
+
+          if (!username || !password) {
+            Utils.showToast('请完整输入工号和密码', 'warning');
+            return;
+          }
+
+          AuthController.performLogin(username, password);
+        });
+
+        // Logout Action
+        DOM.btnLogout.addEventListener('click', function () {
+          AuthController.performLogout();
         });
 
         // Refresh Tasks
-        DOM.btnRefreshTasks.addEventListener('click', () => {
-          showToast('正在同步最新任务列表...', 'info');
-          loadTasks();
+        DOM.btnRefreshTasks.addEventListener('click', function () {
+          Utils.showToast('正在向云端拉取最新任务...', 'info', 1500);
+          TaskController.loadTasks();
         });
 
-        // Submit Request Form
-        DOM.requestForm.addEventListener('submit', async (e) => {
+        // Request Form Submit
+        DOM.requestForm.addEventListener('submit', function (e) {
           e.preventDefault();
-          const title = DOM.reqTitle.value.trim();
-          const body = DOM.reqBody.value.trim();
+          const title = DOM.reqTitleInput.value.trim();
+          const body = DOM.reqBodyInput.value.trim();
 
           if (!title || !body) {
-            showToast('请完整填写申请标题与正文', 'warning');
+            Utils.showToast('申请主题与正文均不可为空', 'warning');
             return;
           }
 
-          try {
-            const res = await fetch('/api/requests/submit', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ title, body })
-            });
-
-            const data = await res.json();
-            if (data.success) {
-              showToast('申请已成功提交至 MongoDB！', 'success');
-              DOM.reqTitle.value = '';
-              DOM.reqBody.value = '';
-              loadMyRequests();
-            } else {
-              showToast(data.message || '提交失败', 'error');
-            }
-          } catch (err) {
-            showToast('网络请求异常，提交未成功', 'error');
-          }
-        });
-
-        // Login Form Submission
-        DOM.loginForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const username = DOM.loginUsername.value.trim();
-          const password = DOM.loginPassword.value;
-
-          if (!username || !password) {
-            showToast('请输入账号与密码', 'warning');
-            return;
-          }
-
-          try {
-            const res = await fetch('/api/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ username, password })
-            });
-
-            const data = await res.json();
-            if (data.success) {
-              handleLoginSuccess(data.user, true);
-            } else {
-              showToast(data.message || '登录认证失败', 'error');
-            }
-          } catch (err) {
-            showToast('无法连接认证服务器', 'error');
-          }
-        });
-
-        // Logout
-        DOM.btnLogout.addEventListener('click', async () => {
-          try {
-            await fetch('/api/auth/logout', { method: 'POST' });
-          } finally {
-            AppState.currentUser = null;
-            showToast('您已成功安全登出', 'info');
-            showLoginView();
-          }
+          RequestController.handleFormSubmit(title, body);
         });
       }
 
-      function escapeHtml(string) {
-        if (!string) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return string.replace(/[&<>"']/g, m => map[m]);
-      }
-
-      // Bootstrap
-      window.addEventListener('DOMContentLoaded', () => {
-        setupListeners();
-        checkSession();
+      // ------------------------------------------------------------------------
+      // APPLICATION BOOTSTRAP
+      // ------------------------------------------------------------------------
+      window.addEventListener('DOMContentLoaded', function () {
+        bindEventListeners();
+        AuthController.initSession();
       });
-    })();
+
+    })(window, document);
   </script>
 </body>
 </html>
