@@ -2,301 +2,460 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>企业协同管理控制台 - 管理员端</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>系统管理总控台 - 协同云端管理</title>
   <style>
+    /* ==========================================================================
+       1. IOS GLASS DESIGN SYSTEM & TOKEN VARIABLES
+       ========================================================================== */
+    :root {
+      --ios-bg-canvas: #090d16;
+      --ios-bg-gradient: radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.85) 45%, #050811 100%);
+      
+      /* Liquid Glass Tokens */
+      --glass-panel-bg: rgba(255, 255, 255, 0.06);
+      --glass-panel-bg-hover: rgba(255, 255, 255, 0.09);
+      --glass-panel-border: rgba(255, 255, 255, 0.12);
+      --glass-panel-border-glow: rgba(59, 130, 246, 0.35);
+      --glass-blur-strength: blur(28px) saturate(190%);
+      --glass-blur-subtle: blur(16px) saturate(160%);
+      --glass-specular-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 100%);
+      
+      /* Vibrant Accents */
+      --ios-blue: #0a84ff;
+      --ios-blue-hover: #0070e0;
+      --ios-blue-glow: 0 0 20px rgba(10, 132, 255, 0.4);
+      --ios-emerald: #30d158;
+      --ios-emerald-soft: rgba(48, 209, 88, 0.15);
+      --ios-amber: #ffd60a;
+      --ios-amber-soft: rgba(255, 214, 10, 0.15);
+      --ios-red: #ff453a;
+      --ios-red-soft: rgba(255, 69, 58, 0.15);
+      --ios-red-hover: #e0352b;
+      
+      /* Typography Colors */
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      
+      /* Radii & Shadows */
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-full: 9999px;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --shadow-float: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      
+      /* Structural Measurements */
+      --sidebar-width: 270px;
+      --bottom-nav-height: 70px;
+      
+      /* Transitions */
+      --ios-spring: 380ms cubic-bezier(0.175, 0.885, 0.32, 1.15);
+      --transition-fast: 160ms ease;
+      --transition-normal: 260ms ease;
+    }
+
+    /* ==========================================================================
+       2. RESET & BASE LAYOUT
+       ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
 
-    :root {
-      --admin-navy: #0f172a;
-      --admin-slate: #1e293b;
-      --primary-accent: #3b82f6;
-      --primary-hover: #2563eb;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --danger-dark: #dc2626;
-      --bg-canvas: #f1f5f9;
-      --surface-white: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #cbd5e1;
-      --sidebar-width: 260px;
-      --bottom-nav-height: 64px;
-      --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --transition-fast: 0.18s ease;
+    input, textarea, select {
+      user-select: auto;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--bg-canvas);
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--ios-bg-canvas);
+      background-image: var(--ios-bg-gradient);
+      background-attachment: fixed;
       color: var(--text-main);
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 14px;
       line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     input, select, textarea, button {
       font-family: inherit;
-      font-size: 14px;
+      font-size: inherit;
       outline: none;
       border: none;
+      background: none;
     }
 
-    /* Toast Notification */
+    /* Interactive Spring Animations */
+    .pressable {
+      transition: transform var(--transition-fast), filter var(--transition-fast);
+      will-change: transform;
+    }
+
+    .pressable:active {
+      transform: scale(0.965);
+      filter: brightness(1.15);
+    }
+
+    /* ==========================================================================
+       3. NOTIFICATION SYSTEM (IOS PILL TOAST)
+       ========================================================================== */
     #toast-container {
       position: fixed;
       top: 24px;
-      right: 24px;
-      z-index: 99999;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100000;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
       pointer-events: none;
+      width: 90%;
+      max-width: 420px;
     }
 
     .toast-item {
       pointer-events: auto;
-      min-width: 280px;
-      max-width: 420px;
-      background: var(--surface-white);
-      border-radius: var(--radius-md);
-      padding: 14px 18px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      width: 100%;
+      background: rgba(18, 24, 38, 0.85);
+      backdrop-filter: var(--glass-blur-strength);
+      -webkit-backdrop-filter: var(--glass-blur-strength);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-full);
+      padding: 12px 20px;
+      box-shadow: var(--shadow-float);
       display: flex;
       align-items: center;
       gap: 12px;
-      border-left: 4px solid var(--primary-accent);
-      transform: translateX(120%);
+      transform: translateY(-40px) scale(0.92);
       opacity: 0;
-      transition: all 0.28s ease;
+      transition: transform var(--ios-spring), opacity var(--transition-normal);
     }
 
-    .toast-item.show { transform: translateX(0); opacity: 1; }
-    .toast-item.success { border-left-color: var(--success); }
-    .toast-item.error { border-left-color: var(--danger); }
-    .toast-item.warning { border-left-color: var(--warning); }
+    .toast-item.show {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
 
-    /* GATE MODAL VIEW */
-    #gate-view-container {
+    .toast-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .toast-message {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-main);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    /* ==========================================================================
+       4. GATE SCREEN & ADMIN LOGIN (BLURRED OVERLAYS)
+       ========================================================================== */
+    .glass-auth-overlay {
       position: fixed;
       inset: 0;
-      z-index: 90000;
+      z-index: 50000;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-      padding: 20px;
+      padding: 24px;
+      background: rgba(5, 8, 17, 0.75);
+      backdrop-filter: blur(35px) saturate(200%);
+      -webkit-backdrop-filter: blur(35px) saturate(200%);
     }
 
-    .gate-box {
+    .glass-auth-card {
       width: 100%;
       max-width: 400px;
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 36px 30px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      background: var(--glass-panel-bg);
+      border: 1px solid var(--glass-panel-border);
+      border-radius: var(--radius-lg);
+      padding: 38px 32px;
+      box-shadow: var(--shadow-glass);
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .gate-box h2 {
-      font-size: 20px;
-      margin-bottom: 8px;
-      color: var(--text-main);
+    .glass-auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--glass-specular-highlight);
     }
 
-    .gate-box p {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 22px;
-    }
-
-    /* Admin Login Card */
-    #admin-login-view {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: radial-gradient(circle at top right, #1e293b, #0f172a);
-      padding: 20px;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 440px;
-      background: var(--surface-white);
-      border-radius: 16px;
-      padding: 40px 32px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
-    }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .login-header-icon {
-      width: 52px;
-      height: 52px;
-      background: #eff6ff;
-      color: #1d4ed8;
-      border-radius: 12px;
+    .glass-icon-wrapper {
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-main);
+    .glass-auth-title {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
       margin-bottom: 6px;
     }
 
-    .form-control {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-color);
-      background: #ffffff;
+    .glass-auth-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 26px;
     }
 
-    .form-control:focus {
-      border-color: var(--primary-accent);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    .glass-form-group {
+      margin-bottom: 18px;
+      text-align: left;
     }
 
-    .btn-admin-submit {
-      width: 100%;
-      padding: 12px;
-      background: var(--admin-slate);
-      color: #ffffff;
+    .glass-label {
+      display: block;
+      font-size: 12.5px;
       font-weight: 600;
-      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      margin-bottom: 7px;
+      margin-left: 2px;
+    }
+
+    .glass-input-field {
+      width: 100%;
+      height: 46px;
+      padding: 0 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-panel-border);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 14.5px;
+      transition: all var(--transition-fast);
+    }
+
+    .glass-input-field:focus {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--ios-blue);
+      box-shadow: var(--ios-blue-glow);
+    }
+
+    .glass-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-panel-border);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 14px;
+      resize: vertical;
+      min-height: 100px;
+      transition: all var(--transition-fast);
+    }
+
+    .glass-textarea:focus {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--ios-blue);
+      box-shadow: var(--ios-blue-glow);
+    }
+
+    .btn-ios-primary {
+      width: 100%;
+      height: 46px;
+      background: var(--ios-blue);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
       cursor: pointer;
-      margin-top: 10px;
-      transition: background var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--ios-blue-glow);
+      transition: background-color var(--transition-fast);
     }
 
-    .btn-admin-submit:hover {
-      background: var(--admin-navy);
+    .btn-ios-primary:hover {
+      background-color: var(--ios-blue-hover);
     }
 
-    /* Workspace Shell */
+    /* ==========================================================================
+       5. MAIN APPLICATION STRUCTURE (SIDEBAR & BOTTOM DOCK)
+       ========================================================================== */
     #admin-app-container {
       display: none;
       min-height: 100vh;
+      position: relative;
     }
 
-    .app-sidebar {
+    /* Left Frosted Sidebar (Desktop) */
+    .ios-sidebar {
       position: fixed;
       top: 0;
       left: 0;
       bottom: 0;
       width: var(--sidebar-width);
-      background: var(--admin-slate);
-      color: #ffffff;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: var(--glass-blur-strength);
+      -webkit-backdrop-filter: var(--glass-blur-strength);
+      border-right: 1px solid var(--glass-panel-border);
       display: flex;
       flex-direction: column;
       z-index: 100;
     }
 
-    .sidebar-brand {
-      padding: 24px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+    .sidebar-brand-box {
+      padding: 28px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .sidebar-brand-badge {
-      background: var(--primary-accent);
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
+    .sidebar-avatar-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--ios-blue), #1d4ed8);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
     }
 
-    .nav-list {
+    .sidebar-brand-text h2 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .sidebar-brand-text span {
+      font-size: 10.5px;
+      color: var(--ios-blue);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+    }
+
+    .sidebar-nav-list {
       list-style: none;
-      padding: 20px 12px;
+      padding: 22px 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       flex: 1;
     }
 
-    .nav-btn {
+    .sidebar-nav-item-btn {
       width: 100%;
+      height: 44px;
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
+      padding: 0 16px;
       border-radius: var(--radius-sm);
-      background: transparent;
-      color: #94a3b8;
-      font-size: 14px;
+      color: var(--text-muted);
+      font-size: 13.5px;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
       transition: all var(--transition-fast);
     }
 
-    .nav-btn:hover {
-      background: rgba(255,255,255,0.06);
-      color: #ffffff;
+    .sidebar-nav-item-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
     }
 
-    .nav-btn.active {
-      background: var(--primary-accent);
+    .sidebar-nav-item-btn.active {
+      background: rgba(10, 132, 255, 0.18);
       color: #ffffff;
       font-weight: 600;
+      border: 1px solid rgba(10, 132, 255, 0.3);
     }
 
-    .sidebar-footer {
-      padding: 16px;
-      border-top: 1px solid rgba(255,255,255,0.1);
+    .sidebar-nav-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer-card {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      background: rgba(0, 0, 0, 0.2);
     }
 
-    .app-main-viewport {
-      margin-left: var(--sidebar-width);
-      padding: 32px 40px;
-      min-height: 100vh;
-      max-width: 1400px;
+    .sidebar-user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
     }
 
-    .mobile-bottom-bar {
+    .btn-logout-ghost {
+      font-size: 12.5px;
+      color: var(--ios-red);
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: background-color var(--transition-fast);
+    }
+
+    .btn-logout-ghost:hover {
+      background: var(--ios-red-soft);
+    }
+
+    /* Bottom Glass Dock (Mobile) */
+    .ios-bottom-dock {
       display: none;
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
       height: var(--bottom-nav-height);
-      background: var(--admin-slate);
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: var(--glass-blur-strength);
+      -webkit-backdrop-filter: var(--glass-blur-strength);
+      border: 1px solid var(--glass-panel-border);
+      border-radius: var(--radius-full);
       z-index: 100;
+      box-shadow: var(--shadow-float);
       justify-content: space-around;
       align-items: center;
+      padding: 0 12px;
     }
 
-    .mobile-nav-btn {
+    .dock-nav-item {
       flex: 1;
       height: 100%;
       display: flex;
@@ -304,34 +463,55 @@
       align-items: center;
       justify-content: center;
       gap: 3px;
-      background: none;
-      color: #94a3b8;
+      color: var(--text-muted);
       font-size: 11px;
       cursor: pointer;
+      transition: color var(--transition-fast);
     }
 
-    .mobile-nav-btn.active {
-      color: #ffffff;
+    .dock-nav-item.active {
+      color: var(--ios-blue);
       font-weight: 600;
     }
 
-    /* Views */
-    .view-section {
-      display: none;
-      animation: fadeIn 0.2s ease forwards;
+    .dock-nav-icon {
+      width: 20px;
+      height: 20px;
     }
 
-    .view-section.active-view {
+    /* Main Viewport Container */
+    .ios-main-viewport {
+      margin-left: var(--sidebar-width);
+      padding: 38px 44px;
+      min-height: 100vh;
+      max-width: 1440px;
+    }
+
+    /* ==========================================================================
+       6. CONTENT PANELS & GLASS DATA CARDS
+       ========================================================================== */
+    .view-content-pane {
+      display: none;
+      animation: springFade 300ms ease forwards;
+    }
+
+    .view-content-pane.active-pane {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes springFade {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .page-header {
-      margin-bottom: 24px;
+    .pane-header-titlebar {
+      margin-bottom: 28px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
@@ -339,351 +519,484 @@
       gap: 16px;
     }
 
-    .page-header h2 {
-      font-size: 22px;
+    .pane-header-titlebar h1 {
+      font-size: 26px;
       font-weight: 700;
+      letter-spacing: -0.4px;
     }
 
-    .content-card {
-      background: var(--surface-white);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 24px;
-      margin-bottom: 24px;
+    .pane-header-titlebar p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
-    .card-header-bar {
+    /* Glass Panels */
+    .glass-card-panel {
+      background: var(--glass-panel-bg);
+      backdrop-filter: var(--glass-blur-subtle);
+      -webkit-backdrop-filter: var(--glass-blur-subtle);
+      border: 1px solid var(--glass-panel-border);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      box-shadow: var(--shadow-glass);
+      margin-bottom: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--glass-specular-highlight);
+    }
+
+    .glass-panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .custom-table-container {
+    .glass-panel-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    /* Glass Tables */
+    .glass-table-scroller {
       overflow-x: auto;
     }
 
-    .custom-table {
+    .glass-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 13.5px;
       text-align: left;
     }
 
-    .custom-table th {
-      background: #f8fafc;
-      padding: 12px 14px;
+    .glass-table th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 14px 16px;
       font-weight: 600;
       color: var(--text-muted);
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--glass-panel-border);
       white-space: nowrap;
     }
 
-    .custom-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid #f1f5f9;
+    .glass-table td {
+      padding: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       color: var(--text-main);
     }
 
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
+    .glass-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges */
+    .ios-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
       font-size: 11.5px;
       font-weight: 600;
-      border-radius: 9999px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
     }
 
-    .badge-assigned { background: #e0f2fe; color: #0369a1; }
-    .badge-claimed { background: #dcfce7; color: #15803d; }
-    .badge-pending { background: #fef3c7; color: #b45309; }
-    .badge-approved { background: #d1fae5; color: #047857; }
-    .badge-rejected { background: #fee2e2; color: #b91c1c; }
+    .badge-blue { background: rgba(10, 132, 255, 0.15); color: #60a5fa; border: 1px solid rgba(10, 132, 255, 0.3); }
+    .badge-green { background: var(--ios-emerald-soft); color: var(--ios-emerald); border: 1px solid rgba(48, 209, 88, 0.3); }
+    .badge-amber { background: var(--ios-amber-soft); color: var(--ios-amber); border: 1px solid rgba(255, 214, 10, 0.3); }
+    .badge-red { background: var(--ios-red-soft); color: var(--ios-red); border: 1px solid rgba(255, 69, 58, 0.3); }
 
-    /* Action Buttons */
-    .btn-action-delete {
-      padding: 6px 10px;
-      background: #fee2e2;
-      color: var(--danger);
-      font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: background var(--transition-fast);
-    }
-
-    .btn-action-delete:hover { background: #fecaca; }
-
-    .btn-action-approve {
-      padding: 6px 10px;
-      background: #d1fae5;
-      color: #047857;
-      font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-    .btn-action-reject {
-      padding: 6px 10px;
-      background: #fef3c7;
-      color: #b45309;
-      font-weight: 600;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-
-    .btn-primary {
-      padding: 10px 18px;
-      background: var(--primary-accent);
-      color: #ffffff;
-      font-weight: 600;
+    /* Action Buttons in Tables */
+    .btn-cell-action {
+      padding: 6px 12px;
       border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all var(--transition-fast);
     }
 
-    .btn-primary:hover {
-      background: var(--primary-hover);
+    .btn-cell-danger {
+      background: var(--ios-red-soft);
+      color: var(--ios-red);
+      border: 1px solid rgba(255, 69, 58, 0.3);
     }
 
-    /* Modal Backdrop */
-    .modal-backdrop {
+    .btn-cell-danger:hover {
+      background: rgba(255, 69, 58, 0.25);
+    }
+
+    .btn-cell-success {
+      background: var(--ios-emerald-soft);
+      color: var(--ios-emerald);
+      border: 1px solid rgba(48, 209, 88, 0.3);
+      margin-right: 6px;
+    }
+
+    .btn-cell-success:hover {
+      background: rgba(48, 209, 88, 0.25);
+    }
+
+    .btn-cell-amber {
+      background: var(--ios-amber-soft);
+      color: var(--ios-amber);
+      border: 1px solid rgba(255, 214, 10, 0.3);
+      margin-right: 6px;
+    }
+
+    .btn-cell-amber:hover {
+      background: rgba(255, 214, 10, 0.25);
+    }
+
+    /* Modal Backdrop & Sheets */
+    .glass-modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
-      z-index: 999;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 1000;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 20px;
     }
 
-    .modal-backdrop.open {
+    .glass-modal-backdrop.open {
       display: flex;
     }
 
-    .modal-box {
+    .glass-modal-sheet {
       width: 100%;
-      max-width: 520px;
-      background: var(--surface-white);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      max-width: 540px;
+      background: rgba(20, 28, 48, 0.85);
+      backdrop-filter: var(--glass-blur-strength);
+      -webkit-backdrop-filter: var(--glass-blur-strength);
+      border: 1px solid var(--glass-panel-border);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      box-shadow: var(--shadow-float);
+      position: relative;
+      animation: sheetPop 280ms cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
     }
 
-    .modal-header {
+    @keyframes sheetPop {
+      from {
+        opacity: 0;
+        transform: scale(0.94) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-sheet-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
+    .btn-modal-close {
+      width: 30px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-modal-close:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: var(--text-main);
+    }
+
+    .file-pill-tip {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* ==========================================================================
+       7. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
     @media (max-width: 768px) {
-      .app-sidebar { display: none; }
-      .mobile-bottom-bar { display: flex; }
-      .app-main-viewport {
+      .ios-sidebar {
+        display: none;
+      }
+
+      .ios-bottom-dock {
+        display: flex;
+      }
+
+      .ios-main-viewport {
         margin-left: 0;
-        padding: 20px 16px calc(var(--bottom-nav-height) + 24px) 16px;
+        padding: 20px 16px calc(var(--bottom-nav-height) + 38px) 16px;
+      }
+
+      .glass-modal-sheet {
+        padding: 22px 18px;
       }
     }
   </style>
 </head>
 <body>
 
-  <div id="toast-container"></div>
+  <!-- Toast Notification System -->
+  <div id="toast-container" aria-live="polite"></div>
 
   <!-- ==========================================================================
-       1. MANDATORY SITE GATE VIEW (Render Environment Password Check)
+       SCREEN 1: MANDATORY GATE CHECK (Render Env Site Gate Password)
        ========================================================================== -->
-  <section id="gate-view-container">
-    <div class="gate-box">
-      <div style="font-size: 42px; margin-bottom: 10px;">🔐</div>
-      <h2>系统安全验证</h2>
-      <p>请输入环境通行密码以进入管理控制台</p>
-      <form id="gate-auth-form">
-        <div class="form-group">
-          <input type="password" id="gate-input-password" class="form-control" placeholder="输入访问口令" style="text-align: center; letter-spacing: 2px;" required autofocus>
+  <section id="gate-overlay" class="glass-auth-overlay">
+    <div class="glass-auth-card">
+      <div class="glass-icon-wrapper">
+        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h1 class="glass-auth-title">内网安全通行验证</h1>
+      <p class="glass-auth-subtitle">请输入环境通行口令进入管理控制台</p>
+
+      <form id="gate-form-element">
+        <div class="glass-form-group">
+          <input type="password" id="gate-password-input" class="glass-input-field" placeholder="输入访问口令 (如: congcong2012)" style="text-align:center; letter-spacing:2px;" required autofocus>
         </div>
-        <button type="submit" class="btn-primary" style="width: 100%; padding: 12px;">验证并进入</button>
+        <button type="submit" id="btn-gate-submit" class="btn-ios-primary pressable" style="margin-top:10px;">
+          <span>验证凭据并进入</span>
+        </button>
       </form>
     </div>
   </section>
 
   <!-- ==========================================================================
-       2. ADMIN ACCOUNT LOGIN VIEW
+       SCREEN 2: ADMIN CREDENTIALS LOGIN VIEW
        ========================================================================== -->
-  <section id="admin-login-view">
-    <div class="login-card">
-      <div class="login-header">
-        <div class="login-header-icon">🛡️</div>
-        <h2>管理控制台登录</h2>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">管理员专属特权鉴权门户</p>
+  <section id="admin-login-overlay" class="glass-auth-overlay" style="display:none;">
+    <div class="glass-auth-card">
+      <div class="glass-icon-wrapper">
+        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
       </div>
+      <h1 class="glass-auth-title">管理员身份认证</h1>
+      <p class="glass-auth-subtitle">综合管控特权鉴权门户</p>
 
       <form id="admin-login-form">
-        <div class="form-group">
-          <label for="admin-user">管理员账号</label>
-          <input type="text" id="admin-user" class="form-control" placeholder="输入管理员用户名" required>
+        <div class="glass-form-group">
+          <label class="glass-label" for="admin-user-input">管理账户名</label>
+          <input type="text" id="admin-user-input" class="glass-input-field" placeholder="输入管理员用户名" autocomplete="username" required>
         </div>
-        <div class="form-group">
-          <label for="admin-pass">管理员密码</label>
-          <input type="password" id="admin-pass" class="form-control" placeholder="输入密码" required>
+
+        <div class="glass-form-group">
+          <label class="glass-label" for="admin-pass-input">特权密码</label>
+          <input type="password" id="admin-pass-input" class="glass-input-field" placeholder="输入密码" autocomplete="current-password" required>
         </div>
-        <button type="submit" class="btn-admin-submit">登 录</button>
+
+        <button type="submit" id="btn-admin-login-submit" class="btn-ios-primary pressable" style="margin-top:12px;">
+          <span>登 录 管 制 台</span>
+        </button>
       </form>
     </div>
   </section>
 
   <!-- ==========================================================================
-       3. ADMIN MAIN DASHBOARD
+       SCREEN 3: MAIN ADMIN WORKSPACE
        ========================================================================== -->
   <div id="admin-app-container">
-    <aside class="app-sidebar">
-      <div class="sidebar-brand">
-        <strong>企业管治后台</strong>
-        <span class="sidebar-brand-badge">ADMIN</span>
+    <!-- Frosted Sidebar for Desktop -->
+    <aside class="ios-sidebar">
+      <div class="sidebar-brand-box">
+        <div class="sidebar-avatar-logo">AD</div>
+        <div class="sidebar-brand-text">
+          <h2>企业总控后台</h2>
+          <span>ADMIN 2026</span>
+        </div>
       </div>
 
-      <ul class="nav-list">
+      <ul class="sidebar-nav-list">
         <li>
-          <button class="nav-btn active" data-target="sec-tasks">
-            <span>📌 任务统筹与撤销</span>
+          <button type="button" class="sidebar-nav-item-btn pressable active" data-target-pane="pane-tasks-management">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>任务统筹与撤销</span>
           </button>
         </li>
         <li>
-          <button class="nav-btn" data-target="sec-requests">
-            <span>📥 员工申请审核</span>
+          <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-requests-audit">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>员工申请审核</span>
           </button>
         </li>
         <li>
-          <button class="nav-btn" data-target="sec-employees">
-            <span>👥 员工账号管理</span>
+          <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-employees-registry">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>员工账号管理</span>
           </button>
         </li>
       </ul>
 
-      <div class="sidebar-footer">
-        <span style="font-size: 12px; color: #94a3b8;" id="admin-display-name">Admin</span>
-        <button id="btn-admin-logout" style="background: none; color: #ef4444; font-size: 12px; cursor: pointer; font-weight: 600;">退出</button>
+      <div class="sidebar-footer-card">
+        <span class="sidebar-user-name" id="sidebar-admin-fullname">Admin</span>
+        <button type="button" id="btn-desktop-logout" class="btn-logout-ghost pressable">退出登录</button>
       </div>
     </aside>
 
-    <nav class="mobile-bottom-bar">
-      <button class="mobile-nav-btn active" data-target="sec-tasks">
-        <span>📌</span>
+    <!-- Frosted Bottom Dock for Mobile -->
+    <nav class="ios-bottom-dock">
+      <button type="button" class="dock-nav-item pressable active" data-target-pane="pane-tasks-management">
+        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
         <span>任务统筹</span>
       </button>
-      <button class="mobile-nav-btn" data-target="sec-requests">
-        <span>📥</span>
+      <button type="button" class="dock-nav-item pressable" data-target-pane="pane-requests-audit">
+        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
         <span>申请审核</span>
       </button>
-      <button class="mobile-nav-btn" data-target="sec-employees">
-        <span>👥</span>
+      <button type="button" class="dock-nav-item pressable" data-target-pane="pane-employees-registry">
+        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
         <span>账号管理</span>
       </button>
     </nav>
 
-    <main class="app-main-viewport">
+    <!-- Main Viewport Panes -->
+    <main class="ios-main-viewport">
 
-      <!-- SECTION 1: 任务统筹与撤销 -->
-      <section id="sec-tasks" class="view-section active-view">
-        <div class="page-header">
+      <!-- PANE 1: 任务统筹与撤销 -->
+      <section id="pane-tasks-management" class="view-content-pane active-pane">
+        <div class="pane-header-titlebar">
           <div>
-            <h2>员工任务统筹</h2>
-            <p style="font-size: 13.5px; color: var(--text-muted);">布置工作任务、跟踪员工领取进度，或直接撤销并彻底删除 MongoDB 记录。</p>
+            <h1>员工任务统筹</h1>
+            <p>下发业务指派任务，上传单文件 ≤10MB（最多5个）的附件，跟踪进度或彻底物理撤销记录。</p>
           </div>
-          <button class="btn-primary" id="btn-open-task-modal">+ 布置新任务</button>
+          <button type="button" id="btn-open-task-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>布置新任务</span>
+          </button>
         </div>
 
-        <div class="content-card">
-          <div class="card-header-bar">
-            <h3>全量任务跟踪列表</h3>
+        <div class="glass-card-panel">
+          <div class="glass-panel-header">
+            <h2>全量任务监视清单</h2>
           </div>
-          <div class="custom-table-container">
-            <table class="custom-table">
+          <div class="glass-table-scroller">
+            <table class="glass-table">
               <thead>
                 <tr>
                   <th>任务名称</th>
                   <th>指派员工</th>
-                  <th>状态</th>
+                  <th>挂载附件</th>
+                  <th>流转状态</th>
                   <th>发布时间</th>
                   <th>领取时间</th>
-                  <th>操作</th>
+                  <th>管理操作</th>
                 </tr>
               </thead>
               <tbody id="tasks-table-body">
-                <!-- Dynamic Content -->
+                <!-- Dynamically populated -->
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 2: 员工申请审核 -->
-      <section id="sec-requests" class="view-section">
-        <div class="page-header">
+      <!-- PANE 2: 员工申请审核 -->
+      <section id="pane-requests-audit" class="view-content-pane">
+        <div class="pane-header-titlebar">
           <div>
-            <h2>员工事务申请流转</h2>
-            <p style="font-size: 13.5px; color: var(--text-muted);">查看员工提交的审批与申请，执行核准、驳回或从数据库物理删除记录。</p>
+            <h1>员工事务申请流转</h1>
+            <p>审批员工提交的资源/行政需求，执行批准、驳回状态变更或物理清除数据记录。</p>
           </div>
         </div>
 
-        <div class="content-card">
-          <div class="card-header-bar">
-            <h3>申请工单列表</h3>
+        <div class="glass-card-panel">
+          <div class="glass-panel-header">
+            <h2>待办工单与请示明细</h2>
           </div>
-          <div class="custom-table-container">
-            <table class="custom-table">
+          <div class="glass-table-scroller">
+            <table class="glass-table">
               <thead>
                 <tr>
                   <th>申请主题</th>
                   <th>申请人</th>
-                  <th>部门</th>
-                  <th>正文说明</th>
+                  <th>所属部门</th>
+                  <th>正文简述</th>
                   <th>状态</th>
                   <th>提交时间</th>
-                  <th>流转 / 删除操作</th>
+                  <th>流转与物理清除</th>
                 </tr>
               </thead>
               <tbody id="requests-table-body">
-                <!-- Dynamic Content -->
+                <!-- Dynamically populated -->
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 3: 员工账号注册与注销 -->
-      <section id="sec-employees" class="view-section">
-        <div class="page-header">
+      <!-- PANE 3: 员工账号管理 -->
+      <section id="pane-employees-registry" class="view-content-pane">
+        <div class="pane-header-titlebar">
           <div>
-            <h2>员工账户与权限管理</h2>
-            <p style="font-size: 13.5px; color: var(--text-muted);">为新员工注册专属凭证，或注销（删除）离职员工账号。</p>
+            <h1>员工账户与权限管制</h1>
+            <p>开通具备独立加密凭据的员工工作台账号，或一键注销离职人员访问权限。</p>
           </div>
-          <button class="btn-primary" id="btn-open-employee-modal">+ 注册新员工账号</button>
+          <button type="button" id="btn-open-employee-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>注册新员工账号</span>
+          </button>
         </div>
 
-        <div class="content-card">
-          <div class="card-header-bar">
-            <h3>活跃员工账号花名册</h3>
+        <div class="glass-card-panel">
+          <div class="glass-panel-header">
+            <h2>活跃员工花名册</h2>
           </div>
-          <div class="custom-table-container">
-            <table class="custom-table">
+          <div class="glass-table-scroller">
+            <table class="glass-table">
               <thead>
                 <tr>
-                  <th>工号 (Staff ID)</th>
+                  <th>员工工号</th>
                   <th>登录用户名</th>
                   <th>真实姓名</th>
                   <th>所属部门</th>
-                  <th>创建时间</th>
+                  <th>注册时间</th>
                   <th>账号注销</th>
                 </tr>
               </thead>
               <tbody id="employees-table-body">
-                <!-- Dynamic Content -->
+                <!-- Dynamically populated -->
               </tbody>
             </table>
           </div>
@@ -694,521 +1007,756 @@
   </div>
 
   <!-- ==========================================================================
-       MODALS
+       MODAL SHEETS (CREATE TASK WITH ATTACHMENTS & REGISTER EMPLOYEE)
        ========================================================================== -->
-  <div class="modal-backdrop" id="modal-task">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3>布置新任务</h3>
-        <button id="btn-close-task-modal" style="background:none; font-size:18px; cursor:pointer;">✕</button>
+
+  <!-- SHEET 1: DISPATCH TASK MODAL -->
+  <div class="glass-modal-backdrop" id="modal-task-backdrop">
+    <div class="glass-modal-sheet">
+      <div class="modal-sheet-header">
+        <h3 style="font-size:17px; font-weight:700;">布置新工作任务</h3>
+        <button type="button" class="btn-modal-close pressable" id="btn-close-task-modal">✕</button>
       </div>
-      <form id="form-create-task">
-        <div class="form-group">
-          <label>任务标题</label>
-          <input type="text" id="task-in-title" class="form-control" placeholder="如：系统安全日志审计" required>
+      <form id="form-dispatch-task">
+        <div class="glass-form-group">
+          <label class="glass-label">任务主题</label>
+          <input type="text" id="task-title-input" class="glass-input-field" placeholder="例：系统架构性能评测与安全审计" required>
         </div>
-        <div class="form-group">
-          <label>指派员工 (用户名)</label>
-          <select id="task-in-assignee" class="form-control" required></select>
+        <div class="glass-form-group">
+          <label class="glass-label">指派执行员工</label>
+          <select id="task-assignee-select" class="glass-input-field" style="background:rgba(20,28,48,0.95);" required>
+            <!-- Dynamically populated -->
+          </select>
         </div>
-        <div class="form-group">
-          <label>任务详细要求与标准</label>
-          <textarea id="task-in-desc" class="form-control" style="min-height: 100px;" placeholder="详述该任务的具体执行目标与验收指标..." required></textarea>
+        <div class="glass-form-group">
+          <label class="glass-label">任务要求与交付指标</label>
+          <textarea id="task-desc-input" class="glass-textarea" placeholder="请详述该任务的具体推进计划、交付标准及验收节点..." required></textarea>
         </div>
-        <button type="submit" class="btn-primary" style="width: 100%;">确认发布任务并同步至数据库</button>
+        <div class="glass-form-group">
+          <label class="glass-label">任务附件 (可选，支持最多5个，单个≤10MB)</label>
+          <input type="file" id="task-files-input" class="glass-input-field" style="padding:10px 14px;" multiple>
+          <div class="file-pill-tip">文件将以二进制形式直接持久化存储至 MongoDB。</div>
+        </div>
+        <button type="submit" id="btn-submit-task-action" class="btn-ios-primary pressable" style="margin-top:16px;">
+          <span>确认发布任务并上传</span>
+        </button>
       </form>
     </div>
   </div>
 
-  <div class="modal-backdrop" id="modal-employee">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3>注册新员工账号</h3>
-        <button id="btn-close-employee-modal" style="background:none; font-size:18px; cursor:pointer;">✕</button>
+  <!-- SHEET 2: REGISTER EMPLOYEE MODAL -->
+  <div class="glass-modal-backdrop" id="modal-emp-backdrop">
+    <div class="glass-modal-sheet">
+      <div class="modal-sheet-header">
+        <h3 style="font-size:17px; font-weight:700;">注册新员工账号</h3>
+        <button type="button" class="btn-modal-close pressable" id="btn-close-emp-modal">✕</button>
       </div>
-      <form id="form-create-employee">
-        <div class="form-group">
-          <label>员工工号 (Staff ID)</label>
-          <input type="text" id="emp-in-staffid" class="form-control" placeholder="如：EMP-202601" required>
+      <form id="form-register-employee">
+        <div class="glass-form-group">
+          <label class="glass-label">员工工号 (Staff ID)</label>
+          <input type="text" id="emp-staffid-input" class="glass-input-field" placeholder="例：EMP-202601" required>
         </div>
-        <div class="form-group">
-          <label>登录用户名</label>
-          <input type="text" id="emp-in-username" class="form-control" placeholder="用于员工端登录" required>
+        <div class="glass-form-group">
+          <label class="glass-label">登录用户名</label>
+          <input type="text" id="emp-username-input" class="glass-input-field" placeholder="员工端登录账号" required>
         </div>
-        <div class="form-group">
-          <label>初始密码</label>
-          <input type="password" id="emp-in-password" class="form-control" placeholder="设置认证密码" required>
+        <div class="glass-form-group">
+          <label class="glass-label">初始认证密码</label>
+          <input type="password" id="emp-password-input" class="glass-input-field" placeholder="设置初始访问密码" required>
         </div>
-        <div class="form-group">
-          <label>真实姓名</label>
-          <input type="text" id="emp-in-fullname" class="form-control" placeholder="姓名" required>
+        <div class="glass-form-group">
+          <label class="glass-label">真实姓名</label>
+          <input type="text" id="emp-fullname-input" class="glass-input-field" placeholder="姓名" required>
         </div>
-        <div class="form-group">
-          <label>所属部门</label>
-          <input type="text" id="emp-in-dept" class="form-control" placeholder="如：研发中心 / 运营部" required>
+        <div class="glass-form-group">
+          <label class="glass-label">所属部门</label>
+          <input type="text" id="emp-dept-input" class="glass-input-field" placeholder="例：技术研发中心" required>
         </div>
-        <button type="submit" class="btn-primary" style="width: 100%;">注册员工账号</button>
+        <button type="submit" id="btn-submit-emp-action" class="btn-ios-primary pressable" style="margin-top:16px;">
+          <span>写入 MongoDB 注册账号</span>
+        </button>
       </form>
     </div>
   </div>
 
   <!-- ==========================================================================
-       JAVASCRIPT APPLICATION ENGINE
+       JAVASCRIPT APPLICATION ENGINE (WITH HAPTICS & REACTIVE CONTROLLERS)
        ========================================================================== -->
   <script>
-    (function () {
+    (function (window, document) {
       'use strict';
 
+      // ------------------------------------------------------------------------
+      // HAPTIC FEEDBACK ENGINE (Vibration API for iOS/Android Support)
+      // ------------------------------------------------------------------------
+      const Haptics = {
+        light() {
+          if ('vibrate' in navigator) {
+            try { navigator.vibrate(12); } catch (e) {}
+          }
+        },
+        medium() {
+          if ('vibrate' in navigator) {
+            try { navigator.vibrate(25); } catch (e) {}
+          }
+        },
+        success() {
+          if ('vibrate' in navigator) {
+            try { navigator.vibrate([15, 40, 20]); } catch (e) {}
+          }
+        },
+        error() {
+          if ('vibrate' in navigator) {
+            try { navigator.vibrate([40, 60, 40]); } catch (e) {}
+          }
+        }
+      };
+
+      // ------------------------------------------------------------------------
+      // STATE STORE
+      // ------------------------------------------------------------------------
       const State = {
         adminUser: null,
+        currentPaneId: 'pane-tasks-management',
         employees: [],
         tasks: [],
         requests: []
       };
 
+      // ------------------------------------------------------------------------
+      // DOM REFS
+      // ------------------------------------------------------------------------
       const DOM = {
         toastContainer: document.getElementById('toast-container'),
-        gateView: document.getElementById('gate-view-container'),
-        gateForm: document.getElementById('gate-auth-form'),
-        gateInput: document.getElementById('gate-input-password'),
-        loginView: document.getElementById('admin-login-view'),
-        appView: document.getElementById('admin-app-container'),
-        loginForm: document.getElementById('admin-login-form'),
-        adminUserIn: document.getElementById('admin-user'),
-        adminPassIn: document.getElementById('admin-pass'),
-        adminDisplayName: document.getElementById('admin-display-name'),
-        btnLogout: document.getElementById('btn-admin-logout'),
-        navButtons: document.querySelectorAll('.nav-btn, .mobile-nav-btn'),
-        sections: document.querySelectorAll('.view-section'),
+        gateOverlay: document.getElementById('gate-overlay'),
+        gateForm: document.getElementById('gate-form-element'),
+        gatePassInput: document.getElementById('gate-password-input'),
+        btnGateSubmit: document.getElementById('btn-gate-submit'),
+        adminLoginOverlay: document.getElementById('admin-login-overlay'),
+        adminLoginForm: document.getElementById('admin-login-form'),
+        adminUserInput: document.getElementById('admin-user-input'),
+        adminPassInput: document.getElementById('admin-pass-input'),
+        btnAdminLoginSubmit: document.getElementById('btn-admin-login-submit'),
+        appContainer: document.getElementById('admin-app-container'),
+        sidebarAdminFullname: document.getElementById('sidebar-admin-fullname'),
+        btnDesktopLogout: document.getElementById('btn-desktop-logout'),
+        navButtons: document.querySelectorAll('.sidebar-nav-item-btn, .dock-nav-item'),
+        panes: document.querySelectorAll('.view-content-pane'),
         // Tasks
         tasksTbody: document.getElementById('tasks-table-body'),
-        modalTask: document.getElementById('modal-task'),
-        btnOpenTaskModal: document.getElementById('btn-open-task-modal'),
+        modalTaskBackdrop: document.getElementById('modal-task-backdrop'),
+        btnOpenTaskSheet: document.getElementById('btn-open-task-sheet'),
         btnCloseTaskModal: document.getElementById('btn-close-task-modal'),
-        formCreateTask: document.getElementById('form-create-task'),
-        taskInAssignee: document.getElementById('task-in-assignee'),
+        formDispatchTask: document.getElementById('form-dispatch-task'),
+        taskTitleInput: document.getElementById('task-title-input'),
+        taskAssigneeSelect: document.getElementById('task-assignee-select'),
+        taskDescInput: document.getElementById('task-desc-input'),
+        taskFilesInput: document.getElementById('task-files-input'),
+        btnSubmitTaskAction: document.getElementById('btn-submit-task-action'),
         // Requests
         requestsTbody: document.getElementById('requests-table-body'),
         // Employees
         employeesTbody: document.getElementById('employees-table-body'),
-        modalEmployee: document.getElementById('modal-employee'),
-        btnOpenEmpModal: document.getElementById('btn-open-employee-modal'),
-        btnCloseEmpModal: document.getElementById('btn-close-employee-modal'),
-        formCreateEmployee: document.getElementById('form-create-employee')
+        modalEmpBackdrop: document.getElementById('modal-emp-backdrop'),
+        btnOpenEmpSheet: document.getElementById('btn-open-employee-sheet'),
+        btnCloseEmpModal: document.getElementById('btn-close-emp-modal'),
+        formRegisterEmployee: document.getElementById('form-register-employee'),
+        empStaffIdInput: document.getElementById('emp-staffid-input'),
+        empUsernameInput: document.getElementById('emp-username-input'),
+        empPasswordInput: document.getElementById('emp-password-input'),
+        empFullNameInput: document.getElementById('emp-fullname-input'),
+        empDeptInput: document.getElementById('emp-dept-input'),
+        btnSubmitEmpAction: document.getElementById('btn-submit-emp-action')
       };
 
-      function showToast(msg, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `toast-item ${type}`;
-        toast.innerHTML = `<span>${type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️')}</span><span>${msg}</span>`;
-        DOM.toastContainer.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => toast.remove(), 300);
-        }, 3200);
-      }
+      // ------------------------------------------------------------------------
+      // UTILITIES
+      // ------------------------------------------------------------------------
+      const Utils = {
+        escapeHtml(str) {
+          if (!str) return '';
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        },
 
-      function formatDate(dateStr) {
-        if (!dateStr) return '--';
-        return new Date(dateStr).toLocaleString('zh-CN', {
-          month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-        });
-      }
+        formatDate(dateString) {
+          if (!dateString) return '--';
+          const d = new Date(dateString);
+          if (isNaN(d.getTime())) return '--';
+          const pad = (n) => (n < 10 ? '0' + n : n);
+          return (
+            d.getFullYear() + '-' +
+            pad(d.getMonth() + 1) + '-' +
+            pad(d.getDate()) + ' ' +
+            pad(d.getHours()) + ':' +
+            pad(d.getMinutes())
+          );
+        },
 
-      function switchTab(targetId) {
-        DOM.navButtons.forEach(btn => {
-          btn.classList.toggle('active', btn.getAttribute('data-target') === targetId);
-        });
-        DOM.sections.forEach(sec => {
-          sec.classList.toggle('active-view', sec.id === targetId);
-        });
+        showToast(message, type = 'info', duration = 3000) {
+          const toast = document.createElement('div');
+          toast.className = 'toast-item';
 
-        if (targetId === 'sec-tasks') loadTasks();
-        if (targetId === 'sec-requests') loadRequests();
-        if (targetId === 'sec-employees') loadEmployees();
-      }
+          let iconColor = 'var(--ios-blue)';
+          if (type === 'success') iconColor = 'var(--ios-emerald)';
+          if (type === 'error') iconColor = 'var(--ios-red)';
 
-      async function checkSession() {
-        try {
+          toast.innerHTML = `
+            <svg class="toast-icon" style="color:${iconColor};" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              ${type === 'success' ? '<polyline points="20 6 9 17 4 12"></polyline>' : (type === 'error' ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>' : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>')}
+            </svg>
+            <div class="toast-message">${Utils.escapeHtml(message)}</div>
+          `;
+
+          DOM.toastContainer.appendChild(toast);
+
+          if (type === 'success') Haptics.success();
+          else if (type === 'error') Haptics.error();
+          else Haptics.light();
+
+          setTimeout(() => toast.classList.add('show'), 10);
+          setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+          }, duration);
+        }
+      };
+
+      // ------------------------------------------------------------------------
+      // HTTP API SERVICE
+      // ------------------------------------------------------------------------
+      const AdminApi = {
+        async verifyGate(password) {
+          const res = await fetch('/api/gate/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+          });
+          return await res.json();
+        },
+
+        async checkSession() {
           const res = await fetch('/api/admin/auth/session');
-          const data = await res.json();
+          return await res.json();
+        },
 
-          if (data.gateLocked) {
-            DOM.gateView.style.display = 'flex';
-            DOM.loginView.style.display = 'none';
-            DOM.appView.style.display = 'none';
-            return;
-          }
+        async login(username, password) {
+          const res = await fetch('/api/admin/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          return await res.json();
+        },
 
-          DOM.gateView.style.display = 'none';
+        async logout() {
+          const res = await fetch('/api/admin/auth/logout', { method: 'POST' });
+          return await res.json();
+        },
 
-          if (res.ok && data.success) {
-            handleLoginSuccess(data.user);
-          } else {
-            DOM.loginView.style.display = 'flex';
-            DOM.appView.style.display = 'none';
-          }
-        } catch (e) {
-          DOM.gateView.style.display = 'flex';
-          DOM.loginView.style.display = 'none';
-          DOM.appView.style.display = 'none';
-        }
-      }
-
-      function handleLoginSuccess(user) {
-        State.adminUser = user;
-        DOM.gateView.style.display = 'none';
-        DOM.loginView.style.display = 'none';
-        DOM.appView.style.display = 'block';
-        DOM.adminDisplayName.textContent = user.full_name || user.username;
-        loadEmployees();
-        switchTab('sec-tasks');
-      }
-
-      // --- TASKS ENGINE ---
-      async function loadTasks() {
-        try {
+        async getTasks() {
           const res = await fetch('/api/admin/tasks/all');
-          const data = await res.json();
-          if (data.success) {
-            State.tasks = data.data;
-            renderTasks(data.data);
-          }
-        } catch (e) {
-          showToast('无法读取任务列表', 'error');
-        }
-      }
+          return await res.json();
+        },
 
-      function renderTasks(tasks) {
-        DOM.tasksTbody.innerHTML = '';
-        if (!tasks.length) {
-          DOM.tasksTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">暂无派发的任务</td></tr>';
-          return;
-        }
+        async createTask(formData) {
+          const res = await fetch('/api/admin/tasks/create', {
+            method: 'POST',
+            body: formData
+          });
+          return await res.json();
+        },
 
-        tasks.forEach(t => {
-          const isClaimed = t.status !== 'Assigned';
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><strong>${escapeHtml(t.task_title)}</strong></td>
-            <td>${escapeHtml(t.assigned_to_username)}</td>
-            <td><span class="badge ${isClaimed ? 'badge-claimed' : 'badge-assigned'}">${isClaimed ? '已领取' : '待领取'}</span></td>
-            <td>${formatDate(t.created_at)}</td>
-            <td>${formatDate(t.claimed_at)}</td>
-            <td>
-              <button class="btn-action-delete" data-task-id="${t._id}">撤销并删除</button>
-            </td>
-          `;
+        async deleteTask(id) {
+          const res = await fetch(`/api/admin/tasks/delete/${id}`, { method: 'DELETE' });
+          return await res.json();
+        },
 
-          tr.querySelector('.btn-action-delete').addEventListener('click', () => revokeTask(t._id));
-          DOM.tasksTbody.appendChild(tr);
-        });
-      }
-
-      async function revokeTask(taskId) {
-        if (!confirm('确定要从 MongoDB 撤销并物理删除该任务吗？此操作不可逆。')) return;
-
-        try {
-          const res = await fetch(`/api/admin/tasks/delete/${taskId}`, { method: 'DELETE' });
-          const data = await res.json();
-          if (data.success) {
-            showToast('任务已成功撤销并自数据库移除', 'success');
-            loadTasks();
-          } else {
-            showToast(data.message || '撤销失败', 'error');
-          }
-        } catch (e) {
-          showToast('网络错误，撤销失败', 'error');
-        }
-      }
-
-      // --- REQUESTS ENGINE ---
-      async function loadRequests() {
-        try {
+        async getRequests() {
           const res = await fetch('/api/admin/requests/all');
-          const data = await res.json();
-          if (data.success) {
-            State.requests = data.data;
-            renderRequests(data.data);
-          }
-        } catch (e) {
-          showToast('无法读取申请工单', 'error');
-        }
-      }
+          return await res.json();
+        },
 
-      function renderRequests(reqs) {
-        DOM.requestsTbody.innerHTML = '';
-        if (!reqs.length) {
-          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">暂无员工申请单</td></tr>';
-          return;
-        }
-
-        reqs.forEach(r => {
-          const tr = document.createElement('tr');
-          const badgeClass = r.status === 'approved' ? 'badge-approved' : (r.status === 'rejected' ? 'badge-rejected' : 'badge-pending');
-          const statusText = r.status === 'approved' ? '已批准' : (r.status === 'rejected' ? '已驳回' : '待处理');
-
-          tr.innerHTML = `
-            <td><strong>${escapeHtml(r.request_title)}</strong></td>
-            <td>${escapeHtml(r.applicant_name)} (${escapeHtml(r.applicant_username)})</td>
-            <td>${escapeHtml(r.department)}</td>
-            <td style="max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(r.request_body)}</td>
-            <td><span class="badge ${badgeClass}">${statusText}</span></td>
-            <td>${formatDate(r.submitted_at)}</td>
-            <td style="white-space: nowrap;">
-              <button class="btn-action-approve" data-id="${r._id}">批准</button>
-              <button class="btn-action-reject" data-id="${r._id}">驳回</button>
-              <button class="btn-action-delete" data-id="${r._id}">删除数据</button>
-            </td>
-          `;
-
-          tr.querySelector('.btn-action-approve').addEventListener('click', () => updateRequestStatus(r._id, 'approved'));
-          tr.querySelector('.btn-action-reject').addEventListener('click', () => updateRequestStatus(r._id, 'rejected'));
-          tr.querySelector('.btn-action-delete').addEventListener('click', () => deleteRequestRecord(r._id));
-
-          DOM.requestsTbody.appendChild(tr);
-        });
-      }
-
-      async function updateRequestStatus(id, status) {
-        try {
+        async updateRequestStatus(id, status) {
           const res = await fetch(`/api/admin/requests/status/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status })
           });
-          const data = await res.json();
-          if (data.success) {
-            showToast('状态已更新', 'success');
-            loadRequests();
-          }
-        } catch (e) {
-          showToast('状态更新失败', 'error');
-        }
-      }
+          return await res.json();
+        },
 
-      async function deleteRequestRecord(id) {
-        if (!confirm('确定将该申请记录从 MongoDB 物理删除？')) return;
-        try {
+        async deleteRequest(id) {
           const res = await fetch(`/api/admin/requests/delete/${id}`, { method: 'DELETE' });
-          const data = await res.json();
-          if (data.success) {
-            showToast('申请数据已删除', 'success');
-            loadRequests();
+          return await res.json();
+        },
+
+        async getEmployees() {
+          const res = await fetch('/api/admin/employees/list');
+          return await res.json();
+        },
+
+        async createEmployee(payload) {
+          const res = await fetch('/api/admin/employees/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          return await res.json();
+        },
+
+        async deleteEmployee(id) {
+          const res = await fetch(`/api/admin/employees/delete/${id}`, { method: 'DELETE' });
+          return await res.json();
+        }
+      };
+
+      // ------------------------------------------------------------------------
+      // UI RENDERERS & ROUTER
+      // ------------------------------------------------------------------------
+      function switchPane(targetPaneId) {
+        Haptics.light();
+        State.currentPaneId = targetPaneId;
+
+        DOM.navButtons.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-target-pane') === targetPaneId);
+        });
+
+        DOM.panes.forEach(p => {
+          p.classList.toggle('active-pane', p.id === targetPaneId);
+        });
+
+        if (targetPaneId === 'pane-tasks-management') loadTasks();
+        if (targetPaneId === 'pane-requests-audit') loadRequests();
+        if (targetPaneId === 'pane-employees-registry') loadEmployees();
+      }
+
+      async function initializeSession() {
+        try {
+          const data = await AdminApi.checkSession();
+          if (data.gateLocked) {
+            DOM.gateOverlay.style.display = 'flex';
+            DOM.adminLoginOverlay.style.display = 'none';
+            DOM.appContainer.style.display = 'none';
+            return;
+          }
+
+          DOM.gateOverlay.style.display = 'none';
+
+          if (data.success && data.user) {
+            handleLoginSuccess(data.user);
+          } else {
+            DOM.adminLoginOverlay.style.display = 'flex';
+            DOM.appContainer.style.display = 'none';
           }
         } catch (e) {
-          showToast('删除失败', 'error');
+          DOM.gateOverlay.style.display = 'flex';
+          DOM.adminLoginOverlay.style.display = 'none';
+          DOM.appContainer.style.display = 'none';
         }
       }
 
-      // --- EMPLOYEES ENGINE ---
+      function handleLoginSuccess(user) {
+        State.adminUser = user;
+        DOM.gateOverlay.style.display = 'none';
+        DOM.adminLoginOverlay.style.display = 'none';
+        DOM.appContainer.style.display = 'block';
+
+        DOM.sidebarAdminFullname.textContent = user.full_name || user.username;
+        loadEmployees();
+        switchPane('pane-tasks-management');
+      }
+
+      // --- TASKS MODULE ---
+      async function loadTasks() {
+        try {
+          const res = await AdminApi.getTasks();
+          if (res.success) {
+            State.tasks = res.data;
+            renderTasksTable(res.data);
+          }
+        } catch (e) {
+          Utils.showToast('无法读取任务列表', 'error');
+        }
+      }
+
+      function renderTasksTable(tasks) {
+        DOM.tasksTbody.innerHTML = '';
+        if (!tasks || !tasks.length) {
+          DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">暂无派发的任务</td></tr>';
+          return;
+        }
+
+        tasks.forEach(t => {
+          const isClaimed = t.status !== 'Assigned';
+          const attCount = (t.attachments || []).length;
+          const tr = document.createElement('tr');
+
+          tr.innerHTML = `
+            <td><strong style="color:#ffffff;">${Utils.escapeHtml(t.task_title)}</strong></td>
+            <td><code>${Utils.escapeHtml(t.assigned_to_username)}</code></td>
+            <td><span class="ios-status-badge badge-blue">📎 ${attCount} 个附件</span></td>
+            <td><span class="ios-status-badge ${isClaimed ? 'badge-green' : 'badge-amber'}">${isClaimed ? '已领取确认' : '待领取'}</span></td>
+            <td>${Utils.formatDate(t.created_at)}</td>
+            <td>${Utils.formatDate(t.claimed_at)}</td>
+            <td>
+              <button class="btn-cell-action btn-cell-danger pressable" data-id="${t._id}">
+                <svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>撤销并删除</span>
+              </button>
+            </td>
+          `;
+
+          tr.querySelector('.btn-cell-danger').addEventListener('click', () => revokeTask(t._id));
+          DOM.tasksTbody.appendChild(tr);
+        });
+      }
+
+      async function revokeTask(id) {
+        Haptics.medium();
+        if (!confirm('确定将该任务及挂载附件从 MongoDB 中彻底删除？此操作不可逆。')) return;
+
+        try {
+          const res = await AdminApi.deleteTask(id);
+          if (res.success) {
+            Utils.showToast('任务已从数据库物理移除', 'success');
+            loadTasks();
+          } else {
+            Utils.showToast(res.message || '删除失败', 'error');
+          }
+        } catch (e) {
+          Utils.showToast('网络错误，删除失败', 'error');
+        }
+      }
+
+      // --- REQUESTS MODULE ---
+      async function loadRequests() {
+        try {
+          const res = await AdminApi.getRequests();
+          if (res.success) {
+            State.requests = res.data;
+            renderRequestsTable(res.data);
+          }
+        } catch (e) {
+          Utils.showToast('无法读取申请工单', 'error');
+        }
+      }
+
+      function renderRequestsTable(reqs) {
+        DOM.requestsTbody.innerHTML = '';
+        if (!reqs || !reqs.length) {
+          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">暂无员工申请记录</td></tr>';
+          return;
+        }
+
+        reqs.forEach(r => {
+          const tr = document.createElement('tr');
+          let statusBadge = '<span class="ios-status-badge badge-amber">审批中</span>';
+          if (r.status === 'approved') statusBadge = '<span class="ios-status-badge badge-green">已批准</span>';
+          if (r.status === 'rejected') statusBadge = '<span class="ios-status-badge badge-red">已驳回</span>';
+
+          tr.innerHTML = `
+            <td><strong style="color:#ffffff;">${Utils.escapeHtml(r.request_title)}</strong></td>
+            <td>${Utils.escapeHtml(r.applicant_name)} (${Utils.escapeHtml(r.applicant_username)})</td>
+            <td>${Utils.escapeHtml(r.department)}</td>
+            <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(r.request_body)}</td>
+            <td>${statusBadge}</td>
+            <td>${Utils.formatDate(r.submitted_at)}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn-cell-action btn-cell-success pressable" data-id="${r._id}">批准</button>
+              <button class="btn-cell-action btn-cell-amber pressable" data-id="${r._id}">驳回</button>
+              <button class="btn-cell-action btn-cell-danger pressable" data-id="${r._id}">清除</button>
+            </td>
+          `;
+
+          tr.querySelector('.btn-cell-success').addEventListener('click', () => updateRequest(r._id, 'approved'));
+          tr.querySelector('.btn-cell-amber').addEventListener('click', () => updateRequest(r._id, 'rejected'));
+          tr.querySelector('.btn-cell-danger').addEventListener('click', () => deleteRequest(r._id));
+
+          DOM.requestsTbody.appendChild(tr);
+        });
+      }
+
+      async function updateRequest(id, status) {
+        Haptics.light();
+        try {
+          const res = await AdminApi.updateRequestStatus(id, status);
+          if (res.success) {
+            Utils.showToast('工单状态已同步', 'success');
+            loadRequests();
+          }
+        } catch (e) {
+          Utils.showToast('状态更新失败', 'error');
+        }
+      }
+
+      async function deleteRequest(id) {
+        Haptics.medium();
+        if (!confirm('确定将该申请数据彻底物理清除？')) return;
+        try {
+          const res = await AdminApi.deleteRequest(id);
+          if (res.success) {
+            Utils.showToast('申请数据已彻底清除', 'success');
+            loadRequests();
+          }
+        } catch (e) {
+          Utils.showToast('清除失败', 'error');
+        }
+      }
+
+      // --- EMPLOYEES MODULE ---
       async function loadEmployees() {
         try {
-          const res = await fetch('/api/admin/employees/list');
-          const data = await res.json();
-          if (data.success) {
-            State.employees = data.data;
-            renderEmployees(data.data);
-            populateAssigneeSelect(data.data);
+          const res = await AdminApi.getEmployees();
+          if (res.success) {
+            State.employees = res.data;
+            renderEmployeesTable(res.data);
+            populateAssigneeSelect(res.data);
           }
         } catch (e) {
-          showToast('无法读取员工花名册', 'error');
+          Utils.showToast('无法读取员工名册', 'error');
         }
       }
 
-      function renderEmployees(emps) {
+      function renderEmployeesTable(emps) {
         DOM.employeesTbody.innerHTML = '';
-        if (!emps.length) {
-          DOM.employeesTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">暂无注册员工</td></tr>';
+        if (!emps || !emps.length) {
+          DOM.employeesTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:32px;">暂无员工账号</td></tr>';
           return;
         }
 
         emps.forEach(emp => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><code>${escapeHtml(emp.staff_id)}</code></td>
-            <td><strong>${escapeHtml(emp.username)}</strong></td>
-            <td>${escapeHtml(emp.full_name)}</td>
-            <td>${escapeHtml(emp.department)}</td>
-            <td>${formatDate(emp.created_at)}</td>
+            <td><code>${Utils.escapeHtml(emp.staff_id)}</code></td>
+            <td><strong>${Utils.escapeHtml(emp.username)}</strong></td>
+            <td>${Utils.escapeHtml(emp.full_name)}</td>
+            <td>${Utils.escapeHtml(emp.department)}</td>
+            <td>${Utils.formatDate(emp.created_at)}</td>
             <td>
-              <button class="btn-action-delete" data-emp-id="${emp._id}">注销账号</button>
+              <button class="btn-cell-action btn-cell-danger pressable" data-id="${emp._id}">注销账号</button>
             </td>
           `;
 
-          tr.querySelector('.btn-action-delete').addEventListener('click', () => deregisterEmployee(emp._id, emp.full_name));
+          tr.querySelector('.btn-cell-danger').addEventListener('click', () => deregisterEmployee(emp._id, emp.full_name));
           DOM.employeesTbody.appendChild(tr);
         });
       }
 
       function populateAssigneeSelect(emps) {
-        DOM.taskInAssignee.innerHTML = '';
+        DOM.taskAssigneeSelect.innerHTML = '';
         emps.forEach(emp => {
           const opt = document.createElement('option');
           opt.value = emp.username;
           opt.textContent = `${emp.full_name} (${emp.username}) - ${emp.department}`;
-          DOM.taskInAssignee.appendChild(opt);
+          DOM.taskAssigneeSelect.appendChild(opt);
         });
       }
 
-      async function deregisterEmployee(empId, name) {
-        if (!confirm(`警告：确定要注销并删除员工 [${name}] 的账号吗？该员工将无法再登录。`)) return;
+      async function deregisterEmployee(id, name) {
+        Haptics.medium();
+        if (!confirm(`警告：确定注销并彻底删除员工 [${name}] 的凭证？该员工将无法再访问系统。`)) return;
 
         try {
-          const res = await fetch(`/api/admin/employees/delete/${empId}`, { method: 'DELETE' });
-          const data = await res.json();
-          if (data.success) {
-            showToast('员工账号已成功注销', 'success');
+          const res = await AdminApi.deleteEmployee(id);
+          if (res.success) {
+            Utils.showToast('员工账号已注销', 'success');
             loadEmployees();
           } else {
-            showToast(data.message || '注销失败', 'error');
+            Utils.showToast(res.message || '注销失败', 'error');
           }
         } catch (e) {
-          showToast('操作网络异常', 'error');
+          Utils.showToast('网络异常，注销失败', 'error');
         }
       }
 
-      // --- LISTENERS ---
-      function setupListeners() {
-        // Gate Form Submit
+      // ------------------------------------------------------------------------
+      // EVENT LISTENERS & MODAL CONTROLLERS
+      // ------------------------------------------------------------------------
+      function bindEvents() {
+        // Navigation Switching
+        DOM.navButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-target-pane');
+            if (target) switchPane(target);
+          });
+        });
+
+        // Gate Verification Submit
         DOM.gateForm.addEventListener('submit', async (e) => {
           e.preventDefault();
-          const pass = DOM.gateInput.value.trim();
+          Haptics.light();
+          const pass = DOM.gatePassInput.value.trim();
+
+          DOM.btnGateSubmit.disabled = true;
+          DOM.btnGateSubmit.innerHTML = '<span>校验口令中...</span>';
+
           try {
-            const res = await fetch('/api/gate/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ password: pass })
-            });
-            const data = await res.json();
-            if (data.success) {
-              showToast('通行口令验证通过', 'success');
-              DOM.gateView.style.display = 'none';
-              checkSession();
+            const res = await AdminApi.verifyGate(pass);
+            if (res.success) {
+              Utils.showToast('通行口令验证通过', 'success');
+              DOM.gateOverlay.style.display = 'none';
+              initializeSession();
             } else {
-              showToast(data.message || '通行口令错误', 'error');
-              DOM.gateInput.value = '';
+              Utils.showToast(res.message || '口令错误', 'error');
+              DOM.gatePassInput.value = '';
             }
           } catch (e) {
-            showToast('验证请求失败', 'error');
+            Utils.showToast('验证请求失败', 'error');
+          } finally {
+            DOM.btnGateSubmit.disabled = false;
+            DOM.btnGateSubmit.innerHTML = '<span>验证凭据并进入</span>';
           }
         });
 
-        DOM.navButtons.forEach(btn => {
-          btn.addEventListener('click', () => switchTab(btn.getAttribute('data-target')));
-        });
-
-        // Admin Login
-        DOM.loginForm.addEventListener('submit', async (e) => {
+        // Admin Credentials Login Submit
+        DOM.adminLoginForm.addEventListener('submit', async (e) => {
           e.preventDefault();
+          Haptics.light();
+          const u = DOM.adminUserInput.value.trim();
+          const p = DOM.adminPassInput.value;
+
+          DOM.btnAdminLoginSubmit.disabled = true;
+          DOM.btnAdminLoginSubmit.innerHTML = '<span>身份鉴权中...</span>';
+
           try {
-            const res = await fetch('/api/admin/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                username: DOM.adminUserIn.value.trim(),
-                password: DOM.adminPassIn.value
-              })
-            });
-            const data = await res.json();
-            if (data.success) {
-              handleLoginSuccess(data.user);
+            const res = await AdminApi.login(u, p);
+            if (res.success) {
+              Utils.showToast('管理员身份验证成功！', 'success');
+              handleLoginSuccess(res.user);
             } else {
-              showToast(data.message || '登录失败', 'error');
+              Utils.showToast(res.message || '登录失败', 'error');
             }
           } catch (e) {
-            showToast('无法连接鉴权网关', 'error');
+            Utils.showToast('无法连接鉴权服务器', 'error');
+          } finally {
+            DOM.btnAdminLoginSubmit.disabled = false;
+            DOM.btnAdminLoginSubmit.innerHTML = '<span>登 录 管 制 台</span>';
           }
         });
 
-        // Logout
-        DOM.btnLogout.addEventListener('click', async () => {
-          await fetch('/api/admin/auth/logout', { method: 'POST' });
-          DOM.loginView.style.display = 'flex';
-          DOM.appView.style.display = 'none';
-          showToast('管理会话已注销', 'info');
+        // Desktop Logout
+        DOM.btnDesktopLogout.addEventListener('click', async () => {
+          Haptics.medium();
+          await AdminApi.logout();
+          DOM.appContainer.style.display = 'none';
+          DOM.adminLoginOverlay.style.display = 'flex';
+          Utils.showToast('管理会话已安全退出', 'info');
         });
 
-        // Modals
-        DOM.btnOpenTaskModal.addEventListener('click', () => DOM.modalTask.classList.add('open'));
-        DOM.btnCloseTaskModal.addEventListener('click', () => DOM.modalTask.classList.remove('open'));
+        // Modal Sheet Toggles
+        DOM.btnOpenTaskSheet.addEventListener('click', () => {
+          Haptics.light();
+          DOM.modalTaskBackdrop.classList.add('open');
+        });
+        DOM.btnCloseTaskModal.addEventListener('click', () => {
+          DOM.modalTaskBackdrop.classList.remove('open');
+        });
 
-        DOM.btnOpenEmpModal.addEventListener('click', () => DOM.modalEmployee.classList.add('open'));
-        DOM.btnCloseEmpModal.addEventListener('click', () => DOM.modalEmployee.classList.remove('open'));
+        DOM.btnOpenEmpSheet.addEventListener('click', () => {
+          Haptics.light();
+          DOM.modalEmpBackdrop.classList.add('open');
+        });
+        DOM.btnCloseEmpModal.addEventListener('click', () => {
+          DOM.modalEmpBackdrop.classList.remove('open');
+        });
 
-        // Form Submit: Create Task
-        DOM.formCreateTask.addEventListener('submit', async (e) => {
+        // Task Form Submit (with Multer files)
+        DOM.formDispatchTask.addEventListener('submit', async (e) => {
           e.preventDefault();
-          const payload = {
-            title: document.getElementById('task-in-title').value.trim(),
-            assigned_to_username: DOM.taskInAssignee.value,
-            description: document.getElementById('task-in-desc').value.trim()
-          };
+          Haptics.light();
+
+          const files = DOM.taskFilesInput.files;
+          if (files.length > 5) {
+            Utils.showToast('最多允许同时上传 5 个附件', 'error');
+            return;
+          }
+
+          for (let i = 0; i < files.length; i++) {
+            if (files[i].size > 10 * 1024 * 1024) {
+              Utils.showToast(`文件 "${files[i].name}" 超过 10MB 限制`, 'error');
+              return;
+            }
+          }
+
+          DOM.btnSubmitTaskAction.disabled = true;
+          DOM.btnSubmitTaskAction.innerHTML = '<span>正在持久化存储至 MongoDB...</span>';
+
+          const formData = new FormData();
+          formData.append('title', DOM.taskTitleInput.value.trim());
+          formData.append('assigned_to_username', DOM.taskAssigneeSelect.value);
+          formData.append('description', DOM.taskDescInput.value.trim());
+
+          for (let i = 0; i < files.length; i++) {
+            formData.append('attachments', files[i]);
+          }
 
           try {
-            const res = await fetch('/api/admin/tasks/create', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.success) {
-              showToast('任务已成功派发并存入数据库！', 'success');
-              DOM.modalTask.classList.remove('open');
-              DOM.formCreateTask.reset();
+            const res = await AdminApi.createTask(formData);
+            if (res.success) {
+              Utils.showToast('任务与附件已成功存入 MongoDB！', 'success');
+              DOM.modalTaskBackdrop.classList.remove('open');
+              DOM.formDispatchTask.reset();
               loadTasks();
             } else {
-              showToast(data.message || '发布失败', 'error');
+              Utils.showToast(res.message || '派发失败', 'error');
             }
           } catch (e) {
-            showToast('派发异常', 'error');
+            Utils.showToast('派发异常', 'error');
+          } finally {
+            DOM.btnSubmitTaskAction.disabled = false;
+            DOM.btnSubmitTaskAction.innerHTML = '<span>确认发布任务并上传</span>';
           }
         });
 
-        // Form Submit: Register Employee
-        DOM.formCreateEmployee.addEventListener('submit', async (e) => {
+        // Register Employee Submit
+        DOM.formRegisterEmployee.addEventListener('submit', async (e) => {
           e.preventDefault();
+          Haptics.light();
+
           const payload = {
-            staff_id: document.getElementById('emp-in-staffid').value.trim(),
-            username: document.getElementById('emp-in-username').value.trim(),
-            password: document.getElementById('emp-in-password').value,
-            full_name: document.getElementById('emp-in-fullname').value.trim(),
-            department: document.getElementById('emp-in-dept').value.trim()
+            staff_id: DOM.empStaffIdInput.value.trim(),
+            username: DOM.empUsernameInput.value.trim(),
+            password: DOM.empPasswordInput.value,
+            full_name: DOM.empFullNameInput.value.trim(),
+            department: DOM.empDeptInput.value.trim()
           };
 
+          DOM.btnSubmitEmpAction.disabled = true;
+          DOM.btnSubmitEmpAction.innerHTML = '<span>写入数据中...</span>';
+
           try {
-            const res = await fetch('/api/admin/employees/create', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            });
-            const data = await res.json();
-            if (data.success) {
-              showToast('员工账号注册成功！', 'success');
-              DOM.modalEmployee.classList.remove('open');
-              DOM.formCreateEmployee.reset();
+            const res = await AdminApi.createEmployee(payload);
+            if (res.success) {
+              Utils.showToast('员工账号注册成功！', 'success');
+              DOM.modalEmpBackdrop.classList.remove('open');
+              DOM.formRegisterEmployee.reset();
               loadEmployees();
             } else {
-              showToast(data.message || '注册失败', 'error');
+              Utils.showToast(res.message || '注册失败', 'error');
             }
           } catch (e) {
-            showToast('注册网络异常', 'error');
+            Utils.showToast('网络注册异常', 'error');
+          } finally {
+            DOM.btnSubmitEmpAction.disabled = false;
+            DOM.btnSubmitEmpAction.innerHTML = '<span>写入 MongoDB 注册账号</span>';
           }
         });
       }
 
-      function escapeHtml(str) {
-        if (!str) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(str).replace(/[&<>"']/g, m => map[m]);
-      }
-
+      // ------------------------------------------------------------------------
+      // BOOTSTRAP
+      // ------------------------------------------------------------------------
       window.addEventListener('DOMContentLoaded', () => {
-        setupListeners();
-        checkSession();
+        bindEvents();
+        initializeSession();
       });
-    })();
+
+    })(window, document);
   </script>
 </body>
 </html>
