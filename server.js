@@ -21,13 +21,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configure Multer in Memory: max 10MB per file, max 5 files
+// Configure Multer in Memory: max 25MB per file, max 5 files
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB Limit
-    files: 5 // Max 5 files
+    fileSize: 25 * 1024 * 1024, // 25MB
+    files: 5
   }
 });
 
@@ -45,6 +45,7 @@ const CorporateEmployeeAccountSchema = new mongoose.Schema({
   password_hash: { type: String, required: true },
   full_name: { type: String, required: true },
   department: { type: String, required: true },
+  account_balance: { type: Number, default: 0.00 }, // Account Reward Balance
   role: { type: String, default: 'employee' },
   created_at: { type: Date, default: Date.now }
 }, { collection: 'corp_app_employee_accounts' });
@@ -59,11 +60,12 @@ const CorporateApplicationRequestSchema = new mongoose.Schema({
   submitted_at: { type: Date, default: Date.now }
 }, { collection: 'corp_app_staff_requests' });
 
-const TaskAttachmentSchema = new mongoose.Schema({
+const FileAttachmentSchema = new mongoose.Schema({
   filename: { type: String, required: true },
   mimetype: { type: String, required: true },
   size: { type: Number, required: true },
-  data: { type: Buffer, required: true }
+  data: { type: Buffer, required: true },
+  uploaded_at: { type: Date, default: Date.now }
 });
 
 const CorporateTaskSchema = new mongoose.Schema({
@@ -71,9 +73,17 @@ const CorporateTaskSchema = new mongoose.Schema({
   task_description: { type: String, required: true },
   assigned_to_username: { type: String, required: true },
   priority: { type: String, enum: ['Low', 'Normal', 'High', 'Urgent'], default: 'Normal' },
-  status: { type: String, enum: ['Assigned', 'Claimed', 'In Progress', 'Completed'], default: 'Assigned' },
-  attachments: [TaskAttachmentSchema],
+  reward_amount: { type: Number, default: 0.00 }, // Reward Amount
+  requires_submission: { type: Boolean, default: false }, // Needs user submission
+  submission_deadline: { type: Date, default: null }, // Deadline
+  status: { type: String, enum: ['Assigned', 'Claimed', 'Submitted', 'Completed'], default: 'Assigned' },
+  reward_distributed: { type: Boolean, default: false },
+  attachments: [FileAttachmentSchema], // Admin attachments
+  submissions: [FileAttachmentSchema], // User deliverables
+  submission_notes: { type: String, default: '' },
   claimed_at: { type: Date, default: null },
+  submitted_at: { type: Date, default: null },
+  completed_at: { type: Date, default: null },
   created_at: { type: Date, default: Date.now }
 }, { collection: 'corp_app_tasks' });
 
@@ -148,9 +158,10 @@ const authenticateAdminToken = (req, res, next) => {
 };
 
 // ==========================================================================
-// 1. EMPLOYEE CLIENT APIS
+// 1. EMPLOYEE APIS
 // ==========================================================================
 
+// Employee Login
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -191,15 +202,34 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-app.get('/api/auth/session', authenticateEmployeeToken, (req, res) => {
-  res.json({ success: true, user: req.user });
+// Employee Session Check with Realtime Balance
+app.get('/api/auth/session', authenticateEmployeeToken, async (req, res) => {
+  try {
+    const employee = await EmployeeAccount.findOne({ username: req.user.username });
+    if (!employee) return res.status(404).json({ success: false, message: '用户不存在' });
+
+    res.json({
+      success: true,
+      user: {
+        staff_id: employee.staff_id,
+        username: employee.username,
+        full_name: employee.full_name,
+        department: employee.department,
+        account_balance: employee.account_balance || 0
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: '获取用户信息失败' });
+  }
 });
 
+// Employee Logout
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('corp_auth_token');
   res.json({ success: true, message: '已安全登出。' });
 });
 
+// Employee Submit Application Request
 app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => {
   const { title, body } = req.body;
   if (!title || !body) {
@@ -222,6 +252,7 @@ app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => 
   }
 });
 
+// Employee View Submitted Requests
 app.get('/api/requests/mine', authenticateEmployeeToken, async (req, res) => {
   try {
     const list = await EmployeeRequest.find({ applicant_username: req.user.username }).sort({ submitted_at: -1 });
@@ -231,12 +262,12 @@ app.get('/api/requests/mine', authenticateEmployeeToken, async (req, res) => {
   }
 });
 
-// Employee View Tasks (Attachments metadata projected without heavy binary data)
+// Employee Tasks View
 app.get('/api/tasks/list', authenticateEmployeeToken, async (req, res) => {
   try {
     const tasks = await TaskItem.find(
       { assigned_to_username: req.user.username },
-      { 'attachments.data': 0 } // Exclude buffer data in list view for performance
+      { 'attachments.data': 0, 'submissions.data': 0 }
     ).sort({ created_at: -1 });
 
     res.json({ success: true, data: tasks });
@@ -245,7 +276,7 @@ app.get('/api/tasks/list', authenticateEmployeeToken, async (req, res) => {
   }
 });
 
-// Employee Download Attachment
+// Download Admin Attachment
 app.get('/api/tasks/:taskId/attachment/:fileId', authenticateEmployeeToken, async (req, res) => {
   try {
     const task = await TaskItem.findOne({
@@ -253,14 +284,10 @@ app.get('/api/tasks/:taskId/attachment/:fileId', authenticateEmployeeToken, asyn
       assigned_to_username: req.user.username
     });
 
-    if (!task) {
-      return res.status(404).json({ success: false, message: '任务不存在或无权访问。' });
-    }
+    if (!task) return res.status(404).json({ success: false, message: '任务不存在或无权访问。' });
 
     const attachment = task.attachments.id(req.params.fileId);
-    if (!attachment) {
-      return res.status(404).json({ success: false, message: '附件不存在。' });
-    }
+    if (!attachment) return res.status(404).json({ success: false, message: '附件不存在。' });
 
     res.setHeader('Content-Type', attachment.mimetype);
     res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(attachment.filename)}`);
@@ -270,16 +297,33 @@ app.get('/api/tasks/:taskId/attachment/:fileId', authenticateEmployeeToken, asyn
   }
 });
 
+// Download User Deliverable Submission
+app.get('/api/tasks/:taskId/submission/:fileId', authenticateEmployeeToken, async (req, res) => {
+  try {
+    const task = await TaskItem.findOne({
+      _id: req.params.taskId,
+      assigned_to_username: req.user.username
+    });
+
+    if (!task) return res.status(404).json({ success: false, message: '任务不存在或无权访问。' });
+
+    const sub = task.submissions.id(req.params.fileId);
+    if (!sub) return res.status(404).json({ success: false, message: '提交的文件不存在。' });
+
+    res.setHeader('Content-Type', sub.mimetype);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(sub.filename)}`);
+    res.send(sub.data);
+  } catch (error) {
+    res.status(500).json({ success: false, message: '文件下载失败。' });
+  }
+});
+
+// Claim Task
 app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => {
   try {
     const task = await TaskItem.findOne({ _id: req.params.id, assigned_to_username: req.user.username });
-    if (!task) {
-      return res.status(404).json({ success: false, message: '任务不存在或无权领取。' });
-    }
-
-    if (task.status !== 'Assigned') {
-      return res.status(400).json({ success: false, message: '该任务已被领取或已完成。' });
-    }
+    if (!task) return res.status(404).json({ success: false, message: '任务不存在或无权领取。' });
+    if (task.status !== 'Assigned') return res.status(400).json({ success: false, message: '该任务已被领取或已完成。' });
 
     task.status = 'Claimed';
     task.claimed_at = new Date();
@@ -291,26 +335,63 @@ app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => 
   }
 });
 
+// Employee Submit Task Deliverables (Max 5 files <= 25MB before deadline)
+app.post('/api/tasks/submit-deliverables/:id', authenticateEmployeeToken, upload.array('deliverables', 5), async (req, res) => {
+  try {
+    const task = await TaskItem.findOne({ _id: req.params.id, assigned_to_username: req.user.username });
+    if (!task) return res.status(404).json({ success: false, message: '任务不存在或无权操作。' });
+
+    if (!['Claimed', 'Submitted'].includes(task.status)) {
+      return res.status(400).json({ success: false, message: '请先领取任务或该任务已结算。' });
+    }
+
+    // Check deadline if configured
+    if (task.submission_deadline && new Date() > new Date(task.submission_deadline)) {
+      return res.status(400).json({ success: false, message: '已超过任务提交截止时间，禁止提交。' });
+    }
+
+    const { notes } = req.body;
+    const uploadedFiles = (req.files || []).map(f => ({
+      filename: Buffer.from(f.originalname, 'latin1').toString('utf8'),
+      mimetype: f.mimetype,
+      size: f.size,
+      data: f.buffer
+    }));
+
+    if (task.requires_submission && uploadedFiles.length === 0 && (!task.submissions || task.submissions.length === 0)) {
+      return res.status(400).json({ success: false, message: '此任务必须提交附件文件。' });
+    }
+
+    if (uploadedFiles.length > 0) {
+      task.submissions = uploadedFiles;
+    }
+
+    task.submission_notes = (notes || '').trim();
+    task.status = 'Submitted';
+    task.submitted_at = new Date();
+    await task.save();
+
+    res.json({ success: true, message: '成果文件已成功提交并同步至云端！', data: task });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: '成果提交失败。' });
+  }
+});
+
 // ==========================================================================
 // 2. ADMIN APIS
 // ==========================================================================
 
 app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ success: false, message: '请输入管理员账号及密码。' });
-  }
+  if (!username || !password) return res.status(400).json({ success: false, message: '请输入管理员账号及密码。' });
 
   try {
     const adminUser = await EmployeeAccount.findOne({ username: username.trim(), role: 'admin' });
-    if (!adminUser) {
-      return res.status(401).json({ success: false, message: '管理员账号不存在。' });
-    }
+    if (!adminUser) return res.status(401).json({ success: false, message: '管理员账号不存在。' });
 
     const isMatch = await bcrypt.compare(password, adminUser.password_hash);
-    if (!isMatch) {
-      return res.status(401).json({ success: false, message: '管理员密码错误。' });
-    }
+    if (!isMatch) return res.status(401).json({ success: false, message: '管理员密码错误。' });
 
     const payload = {
       staff_id: adminUser.staff_id,
@@ -344,6 +425,7 @@ app.post('/api/admin/auth/logout', (req, res) => {
   res.json({ success: true, message: '管理员已安全退出。' });
 });
 
+// Admin List Employees with Balance
 app.get('/api/admin/employees/list', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const list = await EmployeeAccount.find({ role: 'employee' }).sort({ created_at: -1 });
@@ -353,8 +435,9 @@ app.get('/api/admin/employees/list', checkGateAccess, authenticateAdminToken, as
   }
 });
 
+// Admin Register Employee
 app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken, async (req, res) => {
-  const { staff_id, username, password, full_name, department } = req.body;
+  const { staff_id, username, password, full_name, department, initial_balance } = req.body;
   if (!staff_id || !username || !password || !full_name || !department) {
     return res.status(400).json({ success: false, message: '请完整填写所有员工字段。' });
   }
@@ -363,9 +446,7 @@ app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken,
     const existing = await EmployeeAccount.findOne({
       $or: [{ username: username.trim() }, { staff_id: staff_id.trim() }]
     });
-    if (existing) {
-      return res.status(409).json({ success: false, message: '工号或用户名已存在。' });
-    }
+    if (existing) return res.status(409).json({ success: false, message: '工号或用户名已存在。' });
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
@@ -376,6 +457,7 @@ app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken,
       password_hash,
       full_name: full_name.trim(),
       department: department.trim(),
+      account_balance: parseFloat(initial_balance) || 0.00,
       role: 'employee'
     });
 
@@ -386,37 +468,56 @@ app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken,
   }
 });
 
+// Admin Modify Employee Balance
+app.patch('/api/admin/employees/balance/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  const { balance } = req.body;
+  if (balance === undefined || isNaN(parseFloat(balance))) {
+    return res.status(400).json({ success: false, message: '请输入有效的余额数字。' });
+  }
+
+  try {
+    const emp = await EmployeeAccount.findByIdAndUpdate(
+      req.params.id,
+      { account_balance: parseFloat(balance) },
+      { new: true }
+    );
+    res.json({ success: true, message: '员工账户报酬余额已更新！', data: emp });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '修改余额失败。' });
+  }
+});
+
+// Admin Delete Employee
 app.delete('/api/admin/employees/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const target = await EmployeeAccount.findByIdAndDelete(req.params.id);
-    if (!target) {
-      return res.status(404).json({ success: false, message: '未找到指定员工账号。' });
-    }
-    res.json({ success: true, message: '员工账号已成功注销并从 MongoDB 物理删除。' });
+    if (!target) return res.status(404).json({ success: false, message: '未找到指定员工账号。' });
+    res.json({ success: true, message: '员工账号已注销。' });
   } catch (error) {
     res.status(500).json({ success: false, message: '注销员工失败。' });
   }
 });
 
+// Admin View Tasks
 app.get('/api/admin/tasks/all', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
-    const tasks = await TaskItem.find({}, { 'attachments.data': 0 }).sort({ created_at: -1 });
+    const tasks = await TaskItem.find({}, { 'attachments.data': 0, 'submissions.data': 0 }).sort({ created_at: -1 });
     res.json({ success: true, data: tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: '获取任务汇总失败。' });
   }
 });
 
-// Admin: Create & Dispatch Task with Multer File Uploads
+// Admin Create Task
 app.post('/api/admin/tasks/create', checkGateAccess, authenticateAdminToken, upload.array('attachments', 5), async (req, res) => {
-  const { title, description, assigned_to_username, priority } = req.body;
+  const { title, description, assigned_to_username, priority, reward_amount, requires_submission, submission_deadline } = req.body;
   if (!title || !description || !assigned_to_username) {
     return res.status(400).json({ success: false, message: '任务标题、描述与执行人必填。' });
   }
 
   try {
     const fileAttachments = (req.files || []).map(f => ({
-      filename: Buffer.from(f.originalname, 'latin1').toString('utf8'), // Fix UTF-8 encoding
+      filename: Buffer.from(f.originalname, 'latin1').toString('utf8'),
       mimetype: f.mimetype,
       size: f.size,
       data: f.buffer
@@ -427,29 +528,58 @@ app.post('/api/admin/tasks/create', checkGateAccess, authenticateAdminToken, upl
       task_description: description.trim(),
       assigned_to_username: assigned_to_username.trim(),
       priority: priority || 'Normal',
+      reward_amount: parseFloat(reward_amount) || 0.00,
+      requires_submission: requires_submission === 'true' || requires_submission === true,
+      submission_deadline: submission_deadline ? new Date(submission_deadline) : null,
       status: 'Assigned',
       attachments: fileAttachments
     });
 
     await newTask.save();
-    res.json({ success: true, message: '任务与附件已成功派发并存储至 MongoDB！', data: newTask });
+    res.json({ success: true, message: '任务发布成功！', data: newTask });
   } catch (error) {
-    res.status(500).json({ success: false, message: '派发任务或上传附件失败。' });
+    res.status(500).json({ success: false, message: '派发任务失败。' });
   }
 });
 
+// Admin Complete Task & Auto Distribute Reward
+app.post('/api/admin/tasks/complete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
+  try {
+    const task = await TaskItem.findById(req.params.id);
+    if (!task) return res.status(404).json({ success: false, message: '任务未找到。' });
+    if (task.status === 'Completed') return res.status(400).json({ success: false, message: '该任务此前已标记为完成。' });
+
+    task.status = 'Completed';
+    task.completed_at = new Date();
+
+    // Auto distribute reward
+    if (!task.reward_distributed && task.reward_amount > 0) {
+      await EmployeeAccount.findOneAndUpdate(
+        { username: task.assigned_to_username },
+        { $inc: { account_balance: task.reward_amount } }
+      );
+      task.reward_distributed = true;
+    }
+
+    await task.save();
+    res.json({ success: true, message: `任务已审核完成！报酬 ¥${task.reward_amount.toFixed(2)} 已自动划拨至员工账户。`, data: task });
+  } catch (error) {
+    res.status(500).json({ success: false, message: '审核完成处理失败。' });
+  }
+});
+
+// Admin Delete Task
 app.delete('/api/admin/tasks/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const result = await TaskItem.findByIdAndDelete(req.params.id);
-    if (!result) {
-      return res.status(404).json({ success: false, message: '任务不存在或已删除。' });
-    }
-    res.json({ success: true, message: '任务及附件已撤销并从 MongoDB 彻底删除。' });
+    if (!result) return res.status(404).json({ success: false, message: '任务不存在。' });
+    res.json({ success: true, message: '任务已撤销并删除。' });
   } catch (error) {
-    res.status(500).json({ success: false, message: '撤销任务失败。' });
+    res.status(500).json({ success: false, message: '撤销失败。' });
   }
 });
 
+// Admin Requests
 app.get('/api/admin/requests/all', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const requests = await EmployeeRequest.find().sort({ submitted_at: -1 });
@@ -466,11 +596,7 @@ app.patch('/api/admin/requests/status/:id', checkGateAccess, authenticateAdminTo
   }
 
   try {
-    const updated = await EmployeeRequest.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
+    const updated = await EmployeeRequest.findByIdAndUpdate(req.params.id, { status }, { new: true });
     res.json({ success: true, message: '申请状态已同步更新。', data: updated });
   } catch (error) {
     res.status(500).json({ success: false, message: '更新审批状态失败。' });
@@ -480,16 +606,15 @@ app.patch('/api/admin/requests/status/:id', checkGateAccess, authenticateAdminTo
 app.delete('/api/admin/requests/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     await EmployeeRequest.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: '申请记录已从 MongoDB 彻底清除。' });
+    res.json({ success: true, message: '申请记录已清除。' });
   } catch (error) {
-    res.status(500).json({ success: false, message: '删除申请失败。' });
+    res.status(500).json({ success: false, message: '删除失败。' });
   }
 });
 
 // Seed Initial Accounts
 async function initSeed() {
   const salt = await bcrypt.genSalt(10);
-
   const empCount = await EmployeeAccount.countDocuments({ role: 'employee' });
   if (empCount === 0) {
     const empHash = await bcrypt.hash('Employee@2026', salt);
@@ -499,6 +624,7 @@ async function initSeed() {
       password_hash: empHash,
       full_name: 'Alex Vance',
       department: 'Infrastructure Operations',
+      account_balance: 150.00,
       role: 'employee'
     });
     console.log('Default employee created: corp_employee / Employee@2026');
