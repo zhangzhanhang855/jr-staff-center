@@ -11,26 +11,19 @@
   <!-- Google Sans & Google Sans Text Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Google+Sans+Text:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Google+Sans+Text:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    /* ==========================================================================
-       1. IOS GLASS DESIGN SYSTEM & GOOGLE SANS TOKENS
-       ========================================================================== */
     :root {
       --ios-bg-canvas: #090d16;
       --ios-bg-gradient: radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.85) 45%, #050811 100%);
       
-      /* Liquid Glass Tokens */
       --glass-panel-bg: rgba(255, 255, 255, 0.06);
-      --glass-panel-bg-hover: rgba(255, 255, 255, 0.09);
       --glass-panel-border: rgba(255, 255, 255, 0.12);
-      --glass-panel-border-glow: rgba(59, 130, 246, 0.35);
       --glass-blur-strength: blur(28px) saturate(190%);
       --glass-blur-subtle: blur(16px) saturate(160%);
       --glass-specular-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 100%);
       
-      /* Vibrant Accents */
       --ios-blue: #0a84ff;
       --ios-blue-hover: #0070e0;
       --ios-blue-glow: 0 0 20px rgba(10, 132, 255, 0.4);
@@ -42,19 +35,15 @@
       --ios-purple-soft: rgba(191, 90, 242, 0.15);
       --ios-red: #ff453a;
       --ios-red-soft: rgba(255, 69, 58, 0.15);
-      --ios-red-hover: #e0352b;
       
-      /* Typography Colors */
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-subtle: #64748b;
       
-      /* Fonts */
       --font-display: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-body: 'Google Sans Text', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', ui-monospace, monospace;
       
-      /* Radii & Shadows */
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 22px;
@@ -62,19 +51,13 @@
       --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
       --shadow-float: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
       
-      /* Structural Measurements */
       --sidebar-width: 280px;
       --bottom-nav-height: 70px;
       
-      /* Transitions */
       --ios-spring: 380ms cubic-bezier(0.175, 0.885, 0.32, 1.15);
       --transition-fast: 160ms ease;
-      --transition-normal: 260ms ease;
     }
 
-    /* ==========================================================================
-       2. RESET & BASE LAYOUT
-       ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -98,40 +81,20 @@
       font-size: 14px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
     }
 
-    h1, h2, h3, h4, h5, h6, .brand-title {
-      font-family: var(--font-display);
-    }
-
-    input, select, textarea, button {
-      font-family: inherit;
-      font-size: inherit;
-      outline: none;
-      border: none;
-      background: none;
-    }
-
-    code {
-      font-family: var(--font-mono);
-      font-size: 12.5px;
-    }
+    h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
+    input, select, textarea, button { font-family: inherit; font-size: inherit; outline: none; border: none; background: none; }
+    code { font-family: var(--font-mono); font-size: 12.5px; }
 
     .pressable {
       transition: transform var(--transition-fast), filter var(--transition-fast);
       will-change: transform;
     }
+    .pressable:active { transform: scale(0.965); filter: brightness(1.15); }
 
-    .pressable:active {
-      transform: scale(0.965);
-      filter: brightness(1.15);
-    }
-
-    /* ==========================================================================
-       3. NOTIFICATION SYSTEM (IOS PILL TOAST)
-       ========================================================================== */
+    /* Toasts */
     #toast-container {
       position: fixed;
       top: 24px;
@@ -162,31 +125,13 @@
       gap: 12px;
       transform: translateY(-40px) scale(0.92);
       opacity: 0;
-      transition: transform var(--ios-spring), opacity var(--transition-normal);
+      transition: transform var(--ios-spring), opacity 260ms ease;
     }
+    .toast-item.show { transform: translateY(0) scale(1); opacity: 1; }
+    .toast-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    .toast-message { font-size: 13.5px; font-weight: 500; color: var(--text-main); line-height: 1.4; flex: 1; }
 
-    .toast-item.show {
-      transform: translateY(0) scale(1);
-      opacity: 1;
-    }
-
-    .toast-icon {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
-
-    .toast-message {
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--text-main);
-      line-height: 1.4;
-      flex: 1;
-    }
-
-    /* ==========================================================================
-       4. GATE SCREEN & ADMIN LOGIN OVERLAYS
-       ========================================================================== */
+    /* Auth Overlays */
     .glass-auth-overlay {
       position: fixed;
       inset: 0;
@@ -213,16 +158,6 @@
       overflow: hidden;
     }
 
-    .glass-auth-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--glass-specular-highlight);
-    }
-
     .glass-icon-wrapper {
       width: 64px;
       height: 64px;
@@ -236,32 +171,10 @@
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    .glass-auth-title {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-      margin-bottom: 6px;
-    }
-
-    .glass-auth-subtitle {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 26px;
-    }
-
-    .glass-form-group {
-      margin-bottom: 18px;
-      text-align: left;
-    }
-
-    .glass-label {
-      display: block;
-      font-size: 12.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 7px;
-      margin-left: 2px;
-    }
+    .glass-auth-title { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 6px; }
+    .glass-auth-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 26px; }
+    .glass-form-group { margin-bottom: 18px; text-align: left; }
+    .glass-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 7px; margin-left: 2px; }
 
     .glass-input-field {
       width: 100%;
@@ -274,7 +187,6 @@
       font-size: 14.5px;
       transition: all var(--transition-fast);
     }
-
     .glass-input-field:focus {
       background: rgba(255, 255, 255, 0.09);
       border-color: var(--ios-blue);
@@ -290,10 +202,9 @@
       color: var(--text-main);
       font-size: 14px;
       resize: vertical;
-      min-height: 100px;
+      min-height: 90px;
       transition: all var(--transition-fast);
     }
-
     .glass-textarea:focus {
       background: rgba(255, 255, 255, 0.09);
       border-color: var(--ios-blue);
@@ -316,21 +227,10 @@
       box-shadow: var(--ios-blue-glow);
       transition: background-color var(--transition-fast);
     }
+    .btn-ios-primary:hover { background-color: var(--ios-blue-hover); }
 
-    .btn-ios-primary:hover {
-      background-color: var(--ios-blue-hover);
-    }
-
-    /* ==========================================================================
-       5. MAIN APPLICATION STRUCTURE (SIDEBAR & BOTTOM DOCK)
-       ========================================================================== */
-    #admin-app-container {
-      display: none;
-      min-height: 100vh;
-      position: relative;
-    }
-
-    /* Left Frosted Sidebar (Desktop) */
+    /* App Shell */
+    #admin-app-container { display: none; min-height: 100vh; position: relative; }
     .ios-sidebar {
       position: fixed;
       top: 0;
@@ -353,7 +253,6 @@
       align-items: center;
       gap: 12px;
     }
-
     .sidebar-avatar-logo {
       width: 40px;
       height: 40px;
@@ -366,30 +265,10 @@
       font-size: 16px;
       box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
     }
+    .sidebar-brand-text h2 { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+    .sidebar-brand-text span { font-size: 10.5px; color: var(--ios-blue); text-transform: uppercase; font-weight: 700; letter-spacing: 0.6px; }
 
-    .sidebar-brand-text h2 {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-    }
-
-    .sidebar-brand-text span {
-      font-size: 10.5px;
-      color: var(--ios-blue);
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-    }
-
-    .sidebar-nav-list {
-      list-style: none;
-      padding: 22px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex: 1;
-    }
-
+    .sidebar-nav-list { list-style: none; padding: 22px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .sidebar-nav-item-btn {
       width: 100%;
       height: 44px;
@@ -405,30 +284,10 @@
       text-align: left;
       transition: all var(--transition-fast);
     }
-
-    .sidebar-nav-item-btn:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-main);
-    }
-
-    .sidebar-nav-item-btn.active {
-      background: rgba(10, 132, 255, 0.18);
-      color: #ffffff;
-      font-weight: 600;
-      border: 1px solid rgba(10, 132, 255, 0.3);
-    }
-
-    .sidebar-nav-item-btn.music-btn.active {
-      background: var(--ios-purple-soft);
-      color: #e9d5ff;
-      border-color: rgba(191, 90, 242, 0.35);
-    }
-
-    .sidebar-nav-icon {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
+    .sidebar-nav-item-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--text-main); }
+    .sidebar-nav-item-btn.active { background: rgba(10, 132, 255, 0.18); color: #ffffff; font-weight: 600; border: 1px solid rgba(10, 132, 255, 0.3); }
+    .sidebar-nav-item-btn.music-btn.active { background: var(--ios-purple-soft); color: #e9d5ff; border-color: rgba(191, 90, 242, 0.35); }
+    .sidebar-nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
 
     .sidebar-footer-card {
       padding: 16px 20px;
@@ -438,32 +297,11 @@
       justify-content: space-between;
       background: rgba(0, 0, 0, 0.2);
     }
+    .sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+    .btn-logout-ghost { font-size: 12.5px; color: var(--ios-red); font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); }
+    .btn-logout-ghost:hover { background: var(--ios-red-soft); }
 
-    .sidebar-user-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 150px;
-    }
-
-    .btn-logout-ghost {
-      font-size: 12.5px;
-      color: var(--ios-red);
-      font-weight: 600;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: var(--radius-sm);
-      transition: background-color var(--transition-fast);
-    }
-
-    .btn-logout-ghost:hover {
-      background: var(--ios-red-soft);
-    }
-
-    /* Bottom Glass Dock (Mobile) */
+    /* Mobile Dock */
     .ios-bottom-dock {
       display: none;
       position: fixed;
@@ -482,88 +320,20 @@
       align-items: center;
       padding: 0 12px;
     }
+    .dock-nav-item { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--text-muted); font-size: 11px; cursor: pointer; }
+    .dock-nav-item.active { color: var(--ios-blue); font-weight: 600; }
+    .dock-nav-item.music-btn.active { color: var(--ios-purple); }
+    .dock-nav-icon { width: 20px; height: 20px; }
 
-    .dock-nav-item {
-      flex: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      color: var(--text-muted);
-      font-size: 11px;
-      cursor: pointer;
-      transition: color var(--transition-fast);
-    }
+    .ios-main-viewport { margin-left: var(--sidebar-width); padding: 38px 44px; min-height: 100vh; max-width: 1440px; }
+    .view-content-pane { display: none; animation: springFade 300ms ease forwards; }
+    .view-content-pane.active-pane { display: block; }
+    @keyframes springFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .dock-nav-item.active {
-      color: var(--ios-blue);
-      font-weight: 600;
-    }
+    .pane-header-titlebar { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+    .pane-header-titlebar h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.4px; }
+    .pane-header-titlebar p { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
 
-    .dock-nav-item.music-btn.active {
-      color: var(--ios-purple);
-    }
-
-    .dock-nav-icon {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* Main Viewport Container */
-    .ios-main-viewport {
-      margin-left: var(--sidebar-width);
-      padding: 38px 44px;
-      min-height: 100vh;
-      max-width: 1440px;
-    }
-
-    /* ==========================================================================
-       6. CONTENT PANELS & GLASS DATA CARDS
-       ========================================================================== */
-    .view-content-pane {
-      display: none;
-      animation: springFade 300ms ease forwards;
-    }
-
-    .view-content-pane.active-pane {
-      display: block;
-    }
-
-    @keyframes springFade {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .pane-header-titlebar {
-      margin-bottom: 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .pane-header-titlebar h1 {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.4px;
-    }
-
-    .pane-header-titlebar p {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    /* Glass Panels */
     .glass-card-panel {
       background: var(--glass-panel-bg);
       backdrop-filter: var(--glass-blur-subtle);
@@ -576,368 +346,143 @@
       position: relative;
       overflow: hidden;
     }
+    .glass-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-panel-header h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
 
-    .glass-card-panel::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--glass-specular-highlight);
-    }
+    .glass-table-scroller { overflow-x: auto; }
+    .glass-table { width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left; }
+    .glass-table th { background: rgba(255, 255, 255, 0.03); padding: 14px 16px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--glass-panel-border); white-space: nowrap; }
+    .glass-table td { padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); color: var(--text-main); }
+    .glass-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-    .glass-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .glass-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: -0.2px;
-    }
-
-    /* Glass Tables */
-    .glass-table-scroller {
-      overflow-x: auto;
-    }
-
-    .glass-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px;
-      text-align: left;
-    }
-
-    .glass-table th {
-      background: rgba(255, 255, 255, 0.03);
-      padding: 14px 16px;
-      font-weight: 600;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--glass-panel-border);
-      white-space: nowrap;
-    }
-
-    .glass-table td {
-      padding: 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--text-main);
-    }
-
-    .glass-table tbody tr:hover {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    /* Badges */
-    .ios-status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      font-size: 11.5px;
-      font-weight: 600;
-      border-radius: var(--radius-full);
-      white-space: nowrap;
-    }
-
+    .ios-status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-size: 11.5px; font-weight: 600; border-radius: var(--radius-full); white-space: nowrap; }
     .badge-blue { background: rgba(10, 132, 255, 0.15); color: #60a5fa; border: 1px solid rgba(10, 132, 255, 0.3); }
     .badge-green { background: var(--ios-emerald-soft); color: var(--ios-emerald); border: 1px solid rgba(48, 209, 88, 0.3); }
     .badge-amber { background: var(--ios-amber-soft); color: var(--ios-amber); border: 1px solid rgba(255, 214, 10, 0.3); }
     .badge-purple { background: var(--ios-purple-soft); color: #d8b4fe; border: 1px solid rgba(191, 90, 242, 0.3); }
     .badge-red { background: var(--ios-red-soft); color: var(--ios-red); border: 1px solid rgba(255, 69, 58, 0.3); }
 
+    /* Fix: Forced No-wrap & Flex Preservation on Rewards */
     .reward-indicator {
       font-family: var(--font-mono);
       font-weight: 700;
       color: #fde047;
       background: rgba(254, 224, 71, 0.12);
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: var(--radius-sm);
       border: 1px solid rgba(254, 224, 71, 0.25);
+      white-space: nowrap !important;
+      display: inline-block;
+      flex-shrink: 0;
     }
 
-    /* Action Buttons in Tables */
-    .btn-cell-action {
-      padding: 6px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all var(--transition-fast);
-      white-space: nowrap;
-    }
+    .btn-cell-action { padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all var(--transition-fast); white-space: nowrap; }
+    .btn-cell-danger { background: var(--ios-red-soft); color: var(--ios-red); border: 1px solid rgba(255, 69, 58, 0.3); }
+    .btn-cell-danger:hover { background: rgba(255, 69, 58, 0.25); }
+    .btn-cell-success { background: var(--ios-emerald-soft); color: var(--ios-emerald); border: 1px solid rgba(48, 209, 88, 0.3); margin-right: 6px; }
+    .btn-cell-success:hover { background: rgba(48, 209, 88, 0.25); }
+    .btn-cell-amber { background: var(--ios-amber-soft); color: var(--ios-amber); border: 1px solid rgba(255, 214, 10, 0.3); margin-right: 6px; }
+    .btn-cell-amber:hover { background: rgba(255, 214, 10, 0.25); }
+    .btn-cell-edit { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.15); margin-right: 6px; }
+    .btn-cell-edit:hover { background: rgba(255, 255, 255, 0.14); }
 
-    .btn-cell-danger {
-      background: var(--ios-red-soft);
-      color: var(--ios-red);
-      border: 1px solid rgba(255, 69, 58, 0.3);
-    }
+    .music-frame-container { width: 100%; height: calc(100vh - 200px); min-height: 600px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-glass); border: 1px solid var(--glass-panel-border); background-color: #000000; }
+    .music-frame { width: 100%; height: 100%; border: none; }
 
-    .btn-cell-danger:hover {
-      background: rgba(255, 69, 58, 0.25);
-    }
+    .glass-modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+    .glass-modal-backdrop.open { display: flex; }
+    .glass-modal-sheet { width: 100%; max-width: 580px; background: rgba(20, 28, 48, 0.9); backdrop-filter: var(--glass-blur-strength); -webkit-backdrop-filter: var(--glass-blur-strength); border: 1px solid var(--glass-panel-border); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow-float); position: relative; animation: sheetPop 280ms cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards; }
+    @keyframes sheetPop { from { opacity: 0; transform: scale(0.94) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    .modal-sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+    .btn-modal-close { width: 30px; height: 30px; background: rgba(255, 255, 255, 0.08); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
 
-    .btn-cell-success {
-      background: var(--ios-emerald-soft);
-      color: var(--ios-emerald);
-      border: 1px solid rgba(48, 209, 88, 0.3);
-      margin-right: 6px;
-    }
+    .file-pill-tip { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
 
-    .btn-cell-success:hover {
-      background: rgba(48, 209, 88, 0.25);
-    }
+    .switch-control-label { display: flex; align-items: center; gap: 12px; cursor: pointer; margin-bottom: 16px; }
+    .ios-switch { position: relative; width: 44px; height: 26px; background: rgba(255, 255, 255, 0.15); border-radius: var(--radius-full); transition: background-color var(--transition-fast); }
+    .ios-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: #ffffff; border-radius: 50%; transition: transform var(--transition-fast); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    input[type="checkbox"]:checked + .ios-switch { background: var(--ios-blue); }
+    input[type="checkbox"]:checked + .ios-switch::after { transform: translateX(18px); }
 
-    .btn-cell-amber {
-      background: var(--ios-amber-soft);
-      color: var(--ios-amber);
-      border: 1px solid rgba(255, 214, 10, 0.3);
-      margin-right: 6px;
-    }
-
-    .btn-cell-amber:hover {
-      background: rgba(255, 214, 10, 0.25);
-    }
-
-    .btn-cell-edit {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-main);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      margin-right: 6px;
-    }
-
-    .btn-cell-edit:hover {
-      background: rgba(255, 255, 255, 0.14);
-    }
-
-    /* JRmusic Embedded Frame */
-    .music-frame-container {
-      width: 100%;
-      height: calc(100vh - 200px);
-      min-height: 600px;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-glass);
+    /* Bulk Assignee Box */
+    .bulk-assign-container {
       border: 1px solid var(--glass-panel-border);
-      background-color: #000000;
-    }
-
-    .music-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* Modal Backdrop & Sheets */
-    .glass-modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .glass-modal-backdrop.open {
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 12px 14px;
+      max-height: 140px;
+      overflow-y: auto;
       display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-
-    .glass-modal-sheet {
-      width: 100%;
-      max-width: 560px;
-      background: rgba(20, 28, 48, 0.88);
-      backdrop-filter: var(--glass-blur-strength);
-      -webkit-backdrop-filter: var(--glass-blur-strength);
-      border: 1px solid var(--glass-panel-border);
-      border-radius: var(--radius-lg);
-      padding: 30px;
-      box-shadow: var(--shadow-float);
-      position: relative;
-      animation: sheetPop 280ms cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
-    }
-
-    @keyframes sheetPop {
-      from {
-        opacity: 0;
-        transform: scale(0.94) translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .modal-sheet-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 22px;
-    }
-
-    .btn-modal-close {
-      width: 30px;
-      height: 30px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: var(--radius-full);
+    .bulk-assign-item {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
+      gap: 10px;
+      font-size: 13px;
       cursor: pointer;
-      transition: all var(--transition-fast);
     }
-
-    .btn-modal-close:hover {
-      background: rgba(255, 255, 255, 0.16);
-      color: var(--text-main);
-    }
-
-    .file-pill-tip {
-      font-size: 11.5px;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    /* Switch Component */
-    .switch-control-label {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .bulk-assign-item input[type="checkbox"] {
+      accent-color: var(--ios-blue);
+      width: 16px;
+      height: 16px;
       cursor: pointer;
-      margin-bottom: 16px;
     }
 
-    .ios-switch {
-      position: relative;
-      width: 44px;
-      height: 26px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: var(--radius-full);
-      transition: background-color var(--transition-fast);
-    }
-
-    .ios-switch::after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 20px;
-      height: 20px;
-      background: #ffffff;
-      border-radius: 50%;
-      transition: transform var(--transition-fast);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    input[type="checkbox"]:checked + .ios-switch {
-      background: var(--ios-blue);
-    }
-
-    input[type="checkbox"]:checked + .ios-switch::after {
-      transform: translateX(18px);
-    }
-
-    /* ==========================================================================
-       7. RESPONSIVE BREAKPOINTS
-       ========================================================================== */
     @media (max-width: 768px) {
-      .ios-sidebar {
-        display: none;
-      }
-
-      .ios-bottom-dock {
-        display: flex;
-      }
-
-      .ios-main-viewport {
-        margin-left: 0;
-        padding: 20px 16px calc(var(--bottom-nav-height) + 38px) 16px;
-      }
-
-      .glass-modal-sheet {
-        padding: 22px 18px;
-      }
+      .ios-sidebar { display: none; }
+      .ios-bottom-dock { display: flex; }
+      .ios-main-viewport { margin-left: 0; padding: 20px 16px calc(var(--bottom-nav-height) + 38px) 16px; }
+      .glass-modal-sheet { padding: 22px 18px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Toast Notification Dock -->
   <div id="toast-container" aria-live="polite"></div>
 
-  <!-- ==========================================================================
-       SCREEN 1: MANDATORY GATE CHECK (Render Environment Access Code)
-       ========================================================================== -->
+  <!-- GATE OVERLAY -->
   <section id="gate-overlay" class="glass-auth-overlay">
     <div class="glass-auth-card">
       <div class="glass-icon-wrapper">
-        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
+        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
       </div>
-      <h1 class="glass-auth-title">System Gate Authorization</h1>
-      <p class="glass-auth-subtitle">Enter the environment passcode to unlock the console</p>
-
+      <h1 class="glass-auth-title">System Gate Passcode</h1>
+      <p class="glass-auth-subtitle">Enter environment passcode to unlock admin portal</p>
       <form id="gate-form-element">
         <div class="glass-form-group">
           <input type="password" id="gate-password-input" class="glass-input-field" placeholder="Enter Access Code" style="text-align:center; letter-spacing:2px;" required autofocus>
         </div>
-        <button type="submit" id="btn-gate-submit" class="btn-ios-primary pressable" style="margin-top:10px;">
-          <span>Unlock & Proceed</span>
-        </button>
+        <button type="submit" id="btn-gate-submit" class="btn-ios-primary pressable" style="margin-top:10px;">Unlock & Proceed</button>
       </form>
     </div>
   </section>
 
-  <!-- ==========================================================================
-       SCREEN 2: ADMIN CREDENTIALS LOGIN VIEW
-       ========================================================================== -->
+  <!-- LOGIN OVERLAY -->
   <section id="admin-login-overlay" class="glass-auth-overlay" style="display:none;">
     <div class="glass-auth-card">
       <div class="glass-icon-wrapper">
-        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-        </svg>
+        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
       </div>
       <h1 class="glass-auth-title">Administrator Sign In</h1>
-      <p class="glass-auth-subtitle">Corporate Privilege Authentication Portal</p>
-
+      <p class="glass-auth-subtitle">Privileged Corporate Management Gateway</p>
       <form id="admin-login-form">
         <div class="glass-form-group">
-          <label class="glass-label" for="admin-user-input">Administrator Username</label>
-          <input type="text" id="admin-user-input" class="glass-input-field" placeholder="Enter username (e.g. corp_admin)" autocomplete="username" required>
+          <label class="glass-label">Username</label>
+          <input type="text" id="admin-user-input" class="glass-input-field" placeholder="Admin username" autocomplete="username" required>
         </div>
-
         <div class="glass-form-group">
-          <label class="glass-label" for="admin-pass-input">Security Password</label>
-          <input type="password" id="admin-pass-input" class="glass-input-field" placeholder="Enter password" autocomplete="current-password" required>
+          <label class="glass-label">Password</label>
+          <input type="password" id="admin-pass-input" class="glass-input-field" placeholder="Admin password" autocomplete="current-password" required>
         </div>
-
-        <button type="submit" id="btn-admin-login-submit" class="btn-ios-primary pressable" style="margin-top:12px;">
-          <span>Sign In to Console</span>
-        </button>
+        <button type="submit" id="btn-admin-login-submit" class="btn-ios-primary pressable" style="margin-top:12px;">Sign In to Console</button>
       </form>
     </div>
   </section>
 
-  <!-- ==========================================================================
-       SCREEN 3: MAIN ADMIN WORKSPACE
-       ========================================================================== -->
+  <!-- ADMIN SHELL -->
   <div id="admin-app-container">
-    <!-- Frosted Sidebar for Desktop -->
     <aside class="ios-sidebar">
       <div class="sidebar-brand-box">
         <div class="sidebar-avatar-logo">AD</div>
@@ -950,42 +495,25 @@
       <ul class="sidebar-nav-list">
         <li>
           <button type="button" class="sidebar-nav-item-btn pressable active" data-target-pane="pane-tasks-management">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 11l3 3L22 4"></path>
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-            </svg>
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
             <span>Task Management</span>
           </button>
         </li>
         <li>
           <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-requests-audit">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
             <span>Staff Requests</span>
           </button>
         </li>
         <li>
           <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-employees-registry">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
             <span>Accounts & Balance</span>
           </button>
         </li>
         <li>
           <button type="button" class="sidebar-nav-item-btn music-btn pressable" data-target-pane="pane-jrmusic-player">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 18V5l12-2v13"></path>
-              <circle cx="6" cy="18" r="3"></circle>
-              <circle cx="18" cy="16" r="3"></circle>
-            </svg>
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
             <span>JRmusic Radio</span>
           </button>
         </li>
@@ -997,14 +525,13 @@
       </div>
     </aside>
 
-    <!-- Frosted Bottom Dock for Mobile -->
     <nav class="ios-bottom-dock">
       <button type="button" class="dock-nav-item pressable active" data-target-pane="pane-tasks-management">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
         <span>Tasks</span>
       </button>
       <button type="button" class="dock-nav-item pressable" data-target-pane="pane-requests-audit">
-        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
         <span>Requests</span>
       </button>
       <button type="button" class="dock-nav-item pressable" data-target-pane="pane-employees-registry">
@@ -1012,30 +539,28 @@
         <span>Accounts</span>
       </button>
       <button type="button" class="dock-nav-item music-btn pressable" data-target-pane="pane-jrmusic-player">
-        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle></svg>
         <span>Music</span>
       </button>
     </nav>
 
-    <!-- Main Viewport Panes -->
     <main class="ios-main-viewport">
-
-      <!-- PANE 1: TASK MANAGEMENT -->
+      <!-- PANE 1: TASKS -->
       <section id="pane-tasks-management" class="view-content-pane active-pane">
         <div class="pane-header-titlebar">
           <div>
             <h1>Task Orchestration & Dispatch</h1>
-            <p>Assign tasks with reward amounts, configure deliverable file requirements, audit submissions, and complete tasks for payout.</p>
+            <p>Assign tasks in bulk or individually, set reward values, review deliverable attachments, and mark completed for automatic payout.</p>
           </div>
           <button type="button" id="btn-open-task-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
             <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Assign New Task</span>
+            <span>+ Bulk / Single Assign Task</span>
           </button>
         </div>
 
         <div class="glass-card-panel">
           <div class="glass-panel-header">
-            <h2>Active Tasks & Deliverable Tracking</h2>
+            <h2>Active Tasks & Deliverables Tracking</h2>
           </div>
           <div class="glass-table-scroller">
             <table class="glass-table">
@@ -1043,144 +568,120 @@
                 <tr>
                   <th>Task Title</th>
                   <th>Assignee</th>
-                  <th>Reward</th>
-                  <th>Submission Req.</th>
+                  <th>Reward (No-wrap)</th>
+                  <th>Deliverable Req.</th>
                   <th>Deadline</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="tasks-table-body">
-                <!-- Dynamically populated -->
-              </tbody>
+              <tbody id="tasks-table-body"></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- PANE 2: REQUESTS AUDIT -->
+      <!-- PANE 2: REQUESTS -->
       <section id="pane-requests-audit" class="view-content-pane">
         <div class="pane-header-titlebar">
           <div>
-            <h1>Employee Applications & Requests</h1>
-            <p>Review administrative and resource requests submitted by staff members, execute approval, rejection, or data purge.</p>
+            <h1>Employee Requests & Petitions</h1>
+            <p>Review administrative and operational requests from staff members.</p>
           </div>
         </div>
-
         <div class="glass-card-panel">
           <div class="glass-panel-header">
-            <h2>Submitted Requests List</h2>
+            <h2>Submitted Requests</h2>
           </div>
           <div class="glass-table-scroller">
             <table class="glass-table">
               <thead>
                 <tr>
-                  <th>Subject</th>
-                  <th>Applicant</th>
-                  <th>Department</th>
-                  <th>Content Summary</th>
-                  <th>Status</th>
-                  <th>Submitted At</th>
-                  <th>Workflow Actions</th>
+                  <th>Subject</th><th>Applicant</th><th>Department</th><th>Summary</th><th>Status</th><th>Submitted At</th><th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="requests-table-body">
-                <!-- Dynamically populated -->
-              </tbody>
+              <tbody id="requests-table-body"></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- PANE 3: EMPLOYEES & BALANCE MANAGEMENT -->
+      <!-- PANE 3: EMPLOYEES & BALANCE -->
       <section id="pane-employees-registry" class="view-content-pane">
         <div class="pane-header-titlebar">
           <div>
-            <h1>Accounts & Reward Balances</h1>
-            <p>Manage corporate employee login profiles, adjust balance credits, or deregister accounts directly on MongoDB.</p>
+            <h1>Employee Directory & Reward Balances</h1>
+            <p>Manage staff authentication profiles, monitor earnings, and edit reward balances.</p>
           </div>
           <button type="button" id="btn-open-employee-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
-            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>Register New Employee</span>
+            <span>+ Register Employee</span>
           </button>
         </div>
-
         <div class="glass-card-panel">
           <div class="glass-panel-header">
-            <h2>Active Employee Directory</h2>
+            <h2>Active Staff Directory</h2>
           </div>
           <div class="glass-table-scroller">
             <table class="glass-table">
               <thead>
                 <tr>
-                  <th>Staff ID</th>
-                  <th>Username</th>
-                  <th>Full Name</th>
-                  <th>Department</th>
-                  <th>Account Balance</th>
-                  <th>Registered At</th>
-                  <th>Management</th>
+                  <th>Staff ID</th><th>Username</th><th>Full Name</th><th>Department</th><th>Balance</th><th>Registered At</th><th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="employees-table-body">
-                <!-- Dynamically populated -->
-              </tbody>
+              <tbody id="employees-table-body"></tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- PANE 4: JRMUSIC RADIO -->
+      <!-- PANE 4: JRMUSIC -->
       <section id="pane-jrmusic-player" class="view-content-pane">
         <div class="pane-header-titlebar">
           <div>
             <h1>JRmusic Streaming Radio</h1>
-            <p>Embedded online web audio player for workstation background music.</p>
+            <p>Embedded online web audio player for desktop and mobile streaming.</p>
           </div>
         </div>
         <div class="music-frame-container">
-          <iframe 
-            class="music-frame" 
-            src="https://musicplayer-ruby-delta.vercel.app" 
-            allow="autoplay; encrypted-media; fullscreen"
-            loading="lazy"
-          ></iframe>
+          <iframe class="music-frame" src="https://musicplayer-ruby-delta.vercel.app" allow="autoplay; encrypted-media; fullscreen" loading="lazy"></iframe>
         </div>
       </section>
-
     </main>
   </div>
 
-  <!-- ==========================================================================
-       MODAL SHEETS
-       ========================================================================== -->
-
-  <!-- MODAL 1: DISPATCH TASK SHEET -->
+  <!-- BULK TASK MODAL SHEET -->
   <div class="glass-modal-backdrop" id="modal-task-backdrop">
     <div class="glass-modal-sheet">
       <div class="modal-sheet-header">
-        <h3 style="font-size:18px; font-weight:700;">Assign Work Task</h3>
+        <h3 style="font-size:18px; font-weight:700;">Bulk / Single Task Assignment</h3>
         <button type="button" class="btn-modal-close pressable" id="btn-close-task-modal">✕</button>
       </div>
       <form id="form-dispatch-task">
         <div class="glass-form-group">
           <label class="glass-label">Task Title</label>
-          <input type="text" id="task-title-input" class="glass-input-field" placeholder="e.g. Q3 Infrastructure Performance Audit" required>
+          <input type="text" id="task-title-input" class="glass-input-field" placeholder="e.g. Q3 Cloud Architecture Security Review" required>
         </div>
+
         <div class="glass-form-group">
-          <label class="glass-label">Assignee (Employee)</label>
-          <select id="task-assignee-select" class="glass-input-field" style="background:rgba(20,28,48,0.95);" required>
-            <!-- Dynamically populated -->
-          </select>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label class="glass-label" style="margin-bottom:0;">Select Assignees (Bulk Support)</label>
+            <label style="font-size:12px; color:var(--ios-blue); cursor:pointer;">
+              <input type="checkbox" id="select-all-assignees" style="accent-color:var(--ios-blue); vertical-align:middle;"> Select All
+            </label>
+          </div>
+          <div class="bulk-assign-container" id="bulk-assignees-container">
+            <!-- Dynamically populated checkboxes -->
+          </div>
         </div>
+
         <div class="glass-form-group">
-          <label class="glass-label">Task Description & Requirements</label>
-          <textarea id="task-desc-input" class="glass-textarea" placeholder="Detail the task deliverables, metrics, and acceptance criteria..." required></textarea>
+          <label class="glass-label">Task Description & Deliverable Criteria</label>
+          <textarea id="task-desc-input" class="glass-textarea" placeholder="Detail the task objectives, execution steps, and acceptance metrics..." required></textarea>
         </div>
         
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
           <div class="glass-form-group">
-            <label class="glass-label">Reward Amount (¥ / $)</label>
+            <label class="glass-label">Reward Amount per User (¥)</label>
             <input type="number" step="0.01" id="task-reward-input" class="glass-input-field" placeholder="0.00" value="0.00" required>
           </div>
           <div class="glass-form-group">
@@ -1198,115 +699,69 @@
         <div class="glass-form-group">
           <label class="glass-label">Reference Attachments (Max 5 files, ≤25MB each)</label>
           <input type="file" id="task-files-input" class="glass-input-field" style="padding:10px 14px;" multiple>
-          <div class="file-pill-tip">Files are persisted directly into MongoDB as binary blobs.</div>
+          <div class="file-pill-tip">Stored as binary attachments and shared across all selected assignees.</div>
         </div>
 
-        <button type="submit" id="btn-submit-task-action" class="btn-ios-primary pressable" style="margin-top:16px;">
-          <span>Dispatch & Publish Task</span>
+        <button type="submit" id="btn-submit-task-action" class="btn-ios-primary pressable" style="margin-top:14px;">
+          <span>Dispatch Task(s)</span>
         </button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 2: REGISTER EMPLOYEE SHEET -->
+  <!-- REGISTER EMPLOYEE SHEET -->
   <div class="glass-modal-backdrop" id="modal-emp-backdrop">
     <div class="glass-modal-sheet">
       <div class="modal-sheet-header">
-        <h3 style="font-size:18px; font-weight:700;">Register Employee Account</h3>
+        <h3 style="font-size:18px; font-weight:700;">Register Employee Profile</h3>
         <button type="button" class="btn-modal-close pressable" id="btn-close-emp-modal">✕</button>
       </div>
       <form id="form-register-employee">
-        <div class="glass-form-group">
-          <label class="glass-label">Staff ID</label>
-          <input type="text" id="emp-staffid-input" class="glass-input-field" placeholder="e.g. EMP-202601" required>
-        </div>
-        <div class="glass-form-group">
-          <label class="glass-label">Username</label>
-          <input type="text" id="emp-username-input" class="glass-input-field" placeholder="Login account username" required>
-        </div>
-        <div class="glass-form-group">
-          <label class="glass-label">Initial Password</label>
-          <input type="password" id="emp-password-input" class="glass-input-field" placeholder="Set authentication password" required>
-        </div>
-        <div class="glass-form-group">
-          <label class="glass-label">Full Name</label>
-          <input type="text" id="emp-fullname-input" class="glass-input-field" placeholder="e.g. Jane Doe" required>
-        </div>
-        <div class="glass-form-group">
-          <label class="glass-label">Department</label>
-          <input type="text" id="emp-dept-input" class="glass-input-field" placeholder="e.g. Cloud Engineering" required>
-        </div>
-        <div class="glass-form-group">
-          <label class="glass-label">Initial Reward Balance (¥)</label>
-          <input type="number" step="0.01" id="emp-balance-input" class="glass-input-field" value="0.00">
-        </div>
-        <button type="submit" id="btn-submit-emp-action" class="btn-ios-primary pressable" style="margin-top:16px;">
-          <span>Register Account on MongoDB</span>
-        </button>
+        <div class="glass-form-group"><label class="glass-label">Staff ID</label><input type="text" id="emp-staffid-input" class="glass-input-field" placeholder="EMP-202601" required></div>
+        <div class="glass-form-group"><label class="glass-label">Username</label><input type="text" id="emp-username-input" class="glass-input-field" placeholder="Username" required></div>
+        <div class="glass-form-group"><label class="glass-label">Password</label><input type="password" id="emp-password-input" class="glass-input-field" placeholder="Initial password" required></div>
+        <div class="glass-form-group"><label class="glass-label">Full Name</label><input type="text" id="emp-fullname-input" class="glass-input-field" placeholder="Full name" required></div>
+        <div class="glass-form-group"><label class="glass-label">Department</label><input type="text" id="emp-dept-input" class="glass-input-field" placeholder="Department" required></div>
+        <div class="glass-form-group"><label class="glass-label">Initial Balance (¥)</label><input type="number" step="0.01" id="emp-balance-input" class="glass-input-field" value="0.00"></div>
+        <button type="submit" id="btn-submit-emp-action" class="btn-ios-primary pressable" style="margin-top:14px;">Register Account</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 3: MODIFY BALANCE SHEET -->
+  <!-- BALANCE MODAL SHEET -->
   <div class="glass-modal-backdrop" id="modal-balance-backdrop">
     <div class="glass-modal-sheet" style="max-width:440px;">
       <div class="modal-sheet-header">
-        <h3 style="font-size:18px; font-weight:700;">Modify Employee Balance</h3>
+        <h3 style="font-size:18px; font-weight:700;">Edit Employee Balance</h3>
         <button type="button" class="btn-modal-close pressable" id="btn-close-balance-modal">✕</button>
       </div>
       <form id="form-modify-balance">
         <input type="hidden" id="balance-emp-id">
         <div class="glass-form-group">
-          <label class="glass-label">Target Employee</label>
+          <label class="glass-label">Staff Name</label>
           <input type="text" id="balance-emp-name" class="glass-input-field" disabled style="opacity:0.7;">
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">New Balance (¥)</label>
+          <label class="glass-label">New Reward Balance (¥)</label>
           <input type="number" step="0.01" id="balance-value-input" class="glass-input-field" required>
         </div>
-        <button type="submit" id="btn-submit-balance-action" class="btn-ios-primary pressable" style="margin-top:16px;">
-          <span>Save Balance Adjustment</span>
-        </button>
+        <button type="submit" id="btn-submit-balance-action" class="btn-ios-primary pressable" style="margin-top:14px;">Update Balance</button>
       </form>
     </div>
   </div>
 
-  <!-- ==========================================================================
-       JAVASCRIPT APPLICATION ENGINE (WITH HAPTICS & REACTIVE CONTROLLERS)
-       ========================================================================== -->
+  <!-- CONTROLLER SCRIPT -->
   <script>
     (function (window, document) {
       'use strict';
 
-      // ------------------------------------------------------------------------
-      // HAPTIC FEEDBACK ENGINE (Vibration API for iOS/Android Support)
-      // ------------------------------------------------------------------------
       const Haptics = {
-        light() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate(12); } catch (e) {}
-          }
-        },
-        medium() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate(25); } catch (e) {}
-          }
-        },
-        success() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate([15, 40, 20]); } catch (e) {}
-          }
-        },
-        error() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate([40, 60, 40]); } catch (e) {}
-          }
-        }
+        light() { if ('vibrate' in navigator) { try { navigator.vibrate(12); } catch (e) {} } },
+        medium() { if ('vibrate' in navigator) { try { navigator.vibrate(25); } catch (e) {} } },
+        success() { if ('vibrate' in navigator) { try { navigator.vibrate([15, 40, 20]); } catch (e) {} } },
+        error() { if ('vibrate' in navigator) { try { navigator.vibrate([40, 60, 40]); } catch (e) {} } }
       };
 
-      // ------------------------------------------------------------------------
-      // STATE STORE
-      // ------------------------------------------------------------------------
       const State = {
         adminUser: null,
         currentPaneId: 'pane-tasks-management',
@@ -1315,9 +770,6 @@
         requests: []
       };
 
-      // ------------------------------------------------------------------------
-      // DOM REFS
-      // ------------------------------------------------------------------------
       const DOM = {
         toastContainer: document.getElementById('toast-container'),
         gateOverlay: document.getElementById('gate-overlay'),
@@ -1341,16 +793,16 @@
         btnCloseTaskModal: document.getElementById('btn-close-task-modal'),
         formDispatchTask: document.getElementById('form-dispatch-task'),
         taskTitleInput: document.getElementById('task-title-input'),
-        taskAssigneeSelect: document.getElementById('task-assignee-select'),
+        bulkAssigneesContainer: document.getElementById('bulk-assignees-container'),
+        selectAllAssignees: document.getElementById('select-all-assignees'),
         taskDescInput: document.getElementById('task-desc-input'),
         taskRewardInput: document.getElementById('task-reward-input'),
         taskDeadlineInput: document.getElementById('task-deadline-input'),
         taskRequiresSubInput: document.getElementById('task-requires-sub-input'),
         taskFilesInput: document.getElementById('task-files-input'),
         btnSubmitTaskAction: document.getElementById('btn-submit-task-action'),
-        // Requests
+        // Requests & Emps
         requestsTbody: document.getElementById('requests-table-body'),
-        // Employees
         employeesTbody: document.getElementById('employees-table-body'),
         modalEmpBackdrop: document.getElementById('modal-emp-backdrop'),
         btnOpenEmpSheet: document.getElementById('btn-open-employee-sheet'),
@@ -1373,180 +825,60 @@
         btnSubmitBalanceAction: document.getElementById('btn-submit-balance-action')
       };
 
-      // ------------------------------------------------------------------------
-      // UTILITIES
-      // ------------------------------------------------------------------------
       const Utils = {
         escapeHtml(str) {
           if (!str) return '';
-          return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+          return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         },
-
         formatDate(dateString) {
           if (!dateString) return '--';
           const d = new Date(dateString);
           if (isNaN(d.getTime())) return '--';
           const pad = (n) => (n < 10 ? '0' + n : n);
-          return (
-            d.getFullYear() + '-' +
-            pad(d.getMonth() + 1) + '-' +
-            pad(d.getDate()) + ' ' +
-            pad(d.getHours()) + ':' +
-            pad(d.getMinutes())
-          );
+          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         },
-
-        showToast(message, type = 'info', duration = 3200) {
+        showToast(message, type = 'info') {
           const toast = document.createElement('div');
           toast.className = 'toast-item';
-
-          let iconColor = 'var(--ios-blue)';
-          if (type === 'success') iconColor = 'var(--ios-emerald)';
-          if (type === 'error') iconColor = 'var(--ios-red)';
-
+          let iconColor = type === 'success' ? 'var(--ios-emerald)' : (type === 'error' ? 'var(--ios-red)' : 'var(--ios-blue)');
           toast.innerHTML = `
             <svg class="toast-icon" style="color:${iconColor};" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              ${type === 'success' ? '<polyline points="20 6 9 17 4 12"></polyline>' : (type === 'error' ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>' : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>')}
+              ${type === 'success' ? '<polyline points="20 6 9 17 4 12"></polyline>' : (type === 'error' ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line>' : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line>')}
             </svg>
             <div class="toast-message">${Utils.escapeHtml(message)}</div>
           `;
-
           DOM.toastContainer.appendChild(toast);
-
           if (type === 'success') Haptics.success();
           else if (type === 'error') Haptics.error();
           else Haptics.light();
-
           setTimeout(() => toast.classList.add('show'), 10);
-          setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-          }, duration);
+          setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3200);
         }
       };
 
-      // ------------------------------------------------------------------------
-      // HTTP API SERVICE
-      // ------------------------------------------------------------------------
       const AdminApi = {
-        async verifyGate(password) {
-          const res = await fetch('/api/gate/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
-          });
-          return await res.json();
-        },
-
-        async checkSession() {
-          const res = await fetch('/api/admin/auth/session');
-          return await res.json();
-        },
-
-        async login(username, password) {
-          const res = await fetch('/api/admin/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-          });
-          return await res.json();
-        },
-
-        async logout() {
-          const res = await fetch('/api/admin/auth/logout', { method: 'POST' });
-          return await res.json();
-        },
-
-        async getTasks() {
-          const res = await fetch('/api/admin/tasks/all');
-          return await res.json();
-        },
-
-        async createTask(formData) {
-          const res = await fetch('/api/admin/tasks/create', {
-            method: 'POST',
-            body: formData
-          });
-          return await res.json();
-        },
-
-        async completeTask(id) {
-          const res = await fetch(`/api/admin/tasks/complete/${id}`, { method: 'POST' });
-          return await res.json();
-        },
-
-        async deleteTask(id) {
-          const res = await fetch(`/api/admin/tasks/delete/${id}`, { method: 'DELETE' });
-          return await res.json();
-        },
-
-        async getRequests() {
-          const res = await fetch('/api/admin/requests/all');
-          return await res.json();
-        },
-
-        async updateRequestStatus(id, status) {
-          const res = await fetch(`/api/admin/requests/status/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
-          });
-          return await res.json();
-        },
-
-        async deleteRequest(id) {
-          const res = await fetch(`/api/admin/requests/delete/${id}`, { method: 'DELETE' });
-          return await res.json();
-        },
-
-        async getEmployees() {
-          const res = await fetch('/api/admin/employees/list');
-          return await res.json();
-        },
-
-        async createEmployee(payload) {
-          const res = await fetch('/api/admin/employees/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          return await res.json();
-        },
-
-        async updateEmployeeBalance(id, balance) {
-          const res = await fetch(`/api/admin/employees/balance/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ balance })
-          });
-          return await res.json();
-        },
-
-        async deleteEmployee(id) {
-          const res = await fetch(`/api/admin/employees/delete/${id}`, { method: 'DELETE' });
-          return await res.json();
-        }
+        async verifyGate(password) { return (await fetch('/api/gate/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) })).json(); },
+        async checkSession() { return (await fetch('/api/admin/auth/session')).json(); },
+        async login(username, password) { return (await fetch('/api/admin/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) })).json(); },
+        async logout() { return (await fetch('/api/admin/auth/logout', { method: 'POST' })).json(); },
+        async getTasks() { return (await fetch('/api/admin/tasks/all')).json(); },
+        async createBulkTasks(formData) { return (await fetch('/api/admin/tasks/create-bulk', { method: 'POST', body: formData })).json(); },
+        async completeTask(id) { return (await fetch(`/api/admin/tasks/complete/${id}`, { method: 'POST' })).json(); },
+        async deleteTask(id) { return (await fetch(`/api/admin/tasks/delete/${id}`, { method: 'DELETE' })).json(); },
+        async getRequests() { return (await fetch('/api/admin/requests/all')).json(); },
+        async updateRequestStatus(id, status) { return (await fetch(`/api/admin/requests/status/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })).json(); },
+        async deleteRequest(id) { return (await fetch(`/api/admin/requests/delete/${id}`, { method: 'DELETE' })).json(); },
+        async getEmployees() { return (await fetch('/api/admin/employees/list')).json(); },
+        async createEmployee(payload) { return (await fetch('/api/admin/employees/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })).json(); },
+        async updateEmployeeBalance(id, balance) { return (await fetch(`/api/admin/employees/balance/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ balance }) })).json(); },
+        async deleteEmployee(id) { return (await fetch(`/api/admin/employees/delete/${id}`, { method: 'DELETE' })).json(); }
       };
 
-      // ------------------------------------------------------------------------
-      // UI RENDERERS & ROUTER
-      // ------------------------------------------------------------------------
       function switchPane(targetPaneId) {
         Haptics.light();
         State.currentPaneId = targetPaneId;
-
-        DOM.navButtons.forEach(btn => {
-          btn.classList.toggle('active', btn.getAttribute('data-target-pane') === targetPaneId);
-        });
-
-        DOM.panes.forEach(p => {
-          p.classList.toggle('active-pane', p.id === targetPaneId);
-        });
+        DOM.navButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-target-pane') === targetPaneId));
+        DOM.panes.forEach(p => p.classList.toggle('active-pane', p.id === targetPaneId));
 
         if (targetPaneId === 'pane-tasks-management') loadTasks();
         if (targetPaneId === 'pane-requests-audit') loadRequests();
@@ -1562,7 +894,6 @@
             DOM.appContainer.style.display = 'none';
             return;
           }
-
           DOM.gateOverlay.style.display = 'none';
 
           if (data.success && data.user) {
@@ -1573,8 +904,6 @@
           }
         } catch (e) {
           DOM.gateOverlay.style.display = 'flex';
-          DOM.adminLoginOverlay.style.display = 'none';
-          DOM.appContainer.style.display = 'none';
         }
       }
 
@@ -1583,29 +912,23 @@
         DOM.gateOverlay.style.display = 'none';
         DOM.adminLoginOverlay.style.display = 'none';
         DOM.appContainer.style.display = 'block';
-
         DOM.sidebarAdminFullname.textContent = user.full_name || user.username;
         loadEmployees();
         switchPane('pane-tasks-management');
       }
 
-      // --- TASKS MODULE ---
       async function loadTasks() {
-        try {
-          const res = await AdminApi.getTasks();
-          if (res.success) {
-            State.tasks = res.data;
-            renderTasksTable(res.data);
-          }
-        } catch (e) {
-          Utils.showToast('Failed to fetch tasks', 'error');
+        const res = await AdminApi.getTasks();
+        if (res.success) {
+          State.tasks = res.data;
+          renderTasksTable(res.data);
         }
       }
 
       function renderTasksTable(tasks) {
         DOM.tasksTbody.innerHTML = '';
         if (!tasks || !tasks.length) {
-          DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No active tasks found in the database.</td></tr>';
+          DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No active tasks found.</td></tr>';
           return;
         }
 
@@ -1623,15 +946,11 @@
           tr.innerHTML = `
             <td>
               <strong style="color:#ffffff; font-size:14.5px;">${Utils.escapeHtml(t.task_title)}</strong>
-              <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">${(t.attachments || []).length} admin attachments | ${(t.submissions || []).length} user submissions</div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">${(t.attachments || []).length} admin files | ${(t.submissions || []).length} submissions</div>
             </td>
             <td><code>${Utils.escapeHtml(t.assigned_to_username)}</code></td>
-            <td><span class="reward-indicator">¥ ${(parseFloat(t.reward_amount) || 0).toFixed(2)}</span></td>
-            <td>
-              <span class="ios-status-badge ${t.requires_submission ? 'badge-purple' : 'badge-blue'}">
-                ${t.requires_submission ? 'Required (≤25MB)' : 'None'}
-              </span>
-            </td>
+            <td style="white-space:nowrap;"><span class="reward-indicator">¥ ${(parseFloat(t.reward_amount) || 0).toFixed(2)}</span></td>
+            <td><span class="ios-status-badge ${t.requires_submission ? 'badge-purple' : 'badge-blue'}">${t.requires_submission ? 'Required (≤25MB)' : 'None'}</span></td>
             <td style="font-size:12px;">${Utils.formatDate(t.submission_deadline)}</td>
             <td>${statusBadge}</td>
             <td style="white-space:nowrap;">
@@ -1644,7 +963,6 @@
           if (completeBtn) {
             completeBtn.addEventListener('click', () => markTaskCompleted(t._id, t.reward_amount, t.assigned_to_username));
           }
-
           tr.querySelector('[data-delete-id]').addEventListener('click', () => revokeTask(t._id));
           DOM.tasksTbody.appendChild(tr);
         });
@@ -1652,323 +970,162 @@
 
       async function markTaskCompleted(id, reward, username) {
         Haptics.medium();
-        if (!confirm(`Mark this task as completed? This will automatically credit ¥${parseFloat(reward).toFixed(2)} to ${username}'s balance.`)) return;
-
-        try {
-          const res = await AdminApi.completeTask(id);
-          if (res.success) {
-            Utils.showToast(res.message || 'Task completed and reward distributed!', 'success');
-            loadTasks();
-            loadEmployees();
-          } else {
-            Utils.showToast(res.message || 'Action failed', 'error');
-          }
-        } catch (e) {
-          Utils.showToast('Network error during completion processing', 'error');
+        if (!confirm(`Mark task as completed? This will auto-credit ¥${parseFloat(reward).toFixed(2)} to ${username}'s balance.`)) return;
+        const res = await AdminApi.completeTask(id);
+        if (res.success) {
+          Utils.showToast(res.message, 'success');
+          loadTasks();
+          loadEmployees();
         }
       }
 
       async function revokeTask(id) {
         Haptics.medium();
-        if (!confirm('Permanently revoke and delete this task from MongoDB? This action cannot be undone.')) return;
-
-        try {
-          const res = await AdminApi.deleteTask(id);
-          if (res.success) {
-            Utils.showToast('Task removed from MongoDB', 'success');
-            loadTasks();
-          } else {
-            Utils.showToast(res.message || 'Delete failed', 'error');
-          }
-        } catch (e) {
-          Utils.showToast('Network error while revoking task', 'error');
+        if (!confirm('Permanently delete this task from MongoDB?')) return;
+        const res = await AdminApi.deleteTask(id);
+        if (res.success) {
+          Utils.showToast('Task removed', 'success');
+          loadTasks();
         }
       }
 
-      // --- REQUESTS MODULE ---
       async function loadRequests() {
-        try {
-          const res = await AdminApi.getRequests();
-          if (res.success) {
-            State.requests = res.data;
-            renderRequestsTable(res.data);
-          }
-        } catch (e) {
-          Utils.showToast('Failed to fetch requests', 'error');
+        const res = await AdminApi.getRequests();
+        if (res.success) {
+          DOM.requestsTbody.innerHTML = res.data.map(r => `
+            <tr>
+              <td><strong style="color:#ffffff;">${Utils.escapeHtml(r.request_title)}</strong></td>
+              <td>${Utils.escapeHtml(r.applicant_name)} (${Utils.escapeHtml(r.applicant_username)})</td>
+              <td>${Utils.escapeHtml(r.department)}</td>
+              <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(r.request_body)}</td>
+              <td><span class="ios-status-badge ${r.status === 'approved' ? 'badge-green' : (r.status === 'rejected' ? 'badge-red' : 'badge-amber')}">${r.status}</span></td>
+              <td>${Utils.formatDate(r.submitted_at)}</td>
+              <td style="white-space:nowrap;">
+                <button class="btn-cell-action btn-cell-success pressable" onclick="AdminApi.updateRequestStatus('${r._id}','approved').then(loadRequests)">Approve</button>
+                <button class="btn-cell-action btn-cell-amber pressable" onclick="AdminApi.updateRequestStatus('${r._id}','rejected').then(loadRequests)">Reject</button>
+                <button class="btn-cell-action btn-cell-danger pressable" onclick="AdminApi.deleteRequest('${r._id}').then(loadRequests)">Purge</button>
+              </td>
+            </tr>
+          `).join('');
         }
       }
 
-      function renderRequestsTable(reqs) {
-        DOM.requestsTbody.innerHTML = '';
-        if (!reqs || !reqs.length) {
-          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No employee requests found.</td></tr>';
-          return;
-        }
-
-        reqs.forEach(r => {
-          const tr = document.createElement('tr');
-          let statusBadge = '<span class="ios-status-badge badge-amber">Pending</span>';
-          if (r.status === 'approved') statusBadge = '<span class="ios-status-badge badge-green">Approved</span>';
-          if (r.status === 'rejected') statusBadge = '<span class="ios-status-badge badge-red">Rejected</span>';
-
-          tr.innerHTML = `
-            <td><strong style="color:#ffffff;">${Utils.escapeHtml(r.request_title)}</strong></td>
-            <td>${Utils.escapeHtml(r.applicant_name)} (${Utils.escapeHtml(r.applicant_username)})</td>
-            <td>${Utils.escapeHtml(r.department)}</td>
-            <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(r.request_body)}</td>
-            <td>${statusBadge}</td>
-            <td>${Utils.formatDate(r.submitted_at)}</td>
-            <td style="white-space:nowrap;">
-              <button class="btn-cell-action btn-cell-success pressable" data-approve-id="${r._id}">Approve</button>
-              <button class="btn-cell-action btn-cell-amber pressable" data-reject-id="${r._id}">Reject</button>
-              <button class="btn-cell-action btn-cell-danger pressable" data-delete-id="${r._id}">Purge</button>
-            </td>
-          `;
-
-          tr.querySelector('[data-approve-id]').addEventListener('click', () => updateRequest(r._id, 'approved'));
-          tr.querySelector('[data-reject-id]').addEventListener('click', () => updateRequest(r._id, 'rejected'));
-          tr.querySelector('[data-delete-id]').addEventListener('click', () => deleteRequest(r._id));
-
-          DOM.requestsTbody.appendChild(tr);
-        });
-      }
-
-      async function updateRequest(id, status) {
-        Haptics.light();
-        try {
-          const res = await AdminApi.updateRequestStatus(id, status);
-          if (res.success) {
-            Utils.showToast('Request status updated', 'success');
-            loadRequests();
-          }
-        } catch (e) {
-          Utils.showToast('Failed to update request', 'error');
-        }
-      }
-
-      async function deleteRequest(id) {
-        Haptics.medium();
-        if (!confirm('Permanently purge this request record from MongoDB?')) return;
-        try {
-          const res = await AdminApi.deleteRequest(id);
-          if (res.success) {
-            Utils.showToast('Request record purged', 'success');
-            loadRequests();
-          }
-        } catch (e) {
-          Utils.showToast('Purge failed', 'error');
-        }
-      }
-
-      // --- EMPLOYEES MODULE ---
       async function loadEmployees() {
-        try {
-          const res = await AdminApi.getEmployees();
-          if (res.success) {
-            State.employees = res.data;
-            renderEmployeesTable(res.data);
-            populateAssigneeSelect(res.data);
-          }
-        } catch (e) {
-          Utils.showToast('Failed to fetch employee list', 'error');
+        const res = await AdminApi.getEmployees();
+        if (res.success) {
+          State.employees = res.data;
+          renderEmployeesTable(res.data);
+          populateBulkAssignees(res.data);
         }
       }
 
       function renderEmployeesTable(emps) {
-        DOM.employeesTbody.innerHTML = '';
-        if (!emps || !emps.length) {
-          DOM.employeesTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No registered employees.</td></tr>';
-          return;
-        }
-
-        emps.forEach(emp => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
+        DOM.employeesTbody.innerHTML = emps.map(emp => `
+          <tr>
             <td><code>${Utils.escapeHtml(emp.staff_id)}</code></td>
             <td><strong>${Utils.escapeHtml(emp.username)}</strong></td>
             <td>${Utils.escapeHtml(emp.full_name)}</td>
             <td>${Utils.escapeHtml(emp.department)}</td>
-            <td><span class="reward-indicator" style="font-size:13.5px;">¥ ${(parseFloat(emp.account_balance) || 0).toFixed(2)}</span></td>
+            <td style="white-space:nowrap;"><span class="reward-indicator">¥ ${(parseFloat(emp.account_balance) || 0).toFixed(2)}</span></td>
             <td style="font-size:12px;">${Utils.formatDate(emp.created_at)}</td>
             <td style="white-space:nowrap;">
-              <button class="btn-cell-action btn-cell-edit pressable" data-edit-balance-id="${emp._id}" data-name="${emp.full_name}" data-balance="${emp.account_balance || 0}">Edit Balance</button>
-              <button class="btn-cell-action btn-cell-danger pressable" data-delete-emp-id="${emp._id}" data-name="${emp.full_name}">Deregister</button>
+              <button class="btn-cell-action btn-cell-edit pressable" onclick="openBalanceModal('${emp._id}','${Utils.escapeHtml(emp.full_name)}','${emp.account_balance || 0}')">Edit Balance</button>
+              <button class="btn-cell-action btn-cell-danger pressable" onclick="AdminApi.deleteEmployee('${emp._id}').then(loadEmployees)">Deregister</button>
             </td>
-          `;
-
-          tr.querySelector('[data-edit-balance-id]').addEventListener('click', function () {
-            openBalanceModal(
-              this.getAttribute('data-edit-balance-id'),
-              this.getAttribute('data-name'),
-              this.getAttribute('data-balance')
-            );
-          });
-
-          tr.querySelector('[data-delete-emp-id]').addEventListener('click', function () {
-            deregisterEmployee(
-              this.getAttribute('data-delete-emp-id'),
-              this.getAttribute('data-name')
-            );
-          });
-
-          DOM.employeesTbody.appendChild(tr);
-        });
+          </tr>
+        `).join('');
       }
 
-      function populateAssigneeSelect(emps) {
-        DOM.taskAssigneeSelect.innerHTML = '';
-        emps.forEach(emp => {
-          const opt = document.createElement('option');
-          opt.value = emp.username;
-          opt.textContent = `${emp.full_name} (${emp.username}) - ${emp.department}`;
-          DOM.taskAssigneeSelect.appendChild(opt);
-        });
+      function populateBulkAssignees(emps) {
+        DOM.bulkAssigneesContainer.innerHTML = emps.map(e => `
+          <label class="bulk-assign-item">
+            <input type="checkbox" name="bulk_assignee" value="${e.username}">
+            <span>${Utils.escapeHtml(e.full_name)} (${Utils.escapeHtml(e.username)}) - <small style="color:var(--text-muted);">${Utils.escapeHtml(e.department)}</small></span>
+          </label>
+        `).join('');
       }
 
-      function openBalanceModal(empId, name, currentBalance) {
+      window.openBalanceModal = function(empId, name, currentBalance) {
         Haptics.light();
         DOM.balanceEmpId.value = empId;
         DOM.balanceEmpName.value = name;
         DOM.balanceValueInput.value = parseFloat(currentBalance).toFixed(2);
         DOM.modalBalanceBackdrop.classList.add('open');
-      }
+      };
 
-      async function deregisterEmployee(id, name) {
-        Haptics.medium();
-        if (!confirm(`Warning: Are you sure you want to delete [${name}]? They will immediately lose login access.`)) return;
-
-        try {
-          const res = await AdminApi.deleteEmployee(id);
-          if (res.success) {
-            Utils.showToast('Employee account deregistered', 'success');
-            loadEmployees();
-          } else {
-            Utils.showToast(res.message || 'Deregistration failed', 'error');
-          }
-        } catch (e) {
-          Utils.showToast('Network error during deregistration', 'error');
-        }
-      }
-
-      // ------------------------------------------------------------------------
-      // EVENT LISTENERS & MODAL CONTROLLERS
-      // ------------------------------------------------------------------------
       function bindEvents() {
-        // Navigation Switching
-        DOM.navButtons.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const target = btn.getAttribute('data-target-pane');
-            if (target) switchPane(target);
-          });
-        });
+        DOM.navButtons.forEach(btn => btn.addEventListener('click', () => switchPane(btn.getAttribute('data-target-pane'))));
 
-        // Gate Verification Submit
         DOM.gateForm.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
-          const pass = DOM.gatePassInput.value.trim();
-
-          DOM.btnGateSubmit.disabled = true;
-          DOM.btnGateSubmit.innerHTML = '<span>Verifying Passcode...</span>';
-
-          try {
-            const res = await AdminApi.verifyGate(pass);
-            if (res.success) {
-              Utils.showToast('Gate Passcode Verified', 'success');
-              DOM.gateOverlay.style.display = 'none';
-              initializeSession();
-            } else {
-              Utils.showToast(res.message || 'Invalid Passcode', 'error');
-              DOM.gatePassInput.value = '';
-            }
-          } catch (e) {
-            Utils.showToast('Verification request failed', 'error');
-          } finally {
-            DOM.btnGateSubmit.disabled = false;
-            DOM.btnGateSubmit.innerHTML = '<span>Unlock & Proceed</span>';
+          const res = await AdminApi.verifyGate(DOM.gatePassInput.value.trim());
+          if (res.success) {
+            Utils.showToast('Gate Passcode Verified', 'success');
+            DOM.gateOverlay.style.display = 'none';
+            initializeSession();
+          } else {
+            Utils.showToast(res.message || 'Invalid Passcode', 'error');
+            DOM.gatePassInput.value = '';
           }
         });
 
-        // Admin Credentials Login Submit
         DOM.adminLoginForm.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
-          const u = DOM.adminUserInput.value.trim();
-          const p = DOM.adminPassInput.value;
-
-          DOM.btnAdminLoginSubmit.disabled = true;
-          DOM.btnAdminLoginSubmit.innerHTML = '<span>Authenticating...</span>';
-
-          try {
-            const res = await AdminApi.login(u, p);
-            if (res.success) {
-              Utils.showToast('Welcome Administrator!', 'success');
-              handleLoginSuccess(res.user);
-            } else {
-              Utils.showToast(res.message || 'Authentication failed', 'error');
-            }
-          } catch (e) {
-            Utils.showToast('Could not reach auth gateway', 'error');
-          } finally {
-            DOM.btnAdminLoginSubmit.disabled = false;
-            DOM.btnAdminLoginSubmit.innerHTML = '<span>Sign In to Console</span>';
+          const res = await AdminApi.login(DOM.adminUserInput.value.trim(), DOM.adminPassInput.value);
+          if (res.success) {
+            Utils.showToast('Welcome Administrator!', 'success');
+            handleLoginSuccess(res.user);
+          } else {
+            Utils.showToast(res.message || 'Authentication failed', 'error');
           }
         });
 
-        // Desktop Logout
         DOM.btnDesktopLogout.addEventListener('click', async () => {
-          Haptics.medium();
           await AdminApi.logout();
           DOM.appContainer.style.display = 'none';
           DOM.adminLoginOverlay.style.display = 'flex';
-          Utils.showToast('Admin session terminated', 'info');
+          Utils.showToast('Logged out', 'info');
         });
 
-        // Modal Sheet Toggles
-        DOM.btnOpenTaskSheet.addEventListener('click', () => {
-          Haptics.light();
-          DOM.modalTaskBackdrop.classList.add('open');
-        });
-        DOM.btnCloseTaskModal.addEventListener('click', () => {
-          DOM.modalTaskBackdrop.classList.remove('open');
+        // Modals
+        DOM.btnOpenTaskSheet.addEventListener('click', () => DOM.modalTaskBackdrop.classList.add('open'));
+        DOM.btnCloseTaskModal.addEventListener('click', () => DOM.modalTaskBackdrop.classList.remove('open'));
+        DOM.btnOpenEmpSheet.addEventListener('click', () => DOM.modalEmpBackdrop.classList.add('open'));
+        DOM.btnCloseEmpModal.addEventListener('click', () => DOM.modalEmpBackdrop.classList.remove('open'));
+        DOM.btnCloseBalanceModal.addEventListener('click', () => DOM.modalBalanceBackdrop.classList.remove('open'));
+
+        DOM.selectAllAssignees.addEventListener('change', function () {
+          const boxes = DOM.bulkAssigneesContainer.querySelectorAll('input[name="bulk_assignee"]');
+          boxes.forEach(b => b.checked = this.checked);
         });
 
-        DOM.btnOpenEmpSheet.addEventListener('click', () => {
-          Haptics.light();
-          DOM.modalEmpBackdrop.classList.add('open');
-        });
-        DOM.btnCloseEmpModal.addEventListener('click', () => {
-          DOM.modalEmpBackdrop.classList.remove('open');
-        });
-
-        DOM.btnCloseBalanceModal.addEventListener('click', () => {
-          DOM.modalBalanceBackdrop.classList.remove('open');
-        });
-
-        // Task Form Submit (with Multer files <= 25MB each, max 5)
+        // Submit Bulk Tasks
         DOM.formDispatchTask.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
 
-          const files = DOM.taskFilesInput.files;
-          if (files.length > 5) {
-            Utils.showToast('Maximum 5 reference attachments allowed', 'error');
+          const selectedBoxes = DOM.bulkAssigneesContainer.querySelectorAll('input[name="bulk_assignee"]:checked');
+          const assignees = Array.from(selectedBoxes).map(b => b.value);
+
+          if (assignees.length === 0) {
+            Utils.showToast('Please select at least one assignee', 'error');
             return;
           }
 
-          for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 25 * 1024 * 1024) {
-              Utils.showToast(`File "${files[i].name}" exceeds the 25MB limit`, 'error');
-              return;
-            }
+          const files = DOM.taskFilesInput.files;
+          if (files.length > 5) {
+            Utils.showToast('Maximum 5 attachments allowed', 'error');
+            return;
           }
 
           DOM.btnSubmitTaskAction.disabled = true;
-          DOM.btnSubmitTaskAction.innerHTML = '<span>Persisting Task to MongoDB...</span>';
+          DOM.btnSubmitTaskAction.innerHTML = '<span>Dispatching to MongoDB...</span>';
 
           const formData = new FormData();
           formData.append('title', DOM.taskTitleInput.value.trim());
-          formData.append('assigned_to_username', DOM.taskAssigneeSelect.value);
+          formData.append('assignees', JSON.stringify(assignees));
           formData.append('description', DOM.taskDescInput.value.trim());
           formData.append('reward_amount', DOM.taskRewardInput.value || 0);
           formData.append('requires_submission', DOM.taskRequiresSubInput.checked);
@@ -1981,9 +1138,9 @@
           }
 
           try {
-            const res = await AdminApi.createTask(formData);
+            const res = await AdminApi.createBulkTasks(formData);
             if (res.success) {
-              Utils.showToast('Task dispatched successfully!', 'success');
+              Utils.showToast(res.message, 'success');
               DOM.modalTaskBackdrop.classList.remove('open');
               DOM.formDispatchTask.reset();
               loadTasks();
@@ -1991,85 +1148,50 @@
               Utils.showToast(res.message || 'Dispatch failed', 'error');
             }
           } catch (e) {
-            Utils.showToast('Dispatch error occurred', 'error');
+            Utils.showToast('Error during dispatch', 'error');
           } finally {
             DOM.btnSubmitTaskAction.disabled = false;
-            DOM.btnSubmitTaskAction.innerHTML = '<span>Dispatch & Publish Task</span>';
+            DOM.btnSubmitTaskAction.innerHTML = '<span>Dispatch Task(s)</span>';
           }
         });
 
-        // Register Employee Submit
+        // Register Employee
         DOM.formRegisterEmployee.addEventListener('submit', async (e) => {
           e.preventDefault();
-          Haptics.light();
-
-          const payload = {
+          const res = await AdminApi.createEmployee({
             staff_id: DOM.empStaffIdInput.value.trim(),
             username: DOM.empUsernameInput.value.trim(),
             password: DOM.empPasswordInput.value,
             full_name: DOM.empFullNameInput.value.trim(),
             department: DOM.empDeptInput.value.trim(),
             initial_balance: DOM.empBalanceInput.value || 0
-          };
-
-          DOM.btnSubmitEmpAction.disabled = true;
-          DOM.btnSubmitEmpAction.innerHTML = '<span>Registering...</span>';
-
-          try {
-            const res = await AdminApi.createEmployee(payload);
-            if (res.success) {
-              Utils.showToast('Employee account created!', 'success');
-              DOM.modalEmpBackdrop.classList.remove('open');
-              DOM.formRegisterEmployee.reset();
-              loadEmployees();
-            } else {
-              Utils.showToast(res.message || 'Registration failed', 'error');
-            }
-          } catch (e) {
-            Utils.showToast('Network registration error', 'error');
-          } finally {
-            DOM.btnSubmitEmpAction.disabled = false;
-            DOM.btnSubmitEmpAction.innerHTML = '<span>Register Account on MongoDB</span>';
+          });
+          if (res.success) {
+            Utils.showToast('Employee created!', 'success');
+            DOM.modalEmpBackdrop.classList.remove('open');
+            DOM.formRegisterEmployee.reset();
+            loadEmployees();
+          } else {
+            Utils.showToast(res.message || 'Registration failed', 'error');
           }
         });
 
-        // Modify Balance Submit
+        // Modify Balance
         DOM.formModifyBalance.addEventListener('submit', async (e) => {
           e.preventDefault();
-          Haptics.light();
-
-          const empId = DOM.balanceEmpId.value;
-          const newBalance = DOM.balanceValueInput.value;
-
-          DOM.btnSubmitBalanceAction.disabled = true;
-          DOM.btnSubmitBalanceAction.innerHTML = '<span>Saving...</span>';
-
-          try {
-            const res = await AdminApi.updateEmployeeBalance(empId, newBalance);
-            if (res.success) {
-              Utils.showToast('Employee balance updated!', 'success');
-              DOM.modalBalanceBackdrop.classList.remove('open');
-              loadEmployees();
-            } else {
-              Utils.showToast(res.message || 'Failed to update balance', 'error');
-            }
-          } catch (e) {
-            Utils.showToast('Network error updating balance', 'error');
-          } finally {
-            DOM.btnSubmitBalanceAction.disabled = false;
-            DOM.btnSubmitBalanceAction.innerHTML = '<span>Save Balance Adjustment</span>';
+          const res = await AdminApi.updateEmployeeBalance(DOM.balanceEmpId.value, DOM.balanceValueInput.value);
+          if (res.success) {
+            Utils.showToast('Balance updated!', 'success');
+            DOM.modalBalanceBackdrop.classList.remove('open');
+            loadEmployees();
           }
         });
       }
 
-      // ------------------------------------------------------------------------
-      // BOOTSTRAP
-      // ------------------------------------------------------------------------
       window.addEventListener('DOMContentLoaded', () => {
         bindEvents();
         initializeSession();
       });
-
     })(window, document);
   </script>
 </body>
