@@ -11,6 +11,7 @@
  *  - Environment Gate Password Protection Layer
  *  - Automated Balance & Financial Ledger Credit Engine
  *  - Multi-Assignee Bulk Task Dispatch Pipeline
+ *  - Robust Case-Insensitive Auth with Automatic Stale Cookie Invalidation
  * ============================================================================
  */
 
@@ -100,7 +101,6 @@ const uploadHandler = multer({
     files: MAX_CONCURRENT_ATTACHMENTS
   },
   fileFilter: (req, file, callback) => {
-    // Permit any valid corporate business attachments
     callback(null, true);
   }
 });
@@ -113,7 +113,7 @@ const mongooseOptions = {
   autoIndex: true,
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
-  family: 4 // Force IPv4 to prevent VPS DNS resolve latencies
+  family: 4
 };
 
 mongoose.connect(MONGODB_URI, mongooseOptions)
@@ -154,7 +154,6 @@ const CorporateEmployeeAccountSchema = new mongoose.Schema({
     required: [true, 'Username is required.'],
     unique: true,
     trim: true,
-    lowercase: true,
     index: true
   },
   password_hash: {
@@ -316,7 +315,6 @@ const CorporateTaskSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Assignee username is required.'],
     trim: true,
-    lowercase: true,
     index: true
   },
   priority: {
@@ -469,7 +467,7 @@ const checkGateAccess = (req, res, next) => {
 };
 
 /**
- * Employee Role JWT Verification Middleware
+ * Employee Role JWT Verification Middleware (With Auto-Cookie Clearing on Expire)
  */
 const authenticateEmployeeToken = (req, res, next) => {
   const token = req.cookies.corp_auth_token;
@@ -483,6 +481,7 @@ const authenticateEmployeeToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
     if (err || !decodedUser) {
+      res.clearCookie('corp_auth_token');
       return res.status(403).json({
         success: false,
         message: 'Your active session has expired or is invalid. Please log in again.'
@@ -570,7 +569,7 @@ app.post('/api/gate/verify', (req, res) => {
 
 /**
  * POST /api/auth/login
- * Employee Authentication Endpoint
+ * Employee Authentication Endpoint (Supports Case-Insensitive Matching)
  */
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
@@ -583,11 +582,13 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
-    const formattedUsername = username.trim().toLowerCase();
+    const rawIdentifier = String(username).trim();
+    const escapedIdentifier = rawIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     const employee = await EmployeeAccount.findOne({
       $or: [
-        { username: formattedUsername },
-        { staff_id: username.trim() }
+        { username: new RegExp(`^${escapedIdentifier}$`, 'i') },
+        { staff_id: new RegExp(`^${escapedIdentifier}$`, 'i') }
       ],
       role: 'employee'
     });
@@ -646,9 +647,13 @@ app.post('/api/auth/login', async (req, res) => {
  */
 app.get('/api/auth/session', authenticateEmployeeToken, async (req, res) => {
   try {
-    const employee = await EmployeeAccount.findOne({ username: req.user.username });
+    const escapedUser = String(req.user.username).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const employee = await EmployeeAccount.findOne({
+      username: new RegExp(`^${escapedUser}$`, 'i')
+    });
     
     if (!employee) {
+      res.clearCookie('corp_auth_token');
       return res.status(404).json({
         success: false,
         message: 'Active profile data not found.'
@@ -692,7 +697,10 @@ app.post('/api/auth/logout', (req, res) => {
  */
 app.get('/api/tasks/list', authenticateEmployeeToken, async (req, res) => {
   try {
-    const tasks = await TaskItem.find({ assigned_to_username: req.user.username })
+    const escapedUser = String(req.user.username).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const tasks = await TaskItem.find({
+      assigned_to_username: new RegExp(`^${escapedUser}$`, 'i')
+    })
       .sort({ created_at: -1 })
       .lean();
 
@@ -716,9 +724,11 @@ app.get('/api/tasks/list', authenticateEmployeeToken, async (req, res) => {
 app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => {
   try {
     const taskId = req.params.id;
+    const escapedUser = String(req.user.username).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
     const task = await TaskItem.findOne({
       _id: taskId,
-      assigned_to_username: req.user.username
+      assigned_to_username: new RegExp(`^${escapedUser}$`, 'i')
     });
 
     if (!task) {
@@ -765,9 +775,11 @@ app.post('/api/tasks/submit-deliverables/:id',
   async (req, res) => {
     try {
       const taskId = req.params.id;
+      const escapedUser = String(req.user.username).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
       const task = await TaskItem.findOne({
         _id: taskId,
-        assigned_to_username: req.user.username
+        assigned_to_username: new RegExp(`^${escapedUser}$`, 'i')
       });
 
       if (!task) {
@@ -794,7 +806,7 @@ app.post('/api/tasks/submit-deliverables/:id',
         });
       }
 
-      // Purge prior user deliverable files if resubmitting to keep database clean
+      // Purge prior user deliverable files if resubmitting
       if (uploadedFiles.length > 0 && task.submissions && task.submissions.length > 0) {
         const priorIds = task.submissions.map(s => s.file_id);
         await StoredFile.deleteMany({ _id: { $in: priorIds } });
@@ -968,12 +980,11 @@ app.get('/api/files/download/:fileId', async (req, res) => {
       }
 
       const task = await TaskItem.findById(fileDoc.task_id);
-      if (!task || task.assigned_to_username !== authUser.username) {
+      if (!task || task.assigned_to_username.toLowerCase() !== authUser.username.toLowerCase()) {
         return res.status(403).json({ success: false, message: 'Access forbidden: Task does not belong to you.' });
       }
     }
 
-    // Stream out binary payload
     res.setHeader('Content-Type', fileDoc.mimetype || 'application/octet-stream');
     res.setHeader('Content-Length', fileDoc.size);
     res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(fileDoc.filename)}`);
@@ -1004,8 +1015,9 @@ app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
   }
 
   try {
+    const escapedUser = String(username).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const adminUser = await EmployeeAccount.findOne({
-      username: username.trim().toLowerCase(),
+      username: new RegExp(`^${escapedUser}$`, 'i'),
       role: 'admin'
     });
 
@@ -1137,7 +1149,7 @@ app.post('/api/admin/tasks/create-bulk',
       const createdTaskIds = [];
 
       for (const rawUsername of assigneeList) {
-        const targetUsername = String(rawUsername).trim().toLowerCase();
+        const targetUsername = String(rawUsername).trim();
 
         const newTask = new TaskItem({
           task_title: title.trim(),
@@ -1154,7 +1166,6 @@ app.post('/api/admin/tasks/create-bulk',
         await newTask.save();
         createdTaskIds.push(newTask._id);
 
-        // Store Attachment Binaries in Separate Collection
         const fileMetadataList = [];
         for (const f of rawUploadedFiles) {
           const decodedFilename = Buffer.from(f.originalname, 'latin1').toString('utf8');
@@ -1226,10 +1237,10 @@ app.post('/api/admin/tasks/complete/:id', checkGateAccess, authenticateAdminToke
     task.status = 'Completed';
     task.completed_at = new Date();
 
-    // Financial Balance Credit Engine
     if (!task.reward_distributed && task.reward_amount > 0) {
+      const escapedUser = String(task.assigned_to_username).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       await EmployeeAccount.findOneAndUpdate(
-        { username: task.assigned_to_username },
+        { username: new RegExp(`^${escapedUser}$`, 'i') },
         { $inc: { account_balance: task.reward_amount } }
       );
       task.reward_distributed = true;
@@ -1321,13 +1332,13 @@ app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken,
   }
 
   try {
-    const formattedUsername = username.trim().toLowerCase();
-    const formattedStaffId = staff_id.trim();
+    const formattedUsername = String(username).trim();
+    const formattedStaffId = String(staff_id).trim();
 
     const existingAccount = await EmployeeAccount.findOne({
       $or: [
-        { username: formattedUsername },
-        { staff_id: formattedStaffId }
+        { username: new RegExp(`^${formattedUsername.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+        { staff_id: new RegExp(`^${formattedStaffId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
       ]
     });
 
@@ -1345,8 +1356,8 @@ app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken,
       staff_id: formattedStaffId,
       username: formattedUsername,
       password_hash,
-      full_name: full_name.trim(),
-      department: department.trim(),
+      full_name: String(full_name).trim(),
+      department: String(department).trim(),
       account_balance: parseFloat(initial_balance) || 0.00,
       role: 'employee'
     });
@@ -1517,19 +1528,16 @@ app.delete('/api/admin/requests/delete/:id', checkGateAccess, authenticateAdminT
 // 12. FALLBACK ROUTE & SERVER LAUNCH
 // ============================================================================
 
-// Single Page Application Fallback Route
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Create and start HTTP Server
 const server = http.createServer(app);
 
 server.listen(PORT, () => {
   Logger.info(`Corporate Platform Engine active on port ${PORT} [Env: ${NODE_ENV}]`, 'SERVER');
 });
 
-// Graceful Shutdown Handlers
 process.on('SIGTERM', () => {
   Logger.info('SIGTERM received. Shutting down gracefully...', 'SERVER');
   server.close(() => {
