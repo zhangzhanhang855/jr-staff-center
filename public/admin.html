@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#090d16">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>系统管理总控台 - 协同云端管理</title>
+  <title>Corporate Management Console - Admin Portal</title>
+  
+  <!-- Google Sans & Google Sans Text Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Google+Sans+Text:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
     /* ==========================================================================
-       1. IOS GLASS DESIGN SYSTEM & TOKEN VARIABLES
+       1. IOS GLASS DESIGN SYSTEM & GOOGLE SANS TOKENS
        ========================================================================== */
     :root {
       --ios-bg-canvas: #090d16;
@@ -32,6 +38,8 @@
       --ios-emerald-soft: rgba(48, 209, 88, 0.15);
       --ios-amber: #ffd60a;
       --ios-amber-soft: rgba(255, 214, 10, 0.15);
+      --ios-purple: #bf5af2;
+      --ios-purple-soft: rgba(191, 90, 242, 0.15);
       --ios-red: #ff453a;
       --ios-red-soft: rgba(255, 69, 58, 0.15);
       --ios-red-hover: #e0352b;
@@ -40,6 +48,11 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-subtle: #64748b;
+      
+      /* Fonts */
+      --font-display: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Google Sans Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
       
       /* Radii & Shadows */
       --radius-sm: 8px;
@@ -50,7 +63,7 @@
       --shadow-float: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
       
       /* Structural Measurements */
-      --sidebar-width: 270px;
+      --sidebar-width: 280px;
       --bottom-nav-height: 70px;
       
       /* Transitions */
@@ -81,11 +94,16 @@
       background-image: var(--ios-bg-gradient);
       background-attachment: fixed;
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: var(--font-body);
       font-size: 14px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6, .brand-title {
+      font-family: var(--font-display);
     }
 
     input, select, textarea, button {
@@ -96,7 +114,11 @@
       background: none;
     }
 
-    /* Interactive Spring Animations */
+    code {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+
     .pressable {
       transition: transform var(--transition-fast), filter var(--transition-fast);
       will-change: transform;
@@ -122,7 +144,7 @@
       gap: 10px;
       pointer-events: none;
       width: 90%;
-      max-width: 420px;
+      max-width: 440px;
     }
 
     .toast-item {
@@ -163,7 +185,7 @@
     }
 
     /* ==========================================================================
-       4. GATE SCREEN & ADMIN LOGIN (BLURRED OVERLAYS)
+       4. GATE SCREEN & ADMIN LOGIN OVERLAYS
        ========================================================================== */
     .glass-auth-overlay {
       position: fixed;
@@ -180,11 +202,11 @@
 
     .glass-auth-card {
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       background: var(--glass-panel-bg);
       border: 1px solid var(--glass-panel-border);
       border-radius: var(--radius-lg);
-      padding: 38px 32px;
+      padding: 40px 32px;
       box-shadow: var(--shadow-glass);
       text-align: center;
       position: relative;
@@ -215,7 +237,7 @@
     }
 
     .glass-auth-title {
-      font-size: 21px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.4px;
       margin-bottom: 6px;
@@ -333,15 +355,15 @@
     }
 
     .sidebar-avatar-logo {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       background: linear-gradient(135deg, var(--ios-blue), #1d4ed8);
-      border-radius: 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 15px;
+      font-size: 16px;
       box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
     }
 
@@ -396,6 +418,12 @@
       border: 1px solid rgba(10, 132, 255, 0.3);
     }
 
+    .sidebar-nav-item-btn.music-btn.active {
+      background: var(--ios-purple-soft);
+      color: #e9d5ff;
+      border-color: rgba(191, 90, 242, 0.35);
+    }
+
     .sidebar-nav-icon {
       width: 18px;
       height: 18px;
@@ -418,7 +446,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 140px;
+      max-width: 150px;
     }
 
     .btn-logout-ghost {
@@ -472,6 +500,10 @@
     .dock-nav-item.active {
       color: var(--ios-blue);
       font-weight: 600;
+    }
+
+    .dock-nav-item.music-btn.active {
+      color: var(--ios-purple);
     }
 
     .dock-nav-icon {
@@ -616,7 +648,18 @@
     .badge-blue { background: rgba(10, 132, 255, 0.15); color: #60a5fa; border: 1px solid rgba(10, 132, 255, 0.3); }
     .badge-green { background: var(--ios-emerald-soft); color: var(--ios-emerald); border: 1px solid rgba(48, 209, 88, 0.3); }
     .badge-amber { background: var(--ios-amber-soft); color: var(--ios-amber); border: 1px solid rgba(255, 214, 10, 0.3); }
+    .badge-purple { background: var(--ios-purple-soft); color: #d8b4fe; border: 1px solid rgba(191, 90, 242, 0.3); }
     .badge-red { background: var(--ios-red-soft); color: var(--ios-red); border: 1px solid rgba(255, 69, 58, 0.3); }
+
+    .reward-indicator {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #fde047;
+      background: rgba(254, 224, 71, 0.12);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(254, 224, 71, 0.25);
+    }
 
     /* Action Buttons in Tables */
     .btn-cell-action {
@@ -629,6 +672,7 @@
       align-items: center;
       gap: 4px;
       transition: all var(--transition-fast);
+      white-space: nowrap;
     }
 
     .btn-cell-danger {
@@ -663,6 +707,35 @@
       background: rgba(255, 214, 10, 0.25);
     }
 
+    .btn-cell-edit {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-right: 6px;
+    }
+
+    .btn-cell-edit:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    /* JRmusic Embedded Frame */
+    .music-frame-container {
+      width: 100%;
+      height: calc(100vh - 200px);
+      min-height: 600px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-glass);
+      border: 1px solid var(--glass-panel-border);
+      background-color: #000000;
+    }
+
+    .music-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
     /* Modal Backdrop & Sheets */
     .glass-modal-backdrop {
       display: none;
@@ -683,8 +756,8 @@
 
     .glass-modal-sheet {
       width: 100%;
-      max-width: 540px;
-      background: rgba(20, 28, 48, 0.85);
+      max-width: 560px;
+      background: rgba(20, 28, 48, 0.88);
       backdrop-filter: var(--glass-blur-strength);
       -webkit-backdrop-filter: var(--glass-blur-strength);
       border: 1px solid var(--glass-panel-border);
@@ -737,6 +810,45 @@
       margin-top: 6px;
     }
 
+    /* Switch Component */
+    .switch-control-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .ios-switch {
+      position: relative;
+      width: 44px;
+      height: 26px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-full);
+      transition: background-color var(--transition-fast);
+    }
+
+    .ios-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      background: #ffffff;
+      border-radius: 50%;
+      transition: transform var(--transition-fast);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    input[type="checkbox"]:checked + .ios-switch {
+      background: var(--ios-blue);
+    }
+
+    input[type="checkbox"]:checked + .ios-switch::after {
+      transform: translateX(18px);
+    }
+
     /* ==========================================================================
        7. RESPONSIVE BREAKPOINTS
        ========================================================================== */
@@ -762,11 +874,11 @@
 </head>
 <body>
 
-  <!-- Toast Notification System -->
+  <!-- Toast Notification Dock -->
   <div id="toast-container" aria-live="polite"></div>
 
   <!-- ==========================================================================
-       SCREEN 1: MANDATORY GATE CHECK (Render Env Site Gate Password)
+       SCREEN 1: MANDATORY GATE CHECK (Render Environment Access Code)
        ========================================================================== -->
   <section id="gate-overlay" class="glass-auth-overlay">
     <div class="glass-auth-card">
@@ -776,15 +888,15 @@
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
       </div>
-      <h1 class="glass-auth-title">内网安全通行验证</h1>
-      <p class="glass-auth-subtitle">请输入环境通行口令进入管理控制台</p>
+      <h1 class="glass-auth-title">System Gate Authorization</h1>
+      <p class="glass-auth-subtitle">Enter the environment passcode to unlock the console</p>
 
       <form id="gate-form-element">
         <div class="glass-form-group">
-          <input type="password" id="gate-password-input" class="glass-input-field" placeholder="输入访问口令 (如: congcong2012)" style="text-align:center; letter-spacing:2px;" required autofocus>
+          <input type="password" id="gate-password-input" class="glass-input-field" placeholder="Enter Access Code" style="text-align:center; letter-spacing:2px;" required autofocus>
         </div>
         <button type="submit" id="btn-gate-submit" class="btn-ios-primary pressable" style="margin-top:10px;">
-          <span>验证凭据并进入</span>
+          <span>Unlock & Proceed</span>
         </button>
       </form>
     </div>
@@ -800,22 +912,22 @@
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
       </div>
-      <h1 class="glass-auth-title">管理员身份认证</h1>
-      <p class="glass-auth-subtitle">综合管控特权鉴权门户</p>
+      <h1 class="glass-auth-title">Administrator Sign In</h1>
+      <p class="glass-auth-subtitle">Corporate Privilege Authentication Portal</p>
 
       <form id="admin-login-form">
         <div class="glass-form-group">
-          <label class="glass-label" for="admin-user-input">管理账户名</label>
-          <input type="text" id="admin-user-input" class="glass-input-field" placeholder="输入管理员用户名" autocomplete="username" required>
+          <label class="glass-label" for="admin-user-input">Administrator Username</label>
+          <input type="text" id="admin-user-input" class="glass-input-field" placeholder="Enter username (e.g. corp_admin)" autocomplete="username" required>
         </div>
 
         <div class="glass-form-group">
-          <label class="glass-label" for="admin-pass-input">特权密码</label>
-          <input type="password" id="admin-pass-input" class="glass-input-field" placeholder="输入密码" autocomplete="current-password" required>
+          <label class="glass-label" for="admin-pass-input">Security Password</label>
+          <input type="password" id="admin-pass-input" class="glass-input-field" placeholder="Enter password" autocomplete="current-password" required>
         </div>
 
         <button type="submit" id="btn-admin-login-submit" class="btn-ios-primary pressable" style="margin-top:12px;">
-          <span>登 录 管 制 台</span>
+          <span>Sign In to Console</span>
         </button>
       </form>
     </div>
@@ -830,8 +942,8 @@
       <div class="sidebar-brand-box">
         <div class="sidebar-avatar-logo">AD</div>
         <div class="sidebar-brand-text">
-          <h2>企业总控后台</h2>
-          <span>ADMIN 2026</span>
+          <h2>Console Admin</h2>
+          <span>ENTERPRISE 2026</span>
         </div>
       </div>
 
@@ -842,7 +954,7 @@
               <path d="M9 11l3 3L22 4"></path>
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
-            <span>任务统筹与撤销</span>
+            <span>Task Management</span>
           </button>
         </li>
         <li>
@@ -853,7 +965,7 @@
               <line x1="16" y1="13" x2="8" y2="13"></line>
               <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
-            <span>员工申请审核</span>
+            <span>Staff Requests</span>
           </button>
         </li>
         <li>
@@ -864,14 +976,24 @@
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>员工账号管理</span>
+            <span>Accounts & Balance</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="sidebar-nav-item-btn music-btn pressable" data-target-pane="pane-jrmusic-player">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+            <span>JRmusic Radio</span>
           </button>
         </li>
       </ul>
 
       <div class="sidebar-footer-card">
-        <span class="sidebar-user-name" id="sidebar-admin-fullname">Admin</span>
-        <button type="button" id="btn-desktop-logout" class="btn-logout-ghost pressable">退出登录</button>
+        <span class="sidebar-user-name" id="sidebar-admin-fullname">Administrator</span>
+        <button type="button" id="btn-desktop-logout" class="btn-logout-ghost pressable">Sign Out</button>
       </div>
     </aside>
 
@@ -879,49 +1001,53 @@
     <nav class="ios-bottom-dock">
       <button type="button" class="dock-nav-item pressable active" data-target-pane="pane-tasks-management">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-        <span>任务统筹</span>
+        <span>Tasks</span>
       </button>
       <button type="button" class="dock-nav-item pressable" data-target-pane="pane-requests-audit">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-        <span>申请审核</span>
+        <span>Requests</span>
       </button>
       <button type="button" class="dock-nav-item pressable" data-target-pane="pane-employees-registry">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-        <span>账号管理</span>
+        <span>Accounts</span>
+      </button>
+      <button type="button" class="dock-nav-item music-btn pressable" data-target-pane="pane-jrmusic-player">
+        <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        <span>Music</span>
       </button>
     </nav>
 
     <!-- Main Viewport Panes -->
     <main class="ios-main-viewport">
 
-      <!-- PANE 1: 任务统筹与撤销 -->
+      <!-- PANE 1: TASK MANAGEMENT -->
       <section id="pane-tasks-management" class="view-content-pane active-pane">
         <div class="pane-header-titlebar">
           <div>
-            <h1>员工任务统筹</h1>
-            <p>下发业务指派任务，上传单文件 ≤10MB（最多5个）的附件，跟踪进度或彻底物理撤销记录。</p>
+            <h1>Task Orchestration & Dispatch</h1>
+            <p>Assign tasks with reward amounts, configure deliverable file requirements, audit submissions, and complete tasks for payout.</p>
           </div>
           <button type="button" id="btn-open-task-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
             <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>布置新任务</span>
+            <span>Assign New Task</span>
           </button>
         </div>
 
         <div class="glass-card-panel">
           <div class="glass-panel-header">
-            <h2>全量任务监视清单</h2>
+            <h2>Active Tasks & Deliverable Tracking</h2>
           </div>
           <div class="glass-table-scroller">
             <table class="glass-table">
               <thead>
                 <tr>
-                  <th>任务名称</th>
-                  <th>指派员工</th>
-                  <th>挂载附件</th>
-                  <th>流转状态</th>
-                  <th>发布时间</th>
-                  <th>领取时间</th>
-                  <th>管理操作</th>
+                  <th>Task Title</th>
+                  <th>Assignee</th>
+                  <th>Reward</th>
+                  <th>Submission Req.</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="tasks-table-body">
@@ -932,30 +1058,30 @@
         </div>
       </section>
 
-      <!-- PANE 2: 员工申请审核 -->
+      <!-- PANE 2: REQUESTS AUDIT -->
       <section id="pane-requests-audit" class="view-content-pane">
         <div class="pane-header-titlebar">
           <div>
-            <h1>员工事务申请流转</h1>
-            <p>审批员工提交的资源/行政需求，执行批准、驳回状态变更或物理清除数据记录。</p>
+            <h1>Employee Applications & Requests</h1>
+            <p>Review administrative and resource requests submitted by staff members, execute approval, rejection, or data purge.</p>
           </div>
         </div>
 
         <div class="glass-card-panel">
           <div class="glass-panel-header">
-            <h2>待办工单与请示明细</h2>
+            <h2>Submitted Requests List</h2>
           </div>
           <div class="glass-table-scroller">
             <table class="glass-table">
               <thead>
                 <tr>
-                  <th>申请主题</th>
-                  <th>申请人</th>
-                  <th>所属部门</th>
-                  <th>正文简述</th>
-                  <th>状态</th>
-                  <th>提交时间</th>
-                  <th>流转与物理清除</th>
+                  <th>Subject</th>
+                  <th>Applicant</th>
+                  <th>Department</th>
+                  <th>Content Summary</th>
+                  <th>Status</th>
+                  <th>Submitted At</th>
+                  <th>Workflow Actions</th>
                 </tr>
               </thead>
               <tbody id="requests-table-body">
@@ -966,33 +1092,34 @@
         </div>
       </section>
 
-      <!-- PANE 3: 员工账号管理 -->
+      <!-- PANE 3: EMPLOYEES & BALANCE MANAGEMENT -->
       <section id="pane-employees-registry" class="view-content-pane">
         <div class="pane-header-titlebar">
           <div>
-            <h1>员工账户与权限管制</h1>
-            <p>开通具备独立加密凭据的员工工作台账号，或一键注销离职人员访问权限。</p>
+            <h1>Accounts & Reward Balances</h1>
+            <p>Manage corporate employee login profiles, adjust balance credits, or deregister accounts directly on MongoDB.</p>
           </div>
           <button type="button" id="btn-open-employee-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
             <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>注册新员工账号</span>
+            <span>Register New Employee</span>
           </button>
         </div>
 
         <div class="glass-card-panel">
           <div class="glass-panel-header">
-            <h2>活跃员工花名册</h2>
+            <h2>Active Employee Directory</h2>
           </div>
           <div class="glass-table-scroller">
             <table class="glass-table">
               <thead>
                 <tr>
-                  <th>员工工号</th>
-                  <th>登录用户名</th>
-                  <th>真实姓名</th>
-                  <th>所属部门</th>
-                  <th>注册时间</th>
-                  <th>账号注销</th>
+                  <th>Staff ID</th>
+                  <th>Username</th>
+                  <th>Full Name</th>
+                  <th>Department</th>
+                  <th>Account Balance</th>
+                  <th>Registered At</th>
+                  <th>Management</th>
                 </tr>
               </thead>
               <tbody id="employees-table-body">
@@ -1003,77 +1130,142 @@
         </div>
       </section>
 
+      <!-- PANE 4: JRMUSIC RADIO -->
+      <section id="pane-jrmusic-player" class="view-content-pane">
+        <div class="pane-header-titlebar">
+          <div>
+            <h1>JRmusic Streaming Radio</h1>
+            <p>Embedded online web audio player for workstation background music.</p>
+          </div>
+        </div>
+        <div class="music-frame-container">
+          <iframe 
+            class="music-frame" 
+            src="https://musicplayer-ruby-delta.vercel.app" 
+            allow="autoplay; encrypted-media; fullscreen"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </section>
+
     </main>
   </div>
 
   <!-- ==========================================================================
-       MODAL SHEETS (CREATE TASK WITH ATTACHMENTS & REGISTER EMPLOYEE)
+       MODAL SHEETS
        ========================================================================== -->
 
-  <!-- SHEET 1: DISPATCH TASK MODAL -->
+  <!-- MODAL 1: DISPATCH TASK SHEET -->
   <div class="glass-modal-backdrop" id="modal-task-backdrop">
     <div class="glass-modal-sheet">
       <div class="modal-sheet-header">
-        <h3 style="font-size:17px; font-weight:700;">布置新工作任务</h3>
+        <h3 style="font-size:18px; font-weight:700;">Assign Work Task</h3>
         <button type="button" class="btn-modal-close pressable" id="btn-close-task-modal">✕</button>
       </div>
       <form id="form-dispatch-task">
         <div class="glass-form-group">
-          <label class="glass-label">任务主题</label>
-          <input type="text" id="task-title-input" class="glass-input-field" placeholder="例：系统架构性能评测与安全审计" required>
+          <label class="glass-label">Task Title</label>
+          <input type="text" id="task-title-input" class="glass-input-field" placeholder="e.g. Q3 Infrastructure Performance Audit" required>
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">指派执行员工</label>
+          <label class="glass-label">Assignee (Employee)</label>
           <select id="task-assignee-select" class="glass-input-field" style="background:rgba(20,28,48,0.95);" required>
             <!-- Dynamically populated -->
           </select>
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">任务要求与交付指标</label>
-          <textarea id="task-desc-input" class="glass-textarea" placeholder="请详述该任务的具体推进计划、交付标准及验收节点..." required></textarea>
+          <label class="glass-label">Task Description & Requirements</label>
+          <textarea id="task-desc-input" class="glass-textarea" placeholder="Detail the task deliverables, metrics, and acceptance criteria..." required></textarea>
         </div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+          <div class="glass-form-group">
+            <label class="glass-label">Reward Amount (¥ / $)</label>
+            <input type="number" step="0.01" id="task-reward-input" class="glass-input-field" placeholder="0.00" value="0.00" required>
+          </div>
+          <div class="glass-form-group">
+            <label class="glass-label">Submission Deadline</label>
+            <input type="datetime-local" id="task-deadline-input" class="glass-input-field">
+          </div>
+        </div>
+
+        <label class="switch-control-label">
+          <input type="checkbox" id="task-requires-sub-input" style="display:none;">
+          <div class="ios-switch"></div>
+          <span style="font-size:13.5px; font-weight:600; color:var(--text-main);">Requires Deliverable File Submission</span>
+        </label>
+
         <div class="glass-form-group">
-          <label class="glass-label">任务附件 (可选，支持最多5个，单个≤10MB)</label>
+          <label class="glass-label">Reference Attachments (Max 5 files, ≤25MB each)</label>
           <input type="file" id="task-files-input" class="glass-input-field" style="padding:10px 14px;" multiple>
-          <div class="file-pill-tip">文件将以二进制形式直接持久化存储至 MongoDB。</div>
+          <div class="file-pill-tip">Files are persisted directly into MongoDB as binary blobs.</div>
         </div>
+
         <button type="submit" id="btn-submit-task-action" class="btn-ios-primary pressable" style="margin-top:16px;">
-          <span>确认发布任务并上传</span>
+          <span>Dispatch & Publish Task</span>
         </button>
       </form>
     </div>
   </div>
 
-  <!-- SHEET 2: REGISTER EMPLOYEE MODAL -->
+  <!-- MODAL 2: REGISTER EMPLOYEE SHEET -->
   <div class="glass-modal-backdrop" id="modal-emp-backdrop">
     <div class="glass-modal-sheet">
       <div class="modal-sheet-header">
-        <h3 style="font-size:17px; font-weight:700;">注册新员工账号</h3>
+        <h3 style="font-size:18px; font-weight:700;">Register Employee Account</h3>
         <button type="button" class="btn-modal-close pressable" id="btn-close-emp-modal">✕</button>
       </div>
       <form id="form-register-employee">
         <div class="glass-form-group">
-          <label class="glass-label">员工工号 (Staff ID)</label>
-          <input type="text" id="emp-staffid-input" class="glass-input-field" placeholder="例：EMP-202601" required>
+          <label class="glass-label">Staff ID</label>
+          <input type="text" id="emp-staffid-input" class="glass-input-field" placeholder="e.g. EMP-202601" required>
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">登录用户名</label>
-          <input type="text" id="emp-username-input" class="glass-input-field" placeholder="员工端登录账号" required>
+          <label class="glass-label">Username</label>
+          <input type="text" id="emp-username-input" class="glass-input-field" placeholder="Login account username" required>
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">初始认证密码</label>
-          <input type="password" id="emp-password-input" class="glass-input-field" placeholder="设置初始访问密码" required>
+          <label class="glass-label">Initial Password</label>
+          <input type="password" id="emp-password-input" class="glass-input-field" placeholder="Set authentication password" required>
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">真实姓名</label>
-          <input type="text" id="emp-fullname-input" class="glass-input-field" placeholder="姓名" required>
+          <label class="glass-label">Full Name</label>
+          <input type="text" id="emp-fullname-input" class="glass-input-field" placeholder="e.g. Jane Doe" required>
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">所属部门</label>
-          <input type="text" id="emp-dept-input" class="glass-input-field" placeholder="例：技术研发中心" required>
+          <label class="glass-label">Department</label>
+          <input type="text" id="emp-dept-input" class="glass-input-field" placeholder="e.g. Cloud Engineering" required>
+        </div>
+        <div class="glass-form-group">
+          <label class="glass-label">Initial Reward Balance (¥)</label>
+          <input type="number" step="0.01" id="emp-balance-input" class="glass-input-field" value="0.00">
         </div>
         <button type="submit" id="btn-submit-emp-action" class="btn-ios-primary pressable" style="margin-top:16px;">
-          <span>写入 MongoDB 注册账号</span>
+          <span>Register Account on MongoDB</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: MODIFY BALANCE SHEET -->
+  <div class="glass-modal-backdrop" id="modal-balance-backdrop">
+    <div class="glass-modal-sheet" style="max-width:440px;">
+      <div class="modal-sheet-header">
+        <h3 style="font-size:18px; font-weight:700;">Modify Employee Balance</h3>
+        <button type="button" class="btn-modal-close pressable" id="btn-close-balance-modal">✕</button>
+      </div>
+      <form id="form-modify-balance">
+        <input type="hidden" id="balance-emp-id">
+        <div class="glass-form-group">
+          <label class="glass-label">Target Employee</label>
+          <input type="text" id="balance-emp-name" class="glass-input-field" disabled style="opacity:0.7;">
+        </div>
+        <div class="glass-form-group">
+          <label class="glass-label">New Balance (¥)</label>
+          <input type="number" step="0.01" id="balance-value-input" class="glass-input-field" required>
+        </div>
+        <button type="submit" id="btn-submit-balance-action" class="btn-ios-primary pressable" style="margin-top:16px;">
+          <span>Save Balance Adjustment</span>
         </button>
       </form>
     </div>
@@ -1151,6 +1343,9 @@
         taskTitleInput: document.getElementById('task-title-input'),
         taskAssigneeSelect: document.getElementById('task-assignee-select'),
         taskDescInput: document.getElementById('task-desc-input'),
+        taskRewardInput: document.getElementById('task-reward-input'),
+        taskDeadlineInput: document.getElementById('task-deadline-input'),
+        taskRequiresSubInput: document.getElementById('task-requires-sub-input'),
         taskFilesInput: document.getElementById('task-files-input'),
         btnSubmitTaskAction: document.getElementById('btn-submit-task-action'),
         // Requests
@@ -1166,7 +1361,16 @@
         empPasswordInput: document.getElementById('emp-password-input'),
         empFullNameInput: document.getElementById('emp-fullname-input'),
         empDeptInput: document.getElementById('emp-dept-input'),
-        btnSubmitEmpAction: document.getElementById('btn-submit-emp-action')
+        empBalanceInput: document.getElementById('emp-balance-input'),
+        btnSubmitEmpAction: document.getElementById('btn-submit-emp-action'),
+        // Balance Modal
+        modalBalanceBackdrop: document.getElementById('modal-balance-backdrop'),
+        btnCloseBalanceModal: document.getElementById('btn-close-balance-modal'),
+        formModifyBalance: document.getElementById('form-modify-balance'),
+        balanceEmpId: document.getElementById('balance-emp-id'),
+        balanceEmpName: document.getElementById('balance-emp-name'),
+        balanceValueInput: document.getElementById('balance-value-input'),
+        btnSubmitBalanceAction: document.getElementById('btn-submit-balance-action')
       };
 
       // ------------------------------------------------------------------------
@@ -1197,7 +1401,7 @@
           );
         },
 
-        showToast(message, type = 'info', duration = 3000) {
+        showToast(message, type = 'info', duration = 3200) {
           const toast = document.createElement('div');
           toast.className = 'toast-item';
 
@@ -1271,6 +1475,11 @@
           return await res.json();
         },
 
+        async completeTask(id) {
+          const res = await fetch(`/api/admin/tasks/complete/${id}`, { method: 'POST' });
+          return await res.json();
+        },
+
         async deleteTask(id) {
           const res = await fetch(`/api/admin/tasks/delete/${id}`, { method: 'DELETE' });
           return await res.json();
@@ -1305,6 +1514,15 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
+          });
+          return await res.json();
+        },
+
+        async updateEmployeeBalance(id, balance) {
+          const res = await fetch(`/api/admin/employees/balance/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ balance })
           });
           return await res.json();
         },
@@ -1380,56 +1598,90 @@
             renderTasksTable(res.data);
           }
         } catch (e) {
-          Utils.showToast('无法读取任务列表', 'error');
+          Utils.showToast('Failed to fetch tasks', 'error');
         }
       }
 
       function renderTasksTable(tasks) {
         DOM.tasksTbody.innerHTML = '';
         if (!tasks || !tasks.length) {
-          DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">暂无派发的任务</td></tr>';
+          DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No active tasks found in the database.</td></tr>';
           return;
         }
 
         tasks.forEach(t => {
-          const isClaimed = t.status !== 'Assigned';
-          const attCount = (t.attachments || []).length;
-          const tr = document.createElement('tr');
+          const isCompleted = t.status === 'Completed';
+          const isSubmitted = t.status === 'Submitted';
+          const isClaimed = t.status === 'Claimed';
 
+          let statusBadge = '<span class="ios-status-badge badge-blue">Assigned</span>';
+          if (isClaimed) statusBadge = '<span class="ios-status-badge badge-amber">In Progress</span>';
+          if (isSubmitted) statusBadge = '<span class="ios-status-badge badge-purple">Submitted (Review)</span>';
+          if (isCompleted) statusBadge = '<span class="ios-status-badge badge-green">✓ Completed</span>';
+
+          const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><strong style="color:#ffffff;">${Utils.escapeHtml(t.task_title)}</strong></td>
-            <td><code>${Utils.escapeHtml(t.assigned_to_username)}</code></td>
-            <td><span class="ios-status-badge badge-blue">📎 ${attCount} 个附件</span></td>
-            <td><span class="ios-status-badge ${isClaimed ? 'badge-green' : 'badge-amber'}">${isClaimed ? '已领取确认' : '待领取'}</span></td>
-            <td>${Utils.formatDate(t.created_at)}</td>
-            <td>${Utils.formatDate(t.claimed_at)}</td>
             <td>
-              <button class="btn-cell-action btn-cell-danger pressable" data-id="${t._id}">
-                <svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                <span>撤销并删除</span>
-              </button>
+              <strong style="color:#ffffff; font-size:14.5px;">${Utils.escapeHtml(t.task_title)}</strong>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">${(t.attachments || []).length} admin attachments | ${(t.submissions || []).length} user submissions</div>
+            </td>
+            <td><code>${Utils.escapeHtml(t.assigned_to_username)}</code></td>
+            <td><span class="reward-indicator">¥ ${(parseFloat(t.reward_amount) || 0).toFixed(2)}</span></td>
+            <td>
+              <span class="ios-status-badge ${t.requires_submission ? 'badge-purple' : 'badge-blue'}">
+                ${t.requires_submission ? 'Required (≤25MB)' : 'None'}
+              </span>
+            </td>
+            <td style="font-size:12px;">${Utils.formatDate(t.submission_deadline)}</td>
+            <td>${statusBadge}</td>
+            <td style="white-space:nowrap;">
+              ${!isCompleted ? `<button class="btn-cell-action btn-cell-success pressable" data-complete-id="${t._id}">Complete & Pay</button>` : ''}
+              <button class="btn-cell-action btn-cell-danger pressable" data-delete-id="${t._id}">Revoke</button>
             </td>
           `;
 
-          tr.querySelector('.btn-cell-danger').addEventListener('click', () => revokeTask(t._id));
+          const completeBtn = tr.querySelector('[data-complete-id]');
+          if (completeBtn) {
+            completeBtn.addEventListener('click', () => markTaskCompleted(t._id, t.reward_amount, t.assigned_to_username));
+          }
+
+          tr.querySelector('[data-delete-id]').addEventListener('click', () => revokeTask(t._id));
           DOM.tasksTbody.appendChild(tr);
         });
       }
 
+      async function markTaskCompleted(id, reward, username) {
+        Haptics.medium();
+        if (!confirm(`Mark this task as completed? This will automatically credit ¥${parseFloat(reward).toFixed(2)} to ${username}'s balance.`)) return;
+
+        try {
+          const res = await AdminApi.completeTask(id);
+          if (res.success) {
+            Utils.showToast(res.message || 'Task completed and reward distributed!', 'success');
+            loadTasks();
+            loadEmployees();
+          } else {
+            Utils.showToast(res.message || 'Action failed', 'error');
+          }
+        } catch (e) {
+          Utils.showToast('Network error during completion processing', 'error');
+        }
+      }
+
       async function revokeTask(id) {
         Haptics.medium();
-        if (!confirm('确定将该任务及挂载附件从 MongoDB 中彻底删除？此操作不可逆。')) return;
+        if (!confirm('Permanently revoke and delete this task from MongoDB? This action cannot be undone.')) return;
 
         try {
           const res = await AdminApi.deleteTask(id);
           if (res.success) {
-            Utils.showToast('任务已从数据库物理移除', 'success');
+            Utils.showToast('Task removed from MongoDB', 'success');
             loadTasks();
           } else {
-            Utils.showToast(res.message || '删除失败', 'error');
+            Utils.showToast(res.message || 'Delete failed', 'error');
           }
         } catch (e) {
-          Utils.showToast('网络错误，删除失败', 'error');
+          Utils.showToast('Network error while revoking task', 'error');
         }
       }
 
@@ -1442,22 +1694,22 @@
             renderRequestsTable(res.data);
           }
         } catch (e) {
-          Utils.showToast('无法读取申请工单', 'error');
+          Utils.showToast('Failed to fetch requests', 'error');
         }
       }
 
       function renderRequestsTable(reqs) {
         DOM.requestsTbody.innerHTML = '';
         if (!reqs || !reqs.length) {
-          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">暂无员工申请记录</td></tr>';
+          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No employee requests found.</td></tr>';
           return;
         }
 
         reqs.forEach(r => {
           const tr = document.createElement('tr');
-          let statusBadge = '<span class="ios-status-badge badge-amber">审批中</span>';
-          if (r.status === 'approved') statusBadge = '<span class="ios-status-badge badge-green">已批准</span>';
-          if (r.status === 'rejected') statusBadge = '<span class="ios-status-badge badge-red">已驳回</span>';
+          let statusBadge = '<span class="ios-status-badge badge-amber">Pending</span>';
+          if (r.status === 'approved') statusBadge = '<span class="ios-status-badge badge-green">Approved</span>';
+          if (r.status === 'rejected') statusBadge = '<span class="ios-status-badge badge-red">Rejected</span>';
 
           tr.innerHTML = `
             <td><strong style="color:#ffffff;">${Utils.escapeHtml(r.request_title)}</strong></td>
@@ -1467,15 +1719,15 @@
             <td>${statusBadge}</td>
             <td>${Utils.formatDate(r.submitted_at)}</td>
             <td style="white-space:nowrap;">
-              <button class="btn-cell-action btn-cell-success pressable" data-id="${r._id}">批准</button>
-              <button class="btn-cell-action btn-cell-amber pressable" data-id="${r._id}">驳回</button>
-              <button class="btn-cell-action btn-cell-danger pressable" data-id="${r._id}">清除</button>
+              <button class="btn-cell-action btn-cell-success pressable" data-approve-id="${r._id}">Approve</button>
+              <button class="btn-cell-action btn-cell-amber pressable" data-reject-id="${r._id}">Reject</button>
+              <button class="btn-cell-action btn-cell-danger pressable" data-delete-id="${r._id}">Purge</button>
             </td>
           `;
 
-          tr.querySelector('.btn-cell-success').addEventListener('click', () => updateRequest(r._id, 'approved'));
-          tr.querySelector('.btn-cell-amber').addEventListener('click', () => updateRequest(r._id, 'rejected'));
-          tr.querySelector('.btn-cell-danger').addEventListener('click', () => deleteRequest(r._id));
+          tr.querySelector('[data-approve-id]').addEventListener('click', () => updateRequest(r._id, 'approved'));
+          tr.querySelector('[data-reject-id]').addEventListener('click', () => updateRequest(r._id, 'rejected'));
+          tr.querySelector('[data-delete-id]').addEventListener('click', () => deleteRequest(r._id));
 
           DOM.requestsTbody.appendChild(tr);
         });
@@ -1486,25 +1738,25 @@
         try {
           const res = await AdminApi.updateRequestStatus(id, status);
           if (res.success) {
-            Utils.showToast('工单状态已同步', 'success');
+            Utils.showToast('Request status updated', 'success');
             loadRequests();
           }
         } catch (e) {
-          Utils.showToast('状态更新失败', 'error');
+          Utils.showToast('Failed to update request', 'error');
         }
       }
 
       async function deleteRequest(id) {
         Haptics.medium();
-        if (!confirm('确定将该申请数据彻底物理清除？')) return;
+        if (!confirm('Permanently purge this request record from MongoDB?')) return;
         try {
           const res = await AdminApi.deleteRequest(id);
           if (res.success) {
-            Utils.showToast('申请数据已彻底清除', 'success');
+            Utils.showToast('Request record purged', 'success');
             loadRequests();
           }
         } catch (e) {
-          Utils.showToast('清除失败', 'error');
+          Utils.showToast('Purge failed', 'error');
         }
       }
 
@@ -1518,14 +1770,14 @@
             populateAssigneeSelect(res.data);
           }
         } catch (e) {
-          Utils.showToast('无法读取员工名册', 'error');
+          Utils.showToast('Failed to fetch employee list', 'error');
         }
       }
 
       function renderEmployeesTable(emps) {
         DOM.employeesTbody.innerHTML = '';
         if (!emps || !emps.length) {
-          DOM.employeesTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:32px;">暂无员工账号</td></tr>';
+          DOM.employeesTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No registered employees.</td></tr>';
           return;
         }
 
@@ -1536,13 +1788,29 @@
             <td><strong>${Utils.escapeHtml(emp.username)}</strong></td>
             <td>${Utils.escapeHtml(emp.full_name)}</td>
             <td>${Utils.escapeHtml(emp.department)}</td>
-            <td>${Utils.formatDate(emp.created_at)}</td>
-            <td>
-              <button class="btn-cell-action btn-cell-danger pressable" data-id="${emp._id}">注销账号</button>
+            <td><span class="reward-indicator" style="font-size:13.5px;">¥ ${(parseFloat(emp.account_balance) || 0).toFixed(2)}</span></td>
+            <td style="font-size:12px;">${Utils.formatDate(emp.created_at)}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn-cell-action btn-cell-edit pressable" data-edit-balance-id="${emp._id}" data-name="${emp.full_name}" data-balance="${emp.account_balance || 0}">Edit Balance</button>
+              <button class="btn-cell-action btn-cell-danger pressable" data-delete-emp-id="${emp._id}" data-name="${emp.full_name}">Deregister</button>
             </td>
           `;
 
-          tr.querySelector('.btn-cell-danger').addEventListener('click', () => deregisterEmployee(emp._id, emp.full_name));
+          tr.querySelector('[data-edit-balance-id]').addEventListener('click', function () {
+            openBalanceModal(
+              this.getAttribute('data-edit-balance-id'),
+              this.getAttribute('data-name'),
+              this.getAttribute('data-balance')
+            );
+          });
+
+          tr.querySelector('[data-delete-emp-id]').addEventListener('click', function () {
+            deregisterEmployee(
+              this.getAttribute('data-delete-emp-id'),
+              this.getAttribute('data-name')
+            );
+          });
+
           DOM.employeesTbody.appendChild(tr);
         });
       }
@@ -1557,20 +1825,28 @@
         });
       }
 
+      function openBalanceModal(empId, name, currentBalance) {
+        Haptics.light();
+        DOM.balanceEmpId.value = empId;
+        DOM.balanceEmpName.value = name;
+        DOM.balanceValueInput.value = parseFloat(currentBalance).toFixed(2);
+        DOM.modalBalanceBackdrop.classList.add('open');
+      }
+
       async function deregisterEmployee(id, name) {
         Haptics.medium();
-        if (!confirm(`警告：确定注销并彻底删除员工 [${name}] 的凭证？该员工将无法再访问系统。`)) return;
+        if (!confirm(`Warning: Are you sure you want to delete [${name}]? They will immediately lose login access.`)) return;
 
         try {
           const res = await AdminApi.deleteEmployee(id);
           if (res.success) {
-            Utils.showToast('员工账号已注销', 'success');
+            Utils.showToast('Employee account deregistered', 'success');
             loadEmployees();
           } else {
-            Utils.showToast(res.message || '注销失败', 'error');
+            Utils.showToast(res.message || 'Deregistration failed', 'error');
           }
         } catch (e) {
-          Utils.showToast('网络异常，注销失败', 'error');
+          Utils.showToast('Network error during deregistration', 'error');
         }
       }
 
@@ -1593,23 +1869,23 @@
           const pass = DOM.gatePassInput.value.trim();
 
           DOM.btnGateSubmit.disabled = true;
-          DOM.btnGateSubmit.innerHTML = '<span>校验口令中...</span>';
+          DOM.btnGateSubmit.innerHTML = '<span>Verifying Passcode...</span>';
 
           try {
             const res = await AdminApi.verifyGate(pass);
             if (res.success) {
-              Utils.showToast('通行口令验证通过', 'success');
+              Utils.showToast('Gate Passcode Verified', 'success');
               DOM.gateOverlay.style.display = 'none';
               initializeSession();
             } else {
-              Utils.showToast(res.message || '口令错误', 'error');
+              Utils.showToast(res.message || 'Invalid Passcode', 'error');
               DOM.gatePassInput.value = '';
             }
           } catch (e) {
-            Utils.showToast('验证请求失败', 'error');
+            Utils.showToast('Verification request failed', 'error');
           } finally {
             DOM.btnGateSubmit.disabled = false;
-            DOM.btnGateSubmit.innerHTML = '<span>验证凭据并进入</span>';
+            DOM.btnGateSubmit.innerHTML = '<span>Unlock & Proceed</span>';
           }
         });
 
@@ -1621,21 +1897,21 @@
           const p = DOM.adminPassInput.value;
 
           DOM.btnAdminLoginSubmit.disabled = true;
-          DOM.btnAdminLoginSubmit.innerHTML = '<span>身份鉴权中...</span>';
+          DOM.btnAdminLoginSubmit.innerHTML = '<span>Authenticating...</span>';
 
           try {
             const res = await AdminApi.login(u, p);
             if (res.success) {
-              Utils.showToast('管理员身份验证成功！', 'success');
+              Utils.showToast('Welcome Administrator!', 'success');
               handleLoginSuccess(res.user);
             } else {
-              Utils.showToast(res.message || '登录失败', 'error');
+              Utils.showToast(res.message || 'Authentication failed', 'error');
             }
           } catch (e) {
-            Utils.showToast('无法连接鉴权服务器', 'error');
+            Utils.showToast('Could not reach auth gateway', 'error');
           } finally {
             DOM.btnAdminLoginSubmit.disabled = false;
-            DOM.btnAdminLoginSubmit.innerHTML = '<span>登 录 管 制 台</span>';
+            DOM.btnAdminLoginSubmit.innerHTML = '<span>Sign In to Console</span>';
           }
         });
 
@@ -1645,7 +1921,7 @@
           await AdminApi.logout();
           DOM.appContainer.style.display = 'none';
           DOM.adminLoginOverlay.style.display = 'flex';
-          Utils.showToast('管理会话已安全退出', 'info');
+          Utils.showToast('Admin session terminated', 'info');
         });
 
         // Modal Sheet Toggles
@@ -1665,31 +1941,40 @@
           DOM.modalEmpBackdrop.classList.remove('open');
         });
 
-        // Task Form Submit (with Multer files)
+        DOM.btnCloseBalanceModal.addEventListener('click', () => {
+          DOM.modalBalanceBackdrop.classList.remove('open');
+        });
+
+        // Task Form Submit (with Multer files <= 25MB each, max 5)
         DOM.formDispatchTask.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
 
           const files = DOM.taskFilesInput.files;
           if (files.length > 5) {
-            Utils.showToast('最多允许同时上传 5 个附件', 'error');
+            Utils.showToast('Maximum 5 reference attachments allowed', 'error');
             return;
           }
 
           for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 10 * 1024 * 1024) {
-              Utils.showToast(`文件 "${files[i].name}" 超过 10MB 限制`, 'error');
+            if (files[i].size > 25 * 1024 * 1024) {
+              Utils.showToast(`File "${files[i].name}" exceeds the 25MB limit`, 'error');
               return;
             }
           }
 
           DOM.btnSubmitTaskAction.disabled = true;
-          DOM.btnSubmitTaskAction.innerHTML = '<span>正在持久化存储至 MongoDB...</span>';
+          DOM.btnSubmitTaskAction.innerHTML = '<span>Persisting Task to MongoDB...</span>';
 
           const formData = new FormData();
           formData.append('title', DOM.taskTitleInput.value.trim());
           formData.append('assigned_to_username', DOM.taskAssigneeSelect.value);
           formData.append('description', DOM.taskDescInput.value.trim());
+          formData.append('reward_amount', DOM.taskRewardInput.value || 0);
+          formData.append('requires_submission', DOM.taskRequiresSubInput.checked);
+          if (DOM.taskDeadlineInput.value) {
+            formData.append('submission_deadline', DOM.taskDeadlineInput.value);
+          }
 
           for (let i = 0; i < files.length; i++) {
             formData.append('attachments', files[i]);
@@ -1698,18 +1983,18 @@
           try {
             const res = await AdminApi.createTask(formData);
             if (res.success) {
-              Utils.showToast('任务与附件已成功存入 MongoDB！', 'success');
+              Utils.showToast('Task dispatched successfully!', 'success');
               DOM.modalTaskBackdrop.classList.remove('open');
               DOM.formDispatchTask.reset();
               loadTasks();
             } else {
-              Utils.showToast(res.message || '派发失败', 'error');
+              Utils.showToast(res.message || 'Dispatch failed', 'error');
             }
           } catch (e) {
-            Utils.showToast('派发异常', 'error');
+            Utils.showToast('Dispatch error occurred', 'error');
           } finally {
             DOM.btnSubmitTaskAction.disabled = false;
-            DOM.btnSubmitTaskAction.innerHTML = '<span>确认发布任务并上传</span>';
+            DOM.btnSubmitTaskAction.innerHTML = '<span>Dispatch & Publish Task</span>';
           }
         });
 
@@ -1723,27 +2008,56 @@
             username: DOM.empUsernameInput.value.trim(),
             password: DOM.empPasswordInput.value,
             full_name: DOM.empFullNameInput.value.trim(),
-            department: DOM.empDeptInput.value.trim()
+            department: DOM.empDeptInput.value.trim(),
+            initial_balance: DOM.empBalanceInput.value || 0
           };
 
           DOM.btnSubmitEmpAction.disabled = true;
-          DOM.btnSubmitEmpAction.innerHTML = '<span>写入数据中...</span>';
+          DOM.btnSubmitEmpAction.innerHTML = '<span>Registering...</span>';
 
           try {
             const res = await AdminApi.createEmployee(payload);
             if (res.success) {
-              Utils.showToast('员工账号注册成功！', 'success');
+              Utils.showToast('Employee account created!', 'success');
               DOM.modalEmpBackdrop.classList.remove('open');
               DOM.formRegisterEmployee.reset();
               loadEmployees();
             } else {
-              Utils.showToast(res.message || '注册失败', 'error');
+              Utils.showToast(res.message || 'Registration failed', 'error');
             }
           } catch (e) {
-            Utils.showToast('网络注册异常', 'error');
+            Utils.showToast('Network registration error', 'error');
           } finally {
             DOM.btnSubmitEmpAction.disabled = false;
-            DOM.btnSubmitEmpAction.innerHTML = '<span>写入 MongoDB 注册账号</span>';
+            DOM.btnSubmitEmpAction.innerHTML = '<span>Register Account on MongoDB</span>';
+          }
+        });
+
+        // Modify Balance Submit
+        DOM.formModifyBalance.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          Haptics.light();
+
+          const empId = DOM.balanceEmpId.value;
+          const newBalance = DOM.balanceValueInput.value;
+
+          DOM.btnSubmitBalanceAction.disabled = true;
+          DOM.btnSubmitBalanceAction.innerHTML = '<span>Saving...</span>';
+
+          try {
+            const res = await AdminApi.updateEmployeeBalance(empId, newBalance);
+            if (res.success) {
+              Utils.showToast('Employee balance updated!', 'success');
+              DOM.modalBalanceBackdrop.classList.remove('open');
+              loadEmployees();
+            } else {
+              Utils.showToast(res.message || 'Failed to update balance', 'error');
+            }
+          } catch (e) {
+            Utils.showToast('Network error updating balance', 'error');
+          } finally {
+            DOM.btnSubmitBalanceAction.disabled = false;
+            DOM.btnSubmitBalanceAction.innerHTML = '<span>Save Balance Adjustment</span>';
           }
         });
       }
