@@ -1678,6 +1678,18 @@
         if (!tasks || !tasks.length) {
           DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No active tasks found in database.</td></tr>';
           return;
+        // 在 renderTasksTable(tasks) 中：
+let submissionsList = '';
+if (t.submissions && t.submissions.length > 0) {
+  submissionsList = t.submissions.map(sub => `
+    <div style="margin-top:4px;">
+      <a href="/api/files/download/${sub.file_id || sub._id}" target="_blank" download style="color:#60a5fa; text-decoration:underline; font-size:12px;">
+        📥 Download: ${Utils.escapeHtml(sub.filename)} (${(sub.size / (1024*1024)).toFixed(1)}MB)
+      </a>
+    </div>
+  `).join('');
+}
+
         }
 
         tasks.forEach(t => {
