@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#1e3a8a">
+  <meta name="theme-color" content="#0f172a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>企业协同办公系统 - 员工工作台</title>
+  <title>企业协同办公系统 - 员工端工作台</title>
   <style>
     /* ==========================================================================
-       1. DESIGN SYSTEM & CSS VARIABLES
+       1. GLOBAL DESIGN SYSTEM VARIABLES
        ========================================================================== */
     :root {
       --color-primary-50: #eff6ff;
@@ -34,24 +34,31 @@
       --color-slate-700: #334155;
       --color-slate-800: #1e293b;
       --color-slate-900: #0f172a;
+      --color-slate-950: #020617;
 
-      --color-success-50: #ecfdf5;
-      --color-success-100: #d1fae5;
-      --color-success-500: #10b981;
-      --color-success-600: #059669;
-      --color-success-700: #047857;
+      --color-emerald-50: #ecfdf5;
+      --color-emerald-100: #d1fae5;
+      --color-emerald-500: #10b981;
+      --color-emerald-600: #059669;
+      --color-emerald-700: #047857;
 
-      --color-warning-50: #fffbeb;
-      --color-warning-100: #fef3c7;
-      --color-warning-500: #f59e0b;
-      --color-warning-600: #d97706;
-      --color-warning-700: #b45309;
+      --color-amber-50: #fffbeb;
+      --color-amber-100: #fef3c7;
+      --color-amber-500: #f59e0b;
+      --color-amber-600: #d97706;
+      --color-amber-700: #b45309;
 
-      --color-danger-50: #fef2f2;
-      --color-danger-100: #fee2e2;
-      --color-danger-500: #ef4444;
-      --color-danger-600: #dc2626;
-      --color-danger-700: #b91c1c;
+      --color-rose-50: #fff1f2;
+      --color-rose-100: #ffe4e6;
+      --color-rose-500: #f43f5e;
+      --color-rose-600: #e11d48;
+      --color-rose-700: #be123c;
+
+      --color-purple-50: #faf5ff;
+      --color-purple-100: #f3e8ff;
+      --color-purple-500: #a855f7;
+      --color-purple-600: #9333ea;
+      --color-purple-700: #7e22ce;
 
       --color-surface-white: #ffffff;
       --color-surface-card: #ffffff;
@@ -59,8 +66,8 @@
       --color-border-subtle: #e2e8f0;
       --color-border-hover: #cbd5e1;
 
-      --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --font-family-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
       --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
@@ -69,9 +76,9 @@
       --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
       --radius-xs: 4px;
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
       --radius-full: 9999px;
 
       --sidebar-width: 270px;
@@ -79,11 +86,10 @@
 
       --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
       --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ==========================================================================
-       2. RESET & BASE STYLES
+       2. RESET & BASE ELEMENTS
        ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -93,8 +99,8 @@
     }
 
     html, body {
-      height: 100%;
       width: 100%;
+      height: 100%;
     }
 
     body {
@@ -108,7 +114,7 @@
       overflow-x: hidden;
     }
 
-    input, textarea, button, select {
+    input, textarea, select, button {
       font-family: inherit;
       font-size: inherit;
       line-height: inherit;
@@ -123,7 +129,7 @@
     }
 
     /* ==========================================================================
-       3. NOTIFICATION SYSTEM (TOASTS)
+       3. NOTIFICATION (TOAST) ENGINE
        ========================================================================== */
     #toast-container {
       position: fixed;
@@ -139,7 +145,7 @@
 
     .toast-item {
       pointer-events: auto;
-      min-width: 300px;
+      min-width: 320px;
       max-width: 440px;
       background-color: var(--color-surface-white);
       border-radius: var(--radius-md);
@@ -159,17 +165,9 @@
       opacity: 1;
     }
 
-    .toast-item.toast-success {
-      border-left-color: var(--color-success-500);
-    }
-
-    .toast-item.toast-error {
-      border-left-color: var(--color-danger-500);
-    }
-
-    .toast-item.toast-warning {
-      border-left-color: var(--color-warning-500);
-    }
+    .toast-item.toast-success { border-left-color: var(--color-emerald-500); }
+    .toast-item.toast-error { border-left-color: var(--color-rose-500); }
+    .toast-item.toast-warning { border-left-color: var(--color-amber-500); }
 
     .toast-icon {
       width: 20px;
@@ -178,22 +176,9 @@
       margin-top: 1px;
     }
 
-    .toast-content {
-      flex: 1;
-    }
-
-    .toast-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--color-slate-900);
-      margin-bottom: 2px;
-    }
-
-    .toast-message {
-      font-size: 12.5px;
-      color: var(--color-slate-600);
-      line-height: 1.4;
-    }
+    .toast-content { flex: 1; }
+    .toast-title { font-size: 13px; font-weight: 600; color: var(--color-slate-900); margin-bottom: 2px; }
+    .toast-message { font-size: 12.5px; color: var(--color-slate-600); line-height: 1.4; }
 
     /* ==========================================================================
        4. AUTHENTICATION VIEW (LOGIN)
@@ -220,11 +205,7 @@
       position: relative;
     }
 
-    .login-brand-box {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
+    .login-brand-box { text-align: center; margin-bottom: 32px; }
     .login-brand-icon-wrapper {
       width: 60px;
       height: 60px;
@@ -237,51 +218,14 @@
       margin-bottom: 16px;
       box-shadow: var(--shadow-sm);
     }
+    .login-brand-icon-wrapper svg { width: 32px; height: 32px; }
+    .login-brand-title { font-size: 22px; font-weight: 700; color: var(--color-slate-900); letter-spacing: -0.3px; }
+    .login-brand-desc { font-size: 13px; color: var(--color-slate-500); margin-top: 6px; }
 
-    .login-brand-icon-wrapper svg {
-      width: 32px;
-      height: 32px;
-    }
-
-    .login-brand-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--color-slate-900);
-      letter-spacing: -0.3px;
-    }
-
-    .login-brand-desc {
-      font-size: 13px;
-      color: var(--color-slate-500);
-      margin-top: 6px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--color-slate-700);
-      margin-bottom: 8px;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-icon-left {
-      position: absolute;
-      left: 14px;
-      width: 18px;
-      height: 18px;
-      color: var(--color-slate-400);
-      pointer-events: none;
-    }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--color-slate-700); margin-bottom: 8px; }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-icon-left { position: absolute; left: 14px; width: 18px; height: 18px; color: var(--color-slate-400); pointer-events: none; }
 
     .form-control-input {
       width: 100%;
@@ -292,9 +236,8 @@
       border-radius: var(--radius-sm);
       color: var(--color-slate-900);
       font-size: 14px;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+      transition: all var(--transition-fast);
     }
-
     .form-control-input:focus {
       background-color: var(--color-surface-white);
       border-color: var(--color-primary-500);
@@ -311,9 +254,8 @@
       font-size: 14px;
       resize: vertical;
       min-height: 120px;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+      transition: all var(--transition-fast);
     }
-
     .form-control-textarea:focus {
       background-color: var(--color-surface-white);
       border-color: var(--color-primary-500);
@@ -333,16 +275,10 @@
       justify-content: center;
       gap: 10px;
       margin-top: 10px;
-      transition: background-color var(--transition-fast), transform var(--transition-fast);
+      transition: all var(--transition-fast);
     }
-
-    .btn-submit-login:hover {
-      background-color: var(--color-primary-950);
-    }
-
-    .btn-submit-login:active {
-      transform: scale(0.99);
-    }
+    .btn-submit-login:hover { background-color: var(--color-primary-950); }
+    .btn-submit-login:active { transform: scale(0.99); }
 
     .login-footer-disclaimer {
       margin-top: 28px;
@@ -355,7 +291,7 @@
     }
 
     /* ==========================================================================
-       5. MAIN APPLICATION LAYOUT STRUCTURE
+       5. MAIN APPLICATION LAYOUT & NAVIGATION
        ========================================================================== */
     #app-container {
       display: none;
@@ -363,7 +299,7 @@
       position: relative;
     }
 
-    /* Left Sidebar for Desktop */
+    /* Left Sidebar */
     .app-desktop-sidebar {
       position: fixed;
       top: 0;
@@ -399,20 +335,8 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .sidebar-brand-text h2 {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--color-slate-900);
-      letter-spacing: -0.2px;
-    }
-
-    .sidebar-brand-text span {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--color-slate-400);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
+    .sidebar-brand-text h2 { font-size: 15px; font-weight: 700; color: var(--color-slate-900); }
+    .sidebar-brand-text span { font-size: 11px; font-weight: 600; color: var(--color-slate-400); text-transform: uppercase; letter-spacing: 0.6px; }
 
     .sidebar-nav-menu {
       list-style: none;
@@ -437,24 +361,16 @@
       font-weight: 500;
       cursor: pointer;
       text-align: left;
-      transition: background-color var(--transition-fast), color var(--transition-fast);
+      transition: all var(--transition-fast);
     }
+    .nav-link-btn:hover { background-color: var(--color-primary-50); color: var(--color-primary-900); }
+    .nav-link-btn.active { background-color: var(--color-primary-50); color: var(--color-primary-800); font-weight: 600; }
+    .nav-link-icon { width: 20px; height: 20px; flex-shrink: 0; }
 
-    .nav-link-btn:hover {
-      background-color: var(--color-primary-50);
-      color: var(--color-primary-900);
-    }
-
-    .nav-link-btn.active {
-      background-color: var(--color-primary-50);
-      color: var(--color-primary-800);
-      font-weight: 600;
-    }
-
-    .nav-link-icon {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
+    /* Special JRmusic nav highlight */
+    .nav-link-btn.music-btn.active {
+      background-color: var(--color-purple-50);
+      color: var(--color-purple-700);
     }
 
     .sidebar-user-card {
@@ -480,29 +396,11 @@
       flex-shrink: 0;
     }
 
-    .user-info-text {
-      flex: 1;
-      min-width: 0;
-    }
+    .user-info-text { flex: 1; min-width: 0; }
+    .user-display-name { font-size: 13px; font-weight: 600; color: var(--color-slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-display-dept { font-size: 11.5px; color: var(--color-slate-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .user-display-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--color-slate-900);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .user-display-dept {
-      font-size: 11.5px;
-      color: var(--color-slate-500);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Bottom Navigation Bar for Mobile */
+    /* Bottom Mobile Navigation */
     .app-mobile-navbar {
       display: none;
       position: fixed;
@@ -532,16 +430,9 @@
       cursor: pointer;
       transition: color var(--transition-fast);
     }
-
-    .mobile-nav-item.active {
-      color: var(--color-primary-600);
-      font-weight: 600;
-    }
-
-    .mobile-nav-icon {
-      width: 22px;
-      height: 22px;
-    }
+    .mobile-nav-item.active { color: var(--color-primary-600); font-weight: 600; }
+    .mobile-nav-item.music-btn.active { color: var(--color-purple-600); font-weight: 600; }
+    .mobile-nav-icon { width: 22px; height: 22px; }
 
     /* Main Viewport */
     .app-main-content {
@@ -552,26 +443,17 @@
     }
 
     /* ==========================================================================
-       6. VIEW SECTIONS & COMPONENTS
+       6. VIEW SECTIONS & INTERACTIVE COMPONENTS
        ========================================================================== */
     .view-content-pane {
       display: none;
       animation: fadeInView var(--transition-normal) forwards;
     }
-
-    .view-content-pane.active-pane {
-      display: block;
-    }
+    .view-content-pane.active-pane { display: block; }
 
     @keyframes fadeInView {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .view-header-titlebar {
@@ -582,19 +464,8 @@
       flex-wrap: wrap;
       gap: 16px;
     }
-
-    .view-header-titlebar h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--color-slate-900);
-      letter-spacing: -0.4px;
-    }
-
-    .view-header-titlebar p {
-      font-size: 13.5px;
-      color: var(--color-slate-500);
-      margin-top: 4px;
-    }
+    .view-header-titlebar h1 { font-size: 24px; font-weight: 700; color: var(--color-slate-900); letter-spacing: -0.4px; }
+    .view-header-titlebar p { font-size: 13.5px; color: var(--color-slate-500); margin-top: 4px; }
 
     .btn-action-primary {
       height: 40px;
@@ -608,18 +479,11 @@
       gap: 8px;
       cursor: pointer;
       box-shadow: var(--shadow-xs);
-      transition: background-color var(--transition-fast), transform var(--transition-fast);
+      transition: all var(--transition-fast);
     }
+    .btn-action-primary:hover { background-color: var(--color-primary-700); }
+    .btn-action-primary:active { transform: scale(0.98); }
 
-    .btn-action-primary:hover {
-      background-color: var(--color-primary-700);
-    }
-
-    .btn-action-primary:active {
-      transform: scale(0.98);
-    }
-
-    /* Card Panels */
     .card-panel {
       background-color: var(--color-surface-card);
       border: 1px solid var(--color-border-subtle);
@@ -637,12 +501,7 @@
       padding-bottom: 14px;
       border-bottom: 1px solid var(--color-border-subtle);
     }
-
-    .card-panel-header h2 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--color-slate-900);
-    }
+    .card-panel-header h2 { font-size: 16px; font-weight: 600; color: var(--color-slate-900); }
 
     /* Badges */
     .status-badge {
@@ -653,37 +512,34 @@
       font-size: 11.5px;
       font-weight: 600;
       border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+    .badge-assigned { background-color: var(--color-primary-50); color: var(--color-primary-800); }
+    .badge-claimed { background-color: var(--color-amber-50); color: var(--color-amber-700); border: 1px solid var(--color-amber-200); }
+    .badge-submitted { background-color: var(--color-purple-50); color: var(--color-purple-700); border: 1px solid var(--color-purple-200); }
+    .badge-completed { background-color: var(--color-emerald-100); color: var(--color-emerald-700); }
+    .badge-pending { background-color: var(--color-amber-100); color: var(--color-amber-700); }
+    .badge-approved { background-color: var(--color-emerald-100); color: var(--color-emerald-700); }
+    .badge-rejected { background-color: var(--color-rose-100); color: var(--color-rose-700); }
+
+    /* Reward Tag */
+    .reward-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+      color: #854d0e;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 12.5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
     }
 
-    .badge-assigned {
-      background-color: var(--color-primary-50);
-      color: var(--color-primary-800);
-    }
-
-    .badge-claimed {
-      background-color: var(--color-success-100);
-      color: var(--color-success-700);
-    }
-
-    .badge-pending {
-      background-color: var(--color-warning-100);
-      color: var(--color-warning-700);
-    }
-
-    .badge-approved {
-      background-color: var(--color-success-100);
-      color: var(--color-success-700);
-    }
-
-    .badge-rejected {
-      background-color: var(--color-danger-100);
-      color: var(--color-danger-700);
-    }
-
-    /* Task Stream Styles */
+    /* Task Card Stream */
     .tasks-grid-layout {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
       gap: 24px;
     }
 
@@ -691,14 +547,13 @@
       background-color: var(--color-surface-white);
       border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md);
-      padding: 22px;
+      padding: 24px;
       box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+      transition: all var(--transition-fast);
     }
-
     .task-interactive-card:hover {
       box-shadow: var(--shadow-md);
       transform: translateY(-2px);
@@ -712,76 +567,23 @@
       margin-bottom: 12px;
       gap: 12px;
     }
+    .task-title-text { font-size: 16px; font-weight: 600; color: var(--color-slate-900); line-height: 1.4; }
+    .task-description-body { font-size: 13.5px; color: var(--color-slate-600); line-height: 1.6; margin-bottom: 16px; white-space: pre-wrap; word-break: break-word; }
 
-    .task-title-text {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--color-slate-900);
-      line-height: 1.4;
-    }
-
-    .task-description-body {
-      font-size: 13.5px;
-      color: var(--color-slate-600);
-      line-height: 1.6;
-      margin-bottom: 16px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    /* Attachments Container */
+    /* Attachments and Submission Meta Panels */
     .task-attachments-panel {
-      margin: 12px 0 16px 0;
+      margin: 12px 0 14px 0;
       padding: 12px 14px;
       background-color: var(--color-slate-50);
       border: 1px dashed var(--color-border-subtle);
       border-radius: var(--radius-sm);
     }
-
-    .attachment-header-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--color-slate-500);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .attachment-row-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 0;
-      font-size: 12.5px;
-      border-bottom: 1px solid var(--color-slate-200);
-      gap: 8px;
-    }
-
-    .attachment-row-item:last-child {
-      border-bottom: none;
-    }
-
-    .attachment-file-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      overflow: hidden;
-    }
-
-    .attachment-name {
-      font-weight: 500;
-      color: var(--color-slate-800);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .attachment-size {
-      font-size: 11px;
-      color: var(--color-slate-400);
-      flex-shrink: 0;
-    }
+    .attachment-header-title { font-size: 12px; font-weight: 600; color: var(--color-slate-500); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .attachment-row-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; font-size: 12.5px; border-bottom: 1px solid var(--color-slate-200); gap: 8px; }
+    .attachment-row-item:last-child { border-bottom: none; }
+    .attachment-file-meta { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+    .attachment-name { font-weight: 500; color: var(--color-slate-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .attachment-size { font-size: 11px; color: var(--color-slate-400); flex-shrink: 0; }
 
     .btn-download-attachment {
       display: inline-flex;
@@ -796,10 +598,21 @@
       flex-shrink: 0;
       transition: background-color var(--transition-fast);
     }
+    .btn-download-attachment:hover { background-color: var(--color-primary-100); }
 
-    .btn-download-attachment:hover {
-      background-color: var(--color-primary-100);
+    /* Task Deadline and Submission Requirement Indicators */
+    .task-meta-banner {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 14px;
+      background: var(--color-slate-50);
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+      font-size: 12px;
     }
+    .deadline-urgent { color: var(--color-rose-600); font-weight: 600; }
+    .deadline-normal { color: var(--color-slate-600); }
 
     .task-card-footer {
       display: flex;
@@ -809,11 +622,12 @@
       border-top: 1px solid var(--color-slate-100);
       font-size: 12px;
       color: var(--color-slate-400);
+      gap: 8px;
     }
 
     .btn-claim-action {
       padding: 8px 18px;
-      background-color: var(--color-success-600);
+      background-color: var(--color-primary-600);
       color: var(--color-surface-white);
       font-weight: 600;
       border-radius: var(--radius-sm);
@@ -823,76 +637,97 @@
       gap: 6px;
       transition: background-color var(--transition-fast);
     }
+    .btn-claim-action:hover { background-color: var(--color-primary-700); }
+    .btn-claim-action:disabled { background-color: var(--color-slate-300); cursor: not-allowed; }
 
-    .btn-claim-action:hover {
-      background-color: var(--color-success-700);
-    }
-
-    .btn-claim-action:disabled {
-      background-color: var(--color-slate-300);
-      cursor: not-allowed;
-    }
-
-    /* Requests Tables */
-    .data-table-scroller {
-      overflow-x: auto;
-    }
-
-    .data-table-main {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px;
-      text-align: left;
-    }
-
-    .data-table-main th {
-      background-color: var(--color-slate-50);
-      padding: 14px 16px;
+    .btn-submit-deliverable-modal {
+      padding: 8px 16px;
+      background-color: var(--color-purple-600);
+      color: var(--color-surface-white);
       font-weight: 600;
-      color: var(--color-slate-600);
-      border-bottom: 1px solid var(--color-border-subtle);
-      white-space: nowrap;
-    }
-
-    .data-table-main td {
-      padding: 16px;
-      border-bottom: 1px solid var(--color-border-subtle);
-      color: var(--color-slate-800);
-    }
-
-    /* Account Grid */
-    .account-meta-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-    }
-
-    .account-meta-box {
-      padding: 18px;
-      background-color: var(--color-slate-50);
-      border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-submit-deliverable-modal:hover { background-color: var(--color-purple-700); }
+
+    /* JRmusic Player Iframe View */
+    .music-iframe-wrapper {
+      width: 100%;
+      height: calc(100vh - 180px);
+      min-height: 600px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--color-border-subtle);
+      background-color: #000000;
+    }
+    .music-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
 
-    .account-meta-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--color-slate-500);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    /* Modal Component */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 560px;
+      background: var(--color-surface-white);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      box-shadow: var(--shadow-xl);
+      animation: modalPop 240ms ease forwards;
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .btn-modal-close { width: 32px; height: 32px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; background: var(--color-slate-100); cursor: pointer; color: var(--color-slate-500); }
+    .btn-modal-close:hover { background: var(--color-slate-200); }
 
-    .account-meta-val {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--color-slate-900);
+    /* Account Grid with Realtime Balance Highlight */
+    .account-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .account-meta-box { padding: 20px; background-color: var(--color-slate-50); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); }
+    .account-balance-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      color: #ffffff;
+      border: none;
+      box-shadow: var(--shadow-md);
+    }
+    .balance-amount-display {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fde047;
       margin-top: 6px;
+      letter-spacing: -0.5px;
     }
+
+    .data-table-scroller { overflow-x: auto; }
+    .data-table-main { width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left; }
+    .data-table-main th { background-color: var(--color-slate-50); padding: 14px 16px; font-weight: 600; color: var(--color-slate-600); border-bottom: 1px solid var(--color-border-subtle); white-space: nowrap; }
+    .data-table-main td { padding: 16px; border-bottom: 1px solid var(--color-border-subtle); color: var(--color-slate-800); }
 
     .btn-danger-logout {
       padding: 12px 24px;
-      background-color: var(--color-danger-50);
-      color: var(--color-danger-600);
+      background-color: var(--color-rose-50);
+      color: var(--color-rose-600);
       font-weight: 600;
       border-radius: var(--radius-sm);
       cursor: pointer;
@@ -902,53 +737,20 @@
       margin-top: 10px;
       transition: background-color var(--transition-fast);
     }
+    .btn-danger-logout:hover { background-color: var(--color-rose-100); }
 
-    .btn-danger-logout:hover {
-      background-color: var(--color-danger-100);
-    }
-
-    /* Empty States */
-    .empty-placeholder-box {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--color-slate-400);
-    }
-
-    .empty-placeholder-icon {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 14px auto;
-      color: var(--color-slate-300);
-    }
-
-    /* Responsive Queries */
+    /* Responsive Design */
     @media (max-width: 768px) {
-      .app-desktop-sidebar {
-        display: none;
-      }
-
-      .app-mobile-navbar {
-        display: flex;
-      }
-
-      .app-main-content {
-        margin-left: 0;
-        padding: 20px 16px calc(var(--bottom-nav-height) + 24px) 16px;
-      }
-
-      .tasks-grid-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .login-wrapper {
-        padding: 30px 24px;
-      }
+      .app-desktop-sidebar { display: none; }
+      .app-mobile-navbar { display: flex; }
+      .app-main-content { margin-left: 0; padding: 20px 16px calc(var(--bottom-nav-height) + 24px) 16px; }
+      .tasks-grid-layout { grid-template-columns: 1fr; }
+      .music-iframe-wrapper { height: calc(100vh - 200px); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Toast Notification Dock -->
   <div id="toast-container" aria-live="polite"></div>
 
   <!-- ==========================================================================
@@ -958,16 +760,12 @@
     <div class="login-wrapper">
       <div class="login-brand-box">
         <div class="login-brand-icon-wrapper">
-          <!-- Corporate Building Icon -->
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
             <path d="M9 22v-4h6v4"></path>
-            <path d="M8 6h.01"></path>
-            <path d="M16 6h.01"></path>
-            <path d="M8 10h.01"></path>
-            <path d="M16 10h.01"></path>
-            <path d="M8 14h.01"></path>
-            <path d="M16 14h.01"></path>
+            <path d="M8 6h.01"></path><path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path><path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path><path d="M16 14h.01"></path>
           </svg>
         </div>
         <h1 class="login-brand-title">企业协同办公系统</h1>
@@ -978,18 +776,18 @@
         <div class="form-group">
           <label class="form-label" for="login-username-input">员工账号 / 工号</label>
           <div class="input-wrapper">
-            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <input type="text" id="login-username-input" class="form-control-input" placeholder="输入您的内网登录用户名" autocomplete="username" required>
+            <input type="text" id="login-username-input" class="form-control-input" placeholder="输入您的登录用户名" autocomplete="username" required>
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="login-password-input">访问密码</label>
           <div class="input-wrapper">
-            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
@@ -999,7 +797,7 @@
 
         <button type="submit" id="btn-login-action" class="btn-submit-login">
           <span>安全登录</span>
-          <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
@@ -1007,7 +805,7 @@
       </form>
 
       <div class="login-footer-disclaimer">
-        <span>🔒 本系统采用独立命名空间数据存储，不开放外网自主注册。<br>新入职员工请联系综合运维管理员统一分配工号。</span>
+        <span>🔒 本系统采用专属数据存储，不开放外网自主注册。<br>新入职员工请联系综合运维管理员统一分配工号。</span>
       </div>
     </div>
   </section>
@@ -1029,7 +827,7 @@
       <ul class="sidebar-nav-menu">
         <li>
           <button type="button" class="nav-link-btn active" data-view-target="pane-task-overview">
-            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 11l3 3L22 4"></path>
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
@@ -1038,19 +836,28 @@
         </li>
         <li>
           <button type="button" class="nav-link-btn" data-view-target="pane-request-submission">
-            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
               <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
             <span>提交申请</span>
           </button>
         </li>
         <li>
+          <button type="button" class="nav-link-btn music-btn" data-view-target="pane-jrmusic">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+            <span>JRmusic</span>
+          </button>
+        </li>
+        <li>
           <button type="button" class="nav-link-btn" data-view-target="pane-account-profile">
-            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
@@ -1071,42 +878,36 @@
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="app-mobile-navbar">
       <button type="button" class="mobile-nav-item active" data-view-target="pane-task-overview">
-        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 11l3 3L22 4"></path>
-          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-        </svg>
-        <span>任务查看</span>
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>任务</span>
       </button>
       <button type="button" class="mobile-nav-item" data-view-target="pane-request-submission">
-        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-        </svg>
-        <span>提交申请</span>
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <span>申请</span>
+      </button>
+      <button type="button" class="mobile-nav-item music-btn" data-view-target="pane-jrmusic">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        <span>音乐</span>
       </button>
       <button type="button" class="mobile-nav-item" data-view-target="pane-account-profile">
-        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>账户中心</span>
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>账户</span>
       </button>
     </nav>
 
     <!-- Main Dynamic Content Region -->
     <main class="app-main-content">
 
-      <!-- PANE 1: 任务查看 (Task Overview & Claiming) -->
+      <!-- PANE 1: 任务查看 -->
       <section id="pane-task-overview" class="view-content-pane active-pane">
         <div class="view-header-titlebar">
           <div>
             <h1>待办与任务协同</h1>
-            <p>查看管理员派发至本账户的工作任务，可直接下载附件，并在完成后领取确认。</p>
+            <p>查看派发任务，在截止时间前提交成果文件（最多5份，单个≤25MB），完成后将获得报酬入账。</p>
           </div>
           <button type="button" class="btn-action-primary" id="btn-refresh-task-pool">
-            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <polyline points="1 20 1 14 7 14"></polyline>
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline>
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
             </svg>
             <span>刷新任务池</span>
@@ -1118,12 +919,12 @@
         </div>
       </section>
 
-      <!-- PANE 2: 提交申请 (Submit Requests & Audit Logs) -->
+      <!-- PANE 2: 提交申请 -->
       <section id="pane-request-submission" class="view-content-pane">
         <div class="view-header-titlebar">
           <div>
             <h1>提交办公申请</h1>
-            <p>撰写您的业务需求、资源审批或行政请示，数据将沉淀至云端存储。</p>
+            <p>撰写您的业务需求、资源审批或行政请示，数据将实时同步至云端。</p>
           </div>
         </div>
 
@@ -1134,7 +935,7 @@
           <form id="application-form-element">
             <div class="form-group">
               <label class="form-label" for="input-request-title">申请主题 / 标题</label>
-              <input type="text" id="input-request-title" class="form-control-input" placeholder="例：关于申请购置第二季度服务器算力资源的请示" required>
+              <input type="text" id="input-request-title" class="form-control-input" placeholder="例：关于申请采购开发设备及云服务资源的请示" required>
             </div>
             <div class="form-group">
               <label class="form-label" for="input-request-body">详细说明 / 申请正文</label>
@@ -1142,9 +943,8 @@
             </div>
             <div style="display:flex; justify-content:flex-end;">
               <button type="submit" id="btn-submit-request-action" class="btn-action-primary">
-                <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
                 <span>提交申请至数据库</span>
               </button>
@@ -1173,35 +973,58 @@
         </div>
       </section>
 
-      <!-- PANE 3: 账户中心 (Account Center & Logout) -->
+      <!-- PANE 3: JRMUSIC EMBEDDED PLAYER -->
+      <section id="pane-jrmusic" class="view-content-pane">
+        <div class="view-header-titlebar">
+          <div>
+            <h1>JRmusic 音乐电台</h1>
+            <p>办公沉浸式音频播放终端，支持在线音乐流式畅听。</p>
+          </div>
+        </div>
+        <div class="music-iframe-wrapper">
+          <iframe 
+            class="music-iframe" 
+            src="https://musicplayer-ruby-delta.vercel.app" 
+            allow="autoplay; encrypted-media; fullscreen"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </section>
+
+      <!-- PANE 4: 账户中心 -->
       <section id="pane-account-profile" class="view-content-pane">
         <div class="view-header-titlebar">
           <div>
             <h1>个人账户中心</h1>
-            <p>查看当前已验证登录的身份凭证与所属组织单元架构信息。</p>
+            <p>查看当前账户信息、组织架构及任务完成报酬累计余额。</p>
           </div>
         </div>
 
         <div class="card-panel">
           <div class="card-panel-header">
-            <h2>身份基础信息</h2>
+            <h2>报酬余额与身份信息</h2>
           </div>
           <div class="account-meta-grid">
-            <div class="account-meta-box">
-              <div class="account-meta-label">员工编号 (Staff ID)</div>
-              <div class="account-meta-val" id="profile-display-staffid">--</div>
+            <div class="account-meta-box account-balance-card">
+              <div style="font-size:12px; opacity:0.8; text-transform:uppercase; font-weight:600;">任务报酬累计余额</div>
+              <div class="balance-amount-display" id="profile-display-balance">¥ 0.00</div>
+              <div style="font-size:11.5px; opacity:0.7; margin-top:4px;">任务由管理员审核“完成”后自动结算发放</div>
             </div>
             <div class="account-meta-box">
-              <div class="account-meta-label">系统登录名</div>
-              <div class="account-meta-val" id="profile-display-username">--</div>
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">员工工号</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-staffid">--</div>
             </div>
             <div class="account-meta-box">
-              <div class="account-meta-label">真实姓名</div>
-              <div class="account-meta-val" id="profile-display-fullname">--</div>
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">系统登录名</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-username">--</div>
             </div>
             <div class="account-meta-box">
-              <div class="account-meta-label">所属部门</div>
-              <div class="account-meta-val" id="profile-display-dept">--</div>
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">真实姓名</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-fullname">--</div>
+            </div>
+            <div class="account-meta-box">
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">所属部门</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-dept">--</div>
             </div>
           </div>
         </div>
@@ -1214,7 +1037,7 @@
             注销后将销毁当前设备上的认证 Cookie，下次访问需重新输入员工凭证。
           </p>
           <button type="button" id="btn-logout-session-action" class="btn-danger-logout">
-            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
               <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -1228,13 +1051,37 @@
   </div>
 
   <!-- ==========================================================================
+       MODAL: TASK DELIVERABLE SUBMISSION
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-deliverable-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size:18px; font-weight:700;">提交任务完成成果</h3>
+        <button type="button" class="btn-modal-close" id="btn-close-deliverable-modal">✕</button>
+      </div>
+      <form id="form-submit-deliverable">
+        <input type="hidden" id="deliverable-task-id">
+        <div class="form-group">
+          <label class="form-label">成果简述与交付备注</label>
+          <textarea id="deliverable-notes" class="form-control-textarea" style="min-height:90px;" placeholder="说明本次提交成果的主要完成内容与验收要点..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">上传成果附件 (最多5份，每份≤25MB)</label>
+          <input type="file" id="deliverable-files" class="form-control-input" style="padding-top:9px;" multiple>
+          <div style="font-size:12px; color:var(--color-slate-500); margin-top:6px;">支持各类型打包产物、文档、报表与工程附件。</div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-modal-close" id="btn-cancel-deliverable" style="width:auto; padding:0 16px; border-radius:var(--radius-sm);">取消</button>
+          <button type="submit" id="btn-confirm-upload-deliverable" class="btn-action-primary">确认提交成果</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
        7. CLIENT JAVASCRIPT CONTROLLER ARCHITECTURE
        ========================================================================== -->
   <script>
-    /**
-     * Corporate Employee Portal Client Application
-     * Modular Architecture with State Management, Reactive UI Rendering, and API Layer
-     */
     (function (window, document) {
       'use strict';
 
@@ -1246,33 +1093,25 @@
           currentUser: null,
           currentViewId: 'pane-task-overview',
           tasks: [],
-          requests: [],
-          isLoadingTasks: false,
-          isLoadingRequests: false
+          requests: []
         },
-
         listeners: [],
-
         subscribe(listener) {
-          if (typeof listener === 'function') {
-            this.listeners.push(listener);
-          }
+          if (typeof listener === 'function') this.listeners.push(listener);
         },
-
         setState(newState) {
           this.state = Object.assign({}, this.state, newState);
           for (let i = 0; i < this.listeners.length; i++) {
             this.listeners[i](this.state);
           }
         },
-
         getState() {
           return this.state;
         }
       };
 
       // ------------------------------------------------------------------------
-      // DOM ELEMENT CACHE
+      // DOM CACHE
       // ------------------------------------------------------------------------
       const DOM = {
         toastContainer: document.getElementById('toast-container'),
@@ -1289,6 +1128,7 @@
         profileUsername: document.getElementById('profile-display-username'),
         profileFullname: document.getElementById('profile-display-fullname'),
         profileDept: document.getElementById('profile-display-dept'),
+        profileBalance: document.getElementById('profile-display-balance'),
         btnLogout: document.getElementById('btn-logout-session-action'),
         navButtons: document.querySelectorAll('.nav-link-btn, .mobile-nav-item'),
         viewPanes: document.querySelectorAll('.view-content-pane'),
@@ -1298,7 +1138,16 @@
         reqTitleInput: document.getElementById('input-request-title'),
         reqBodyInput: document.getElementById('input-request-body'),
         btnSubmitRequest: document.getElementById('btn-submit-request-action'),
-        myRequestsTableBody: document.getElementById('my-requests-table-body')
+        myRequestsTableBody: document.getElementById('my-requests-table-body'),
+        // Deliverables Modal
+        modalDeliverable: document.getElementById('modal-deliverable-backdrop'),
+        formDeliverable: document.getElementById('form-submit-deliverable'),
+        deliverableTaskId: document.getElementById('deliverable-task-id'),
+        deliverableNotes: document.getElementById('deliverable-notes'),
+        deliverableFiles: document.getElementById('deliverable-files'),
+        btnCloseDeliverable: document.getElementById('btn-close-deliverable-modal'),
+        btnCancelDeliverable: document.getElementById('btn-cancel-deliverable'),
+        btnConfirmDeliverable: document.getElementById('btn-confirm-upload-deliverable')
       };
 
       // ------------------------------------------------------------------------
@@ -1337,18 +1186,15 @@
           return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
         },
 
-        showToast(message, type, duration) {
-          type = type || 'info';
-          duration = duration || 3400;
-
+        showToast(message, type = 'info', duration = 3400) {
           const toast = document.createElement('div');
           toast.className = 'toast-item toast-' + type;
 
           let iconSvg = '';
           if (type === 'success') {
-            iconSvg = '<svg class="toast-icon" style="color:var(--color-success-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-emerald-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
           } else if (type === 'error') {
-            iconSvg = '<svg class="toast-icon" style="color:var(--color-danger-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-rose-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
           } else {
             iconSvg = '<svg class="toast-icon" style="color:var(--color-primary-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
           }
@@ -1362,18 +1208,10 @@
           );
 
           DOM.toastContainer.appendChild(toast);
-
-          window.setTimeout(function () {
-            toast.classList.add('show');
-          }, 10);
-
-          window.setTimeout(function () {
+          setTimeout(() => toast.classList.add('show'), 10);
+          setTimeout(() => {
             toast.classList.remove('show');
-            window.setTimeout(function () {
-              if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-              }
-            }, 300);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
           }, duration);
         }
       };
@@ -1382,29 +1220,26 @@
       // HTTP API SERVICE CLIENT
       // ------------------------------------------------------------------------
       const ApiService = {
-        async request(endpoint, options) {
-          options = options || {};
+        async request(endpoint, options = {}) {
           options.headers = options.headers || {};
-
           try {
             const response = await fetch(endpoint, options);
             const data = await response.json();
-            return { ok: response.ok, status: response.status, data: data };
+            return { ok: response.ok, status: response.status, data };
           } catch (err) {
-            console.error('Network Request Error:', err);
             return { ok: false, status: 0, data: { success: false, message: '网络请求异常，无法连接至业务网关' } };
           }
         },
 
         async checkSession() {
-          return await this.request('/api/auth/session', { method: 'GET' });
+          return await this.request('/api/auth/session');
         },
 
         async login(username, password) {
           return await this.request('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: username, password: password })
+            body: JSON.stringify({ username, password })
           });
         },
 
@@ -1413,22 +1248,29 @@
         },
 
         async fetchTasks() {
-          return await this.request('/api/tasks/list', { method: 'GET' });
+          return await this.request('/api/tasks/list');
         },
 
         async claimTask(taskId) {
           return await this.request('/api/tasks/claim/' + encodeURIComponent(taskId), { method: 'POST' });
         },
 
+        async submitDeliverables(taskId, formData) {
+          return await fetch('/api/tasks/submit-deliverables/' + encodeURIComponent(taskId), {
+            method: 'POST',
+            body: formData
+          }).then(res => res.json());
+        },
+
         async fetchMyRequests() {
-          return await this.request('/api/requests/mine', { method: 'GET' });
+          return await this.request('/api/requests/mine');
         },
 
         async submitRequest(title, body) {
           return await this.request('/api/requests/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: title, body: body })
+            body: JSON.stringify({ title, body })
           });
         }
       };
@@ -1440,28 +1282,20 @@
         switchView(targetPaneId) {
           AppStore.setState({ currentViewId: targetPaneId });
 
-          for (let i = 0; i < DOM.navButtons.length; i++) {
-            const btn = DOM.navButtons[i];
-            if (btn.getAttribute('data-view-target') === targetPaneId) {
-              btn.classList.add('active');
-            } else {
-              btn.classList.remove('active');
-            }
-          }
+          DOM.navButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-view-target') === targetPaneId);
+          });
 
-          for (let j = 0; j < DOM.viewPanes.length; j++) {
-            const pane = DOM.viewPanes[j];
-            if (pane.id === targetPaneId) {
-              pane.classList.add('active-pane');
-            } else {
-              pane.classList.remove('active-pane');
-            }
-          }
+          DOM.viewPanes.forEach(pane => {
+            pane.classList.toggle('active-pane', pane.id === targetPaneId);
+          });
 
           if (targetPaneId === 'pane-task-overview') {
             TaskController.loadTasks();
           } else if (targetPaneId === 'pane-request-submission') {
             RequestController.loadHistoryRequests();
+          } else if (targetPaneId === 'pane-account-profile') {
+            AuthController.refreshUserProfile();
           }
         },
 
@@ -1477,6 +1311,7 @@
           DOM.profileUsername.textContent = user.username || 'N/A';
           DOM.profileFullname.textContent = user.full_name || 'N/A';
           DOM.profileDept.textContent = user.department || 'N/A';
+          DOM.profileBalance.textContent = '¥ ' + (parseFloat(user.account_balance) || 0).toFixed(2);
         },
 
         renderTasksGrid(tasks) {
@@ -1484,129 +1319,189 @@
 
           if (!tasks || tasks.length === 0) {
             DOM.tasksStreamContainer.innerHTML = (
-              '<div class="empty-placeholder-box" style="grid-column:1/-1;">' +
-              '  <svg class="empty-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' +
-              '  <p style="font-size:14px; font-weight:500;">暂无分配给您的工作协同任务</p>' +
+              '<div style="grid-column:1/-1; text-align:center; padding:48px 24px; color:var(--color-slate-400);">' +
+              '  <svg style="width:48px;height:48px;margin:0 auto 12px;color:var(--color-slate-300);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' +
+              '  <p style="font-size:15px; font-weight:600; color:var(--color-slate-700);">暂无指派给您的工作协同任务</p>' +
               '  <span style="font-size:12px; margin-top:4px; display:block;">管理员下发新任务后将在此处实时呈现</span>' +
               '</div>'
             );
             return;
           }
 
-          for (let i = 0; i < tasks.length; i++) {
-            const task = tasks[i];
-            const isClaimed = task.status !== 'Assigned';
+          tasks.forEach(task => {
+            const isAssigned = task.status === 'Assigned';
+            const isClaimed = task.status === 'Claimed';
+            const isSubmitted = task.status === 'Submitted';
+            const isCompleted = task.status === 'Completed';
+
+            let statusBadge = '<span class="status-badge badge-assigned">待领取</span>';
+            if (isClaimed) statusBadge = '<span class="status-badge badge-claimed">已领取 (推进中)</span>';
+            if (isSubmitted) statusBadge = '<span class="status-badge badge-submitted">成果已提交 (待核审)</span>';
+            if (isCompleted) statusBadge = '<span class="status-badge badge-completed">✓ 已结项结算</span>';
 
             const card = document.createElement('div');
             card.className = 'task-interactive-card';
 
+            // Attachments from Admin
             let attachmentsMarkup = '';
             if (task.attachments && task.attachments.length > 0) {
-              let rows = '';
-              for (let a = 0; a < task.attachments.length; a++) {
-                const att = task.attachments[a];
-                rows += (
-                  '<div class="attachment-row-item">' +
-                  '  <div class="attachment-file-meta">' +
-                  '    <svg style="width:14px;height:14px;color:var(--color-primary-600);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>' +
-                  '    <span class="attachment-name">' + Utils.escapeHtml(att.filename) + '</span>' +
-                  '    <span class="attachment-size">(' + Utils.formatFileSize(att.size) + ')</span>' +
-                  '  </div>' +
-                  '  <a class="btn-download-attachment" href="/api/tasks/' + encodeURIComponent(task._id) + '/attachment/' + encodeURIComponent(att._id) + '" target="_blank" download>' +
-                  '    <svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>' +
-                  '    <span>下载</span>' +
-                  '  </a>' +
-                  '</div>'
-                );
-              }
+              const rows = task.attachments.map(att => `
+                <div class="attachment-row-item">
+                  <div class="attachment-file-meta">
+                    <svg style="width:14px;height:14px;color:var(--color-primary-600);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span class="attachment-name">${Utils.escapeHtml(att.filename)}</span>
+                    <span class="attachment-size">(${Utils.formatFileSize(att.size)})</span>
+                  </div>
+                  <a class="btn-download-attachment" href="/api/tasks/${encodeURIComponent(task._id)}/attachment/${encodeURIComponent(att._id)}" target="_blank" download>下载</a>
+                </div>
+              `).join('');
 
-              attachmentsMarkup = (
-                '<div class="task-attachments-panel">' +
-                '  <div class="attachment-header-title">' +
-                '    <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>' +
-                '    <span>任务相关附件 (' + task.attachments.length + ' 个):</span>' +
-                '  </div>' +
-                rows +
-                '</div>'
-              );
+              attachmentsMarkup = `
+                <div class="task-attachments-panel">
+                  <div class="attachment-header-title">
+                    <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    <span>管理员下发附件 (${task.attachments.length}个):</span>
+                  </div>
+                  ${rows}
+                </div>
+              `;
             }
 
-            card.innerHTML = (
-              '<div>' +
-              '  <div class="task-header-row">' +
-              '    <h3 class="task-title-text">' + Utils.escapeHtml(task.task_title) + '</h3>' +
-              '    <span class="status-badge ' + (isClaimed ? 'badge-claimed' : 'badge-assigned') + '">' +
-              (isClaimed
-                ? '<svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg> 已领取'
-                : '<svg style="width:12px;height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"></circle></svg> 待领取') +
-              '    </span>' +
-              '  </div>' +
-              '  <div class="task-description-body">' + Utils.escapeHtml(task.task_description) + '</div>' +
-              attachmentsMarkup +
-              '</div>' +
-              '<div class="task-card-footer">' +
-              '  <span>派发于: ' + Utils.formatDate(task.created_at) + '</span>' +
-              '  <button type="button" class="btn-claim-action" data-task-id="' + Utils.escapeHtml(task._id) + '" ' + (isClaimed ? 'disabled' : '') + '>' +
-              (isClaimed
-                ? '<span>✓ 已确认领取</span>'
-                : '<span>立即领取</span><svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>') +
-              '  </button>' +
-              '</div>'
-            );
+            // User Submitted Deliverables
+            let submissionsMarkup = '';
+            if (task.submissions && task.submissions.length > 0) {
+              const rows = task.submissions.map(sub => `
+                <div class="attachment-row-item">
+                  <div class="attachment-file-meta">
+                    <svg style="width:14px;height:14px;color:var(--color-purple-600);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span class="attachment-name">${Utils.escapeHtml(sub.filename)}</span>
+                    <span class="attachment-size">(${Utils.formatFileSize(sub.size)})</span>
+                  </div>
+                  <a class="btn-download-attachment" href="/api/tasks/${encodeURIComponent(task._id)}/submission/${encodeURIComponent(sub._id)}" target="_blank" download>查看</a>
+                </div>
+              `).join('');
 
+              submissionsMarkup = `
+                <div class="task-attachments-panel" style="border-color:var(--color-purple-200); background:var(--color-purple-50);">
+                  <div class="attachment-header-title" style="color:var(--color-purple-700);">
+                    <span>📦 我提交的交付成果 (${task.submissions.length}个文件):</span>
+                  </div>
+                  ${rows}
+                  ${task.submission_notes ? `<div style="font-size:12px; color:var(--color-purple-800); margin-top:6px;">备注: ${Utils.escapeHtml(task.submission_notes)}</div>` : ''}
+                </div>
+              `;
+            }
+
+            // Deadline computation
+            let deadlineHtml = '';
+            if (task.submission_deadline) {
+              const isPast = new Date() > new Date(task.submission_deadline);
+              deadlineHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>提交截止时间:</span>
+                  <span class="${isPast ? 'deadline-urgent' : 'deadline-normal'}">
+                    ${Utils.formatDate(task.submission_deadline)} ${isPast ? '(已截止)' : ''}
+                  </span>
+                </div>
+              `;
+            }
+
+            // Requirements Indicator
+            const requirementHtml = `
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span>成果交付要求:</span>
+                <span style="font-weight:600; color:${task.requires_submission ? 'var(--color-purple-600)' : 'var(--color-slate-600)'};">
+                  ${task.requires_submission ? '必须提交成果文件 (≤25MB)' : '无需提交文件'}
+                </span>
+              </div>
+            `;
+
+            // Action Buttons Logic
+            let actionButtonHtml = '';
+            if (isAssigned) {
+              actionButtonHtml = `<button type="button" class="btn-claim-action" data-task-id="${task._id}">立即领取任务</button>`;
+            } else if (isClaimed || isSubmitted) {
+              if (task.requires_submission) {
+                actionButtonHtml = `
+                  <button type="button" class="btn-submit-deliverable-modal" data-task-id="${task._id}">
+                    ${isSubmitted ? '重新更新成果文件' : '📤 提交成果文件'}
+                  </button>
+                `;
+              } else {
+                actionButtonHtml = `<span style="font-weight:600; color:var(--color-amber-600);">推进中 (等待管理员审核)</span>`;
+              }
+            } else if (isCompleted) {
+              actionButtonHtml = `<span style="font-weight:600; color:var(--color-emerald-600);">✓ 任务已完结结算</span>`;
+            }
+
+            card.innerHTML = `
+              <div>
+                <div class="task-header-row">
+                  <div>
+                    <h3 class="task-title-text">${Utils.escapeHtml(task.task_title)}</h3>
+                    <div style="margin-top:4px;">${statusBadge}</div>
+                  </div>
+                  <div class="reward-pill">
+                    <span>¥</span>
+                    <span>${(parseFloat(task.reward_amount) || 0).toFixed(2)}</span>
+                  </div>
+                </div>
+                <div class="task-description-body">${Utils.escapeHtml(task.task_description)}</div>
+                ${attachmentsMarkup}
+                <div class="task-meta-banner">
+                  ${requirementHtml}
+                  ${deadlineHtml}
+                </div>
+                ${submissionsMarkup}
+              </div>
+              <div class="task-card-footer">
+                <span>发布: ${Utils.formatDate(task.created_at)}</span>
+                <div>${actionButtonHtml}</div>
+              </div>
+            `;
+
+            // Bind Claim
             const claimBtn = card.querySelector('.btn-claim-action');
-            if (!isClaimed) {
-              claimBtn.addEventListener('click', (function (tId, btnElement) {
-                return function () {
-                  TaskController.handleClaimTask(tId, btnElement);
-                };
-              })(task._id, claimBtn));
+            if (claimBtn) {
+              claimBtn.addEventListener('click', () => TaskController.handleClaimTask(task._id, claimBtn));
+            }
+
+            // Bind Deliverable Modal
+            const deliverableBtn = card.querySelector('.btn-submit-deliverable-modal');
+            if (deliverableBtn) {
+              deliverableBtn.addEventListener('click', () => TaskController.openDeliverableModal(task._id));
             }
 
             DOM.tasksStreamContainer.appendChild(card);
-          }
+          });
         },
 
         renderRequestsHistory(requests) {
           DOM.myRequestsTableBody.innerHTML = '';
-
           if (!requests || requests.length === 0) {
-            DOM.myRequestsTableBody.innerHTML = (
-              '<tr>' +
-              '  <td colspan="3" style="text-align:center; color:var(--color-slate-400); padding:32px;">暂无提交的事务审批申请记录</td>' +
-              '</tr>'
-            );
+            DOM.myRequestsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--color-slate-400); padding:32px;">暂无提交的事务审批申请记录</td></tr>';
             return;
           }
 
-          for (let i = 0; i < requests.length; i++) {
-            const req = requests[i];
+          requests.forEach(req => {
             const tr = document.createElement('tr');
-
             let badgeClass = 'badge-pending';
             let badgeLabel = '审批流转中';
+            if (req.status === 'approved') { badgeClass = 'badge-approved'; badgeLabel = '已核准通过'; }
+            if (req.status === 'rejected') { badgeClass = 'badge-rejected'; badgeLabel = '已予以驳回'; }
 
-            if (req.status === 'approved') {
-              badgeClass = 'badge-approved';
-              badgeLabel = '已核准通过';
-            } else if (req.status === 'rejected') {
-              badgeClass = 'badge-rejected';
-              badgeLabel = '已予以驳回';
-            }
-
-            tr.innerHTML = (
-              '<td><strong style="color:var(--color-slate-900);">' + Utils.escapeHtml(req.request_title) + '</strong></td>' +
-              '<td>' + Utils.formatDate(req.submitted_at) + '</td>' +
-              '<td><span class="status-badge ' + badgeClass + '">' + badgeLabel + '</span></td>'
-            );
-
+            tr.innerHTML = `
+              <td><strong style="color:var(--color-slate-900);">${Utils.escapeHtml(req.request_title)}</strong></td>
+              <td>${Utils.formatDate(req.submitted_at)}</td>
+              <td><span class="status-badge ${badgeClass}">${badgeLabel}</span></td>
+            `;
             DOM.myRequestsTableBody.appendChild(tr);
-          }
+          });
         }
       };
 
       // ------------------------------------------------------------------------
-      // BUSINESS DOMAIN CONTROLLERS
+      // CONTROLLERS
       // ------------------------------------------------------------------------
       const AuthController = {
         async initSession() {
@@ -1615,6 +1510,14 @@
             this.handleAuthSuccess(res.data.user, false);
           } else {
             this.showLoginView();
+          }
+        },
+
+        async refreshUserProfile() {
+          const res = await ApiService.checkSession();
+          if (res.ok && res.data && res.data.success) {
+            AppStore.setState({ currentUser: res.data.user });
+            ViewRenderer.renderUserProfile(res.data.user);
           }
         },
 
@@ -1629,11 +1532,9 @@
           DOM.appContainer.style.display = 'block';
 
           ViewRenderer.renderUserProfile(user);
-
           if (isInteractive) {
             Utils.showToast('欢迎登录协同办公平台，' + (user.full_name || user.username), 'success');
           }
-
           ViewRenderer.switchView('pane-task-overview');
         },
 
@@ -1642,21 +1543,13 @@
           DOM.btnLoginSubmit.innerHTML = '<span>认证中...</span>';
 
           const res = await ApiService.login(username, password);
-
           DOM.btnLoginSubmit.disabled = false;
-          DOM.btnLoginSubmit.innerHTML = (
-            '<span>安全登录</span>' +
-            '<svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-            '  <line x1="5" y1="12" x2="19" y2="12"></line>' +
-            '  <polyline points="12 5 19 12 12 19"></polyline>' +
-            '</svg>'
-          );
+          DOM.btnLoginSubmit.innerHTML = '<span>安全登录</span>';
 
           if (res.ok && res.data && res.data.success) {
             this.handleAuthSuccess(res.data.user, true);
           } else {
-            const msg = (res.data && res.data.message) ? res.data.message : '身份凭据校验失败，请重试';
-            Utils.showToast(msg, 'error');
+            Utils.showToast(res.data.message || '登录失败', 'error');
           }
         },
 
@@ -1670,133 +1563,155 @@
 
       const TaskController = {
         async loadTasks() {
-          AppStore.setState({ isLoadingTasks: true });
           const res = await ApiService.fetchTasks();
-          AppStore.setState({ isLoadingTasks: false });
-
           if (res.ok && res.data && res.data.success) {
             AppStore.setState({ tasks: res.data.data });
             ViewRenderer.renderTasksGrid(res.data.data);
           } else {
-            Utils.showToast('无法同步任务列表，请检查网络', 'error');
+            Utils.showToast('获取任务失败', 'error');
           }
         },
 
         async handleClaimTask(taskId, btnElement) {
           btnElement.disabled = true;
-          btnElement.innerHTML = '<span>状态同步中...</span>';
+          btnElement.textContent = '同步中...';
 
           const res = await ApiService.claimTask(taskId);
-
           if (res.ok && res.data && res.data.success) {
-            Utils.showToast('任务已成功领取，状态已更新至云端！', 'success');
+            Utils.showToast('任务已成功领取！', 'success');
             this.loadTasks();
           } else {
-            const msg = (res.data && res.data.message) ? res.data.message : '领取任务失败';
-            Utils.showToast(msg, 'error');
+            Utils.showToast(res.data.message || '领取失败', 'error');
             btnElement.disabled = false;
-            btnElement.innerHTML = '<span>立即领取</span>';
+            btnElement.textContent = '立即领取任务';
+          }
+        },
+
+        openDeliverableModal(taskId) {
+          DOM.deliverableTaskId.value = taskId;
+          DOM.deliverableNotes.value = '';
+          DOM.deliverableFiles.value = '';
+          DOM.modalDeliverable.classList.add('open');
+        },
+
+        closeDeliverableModal() {
+          DOM.modalDeliverable.classList.remove('open');
+        },
+
+        async submitDeliverableForm() {
+          const taskId = DOM.deliverableTaskId.value;
+          const files = DOM.deliverableFiles.files;
+
+          if (files.length > 5) {
+            Utils.showToast('最多允许同时上传 5 份成果文件', 'error');
+            return;
+          }
+
+          for (let i = 0; i < files.length; i++) {
+            if (files[i].size > 25 * 1024 * 1024) {
+              Utils.showToast(`文件 "${files[i].name}" 超过 25MB 上限`, 'error');
+              return;
+            }
+          }
+
+          DOM.btnConfirmDeliverable.disabled = true;
+          DOM.btnConfirmDeliverable.textContent = '正在上传成果至云端...';
+
+          const formData = new FormData();
+          formData.append('notes', DOM.deliverableNotes.value.trim());
+          for (let i = 0; i < files.length; i++) {
+            formData.append('deliverables', files[i]);
+          }
+
+          try {
+            const data = await ApiService.submitDeliverables(taskId, formData);
+            if (data.success) {
+              Utils.showToast('成果文件已成功提交并同步！', 'success');
+              this.closeDeliverableModal();
+              this.loadTasks();
+            } else {
+              Utils.showToast(data.message || '提交失败', 'error');
+            }
+          } catch (e) {
+            Utils.showToast('上传错误', 'error');
+          } finally {
+            DOM.btnConfirmDeliverable.disabled = false;
+            DOM.btnConfirmDeliverable.textContent = '确认提交成果';
           }
         }
       };
 
       const RequestController = {
         async loadHistoryRequests() {
-          AppStore.setState({ isLoadingRequests: true });
           const res = await ApiService.fetchMyRequests();
-          AppStore.setState({ isLoadingRequests: false });
-
           if (res.ok && res.data && res.data.success) {
             AppStore.setState({ requests: res.data.data });
             ViewRenderer.renderRequestsHistory(res.data.data);
-          } else {
-            Utils.showToast('获取历史申请单据失败', 'error');
           }
         },
 
         async handleFormSubmit(title, body) {
           DOM.btnSubmitRequest.disabled = true;
-          DOM.btnSubmitRequest.innerHTML = '<span>正在持久化写入...</span>';
+          DOM.btnSubmitRequest.innerHTML = '<span>提交中...</span>';
 
           const res = await ApiService.submitRequest(title, body);
-
           DOM.btnSubmitRequest.disabled = false;
-          DOM.btnSubmitRequest.innerHTML = (
-            '<svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>' +
-            '<span>提交申请至数据库</span>'
-          );
+          DOM.btnSubmitRequest.innerHTML = '<span>提交申请至数据库</span>';
 
           if (res.ok && res.data && res.data.success) {
-            Utils.showToast('申请单据已成功提交并写入数据库！', 'success');
+            Utils.showToast('申请单据已成功提交至数据库！', 'success');
             DOM.reqTitleInput.value = '';
             DOM.reqBodyInput.value = '';
             this.loadHistoryRequests();
           } else {
-            const msg = (res.data && res.data.message) ? res.data.message : '提交申请失败';
-            Utils.showToast(msg, 'error');
+            Utils.showToast(res.data.message || '提交失败', 'error');
           }
         }
       };
 
       // ------------------------------------------------------------------------
-      // EVENT BUS & BINDINGS
+      // EVENT BINDINGS
       // ------------------------------------------------------------------------
-      function bindEventListeners() {
-        // Navigation Buttons
-        for (let i = 0; i < DOM.navButtons.length; i++) {
-          DOM.navButtons[i].addEventListener('click', function () {
+      function bindEvents() {
+        DOM.navButtons.forEach(btn => {
+          btn.addEventListener('click', function () {
             const target = this.getAttribute('data-view-target');
-            if (target) {
-              ViewRenderer.switchView(target);
-            }
+            if (target) ViewRenderer.switchView(target);
           });
-        }
+        });
 
-        // Login Form
         DOM.loginForm.addEventListener('submit', function (e) {
           e.preventDefault();
-          const username = DOM.loginUsernameInput.value.trim();
-          const password = DOM.loginPasswordInput.value;
-
-          if (!username || !password) {
-            Utils.showToast('请完整输入工号和密码', 'warning');
-            return;
-          }
-
-          AuthController.performLogin(username, password);
+          const u = DOM.loginUsernameInput.value.trim();
+          const p = DOM.loginPasswordInput.value;
+          if (u && p) AuthController.performLogin(u, p);
         });
 
-        // Logout Action
-        DOM.btnLogout.addEventListener('click', function () {
-          AuthController.performLogout();
-        });
-
-        // Refresh Tasks
-        DOM.btnRefreshTasks.addEventListener('click', function () {
-          Utils.showToast('正在向云端拉取最新任务...', 'info', 1500);
+        DOM.btnLogout.addEventListener('click', () => AuthController.performLogout());
+        DOM.btnRefreshTasks.addEventListener('click', () => {
+          Utils.showToast('正在向云端拉取最新任务...', 'info', 1200);
           TaskController.loadTasks();
+          AuthController.refreshUserProfile();
         });
 
-        // Request Form Submit
         DOM.requestForm.addEventListener('submit', function (e) {
           e.preventDefault();
           const title = DOM.reqTitleInput.value.trim();
           const body = DOM.reqBodyInput.value.trim();
+          if (title && body) RequestController.handleFormSubmit(title, body);
+        });
 
-          if (!title || !body) {
-            Utils.showToast('申请主题与正文均不可为空', 'warning');
-            return;
-          }
-
-          RequestController.handleFormSubmit(title, body);
+        // Deliverables Modal
+        DOM.btnCloseDeliverable.addEventListener('click', () => TaskController.closeDeliverableModal());
+        DOM.btnCancelDeliverable.addEventListener('click', () => TaskController.closeDeliverableModal());
+        DOM.formDeliverable.addEventListener('submit', function (e) {
+          e.preventDefault();
+          TaskController.submitDeliverableForm();
         });
       }
 
-      // ------------------------------------------------------------------------
-      // APPLICATION BOOTSTRAP
-      // ------------------------------------------------------------------------
       window.addEventListener('DOMContentLoaded', function () {
-        bindEventListeners();
+        bindEvents();
         AuthController.initSession();
       });
 
