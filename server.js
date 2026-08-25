@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configure Multer in Memory: max 25MB per file, max 5 files
+// Configure Multer: max 25MB per file, max 5 files
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
@@ -97,7 +97,7 @@ const TaskItem = mongoose.model('CorporateTask', CorporateTaskSchema);
 app.post('/api/gate/verify', (req, res) => {
   const { password } = req.body;
   if (!password || password !== SITE_GATE_PASSWORD) {
-    return res.status(401).json({ success: false, message: 'Gate Passcode incorrect.' });
+    return res.status(401).json({ success: false, message: 'Invalid gate passcode.' });
   }
 
   const token = jwt.sign({ adminGatePassed: true }, GATE_SECRET, { expiresIn: '8h' });
@@ -108,17 +108,17 @@ app.post('/api/gate/verify', (req, res) => {
     maxAge: 8 * 60 * 60 * 1000
   });
 
-  res.json({ success: true, message: 'Passcode verified.' });
+  res.json({ success: true, message: 'Gate unlocked.' });
 });
 
 const checkGateAccess = (req, res, next) => {
   const gateToken = req.cookies.corp_site_gate_pass;
   if (!gateToken) {
-    return res.status(403).json({ success: false, gateLocked: true, message: 'Admin passcode authorization required.' });
+    return res.status(403).json({ success: false, gateLocked: true, message: 'Admin gate code required.' });
   }
   jwt.verify(gateToken, GATE_SECRET, (err) => {
     if (err) {
-      return res.status(403).json({ success: false, gateLocked: true, message: 'Passcode expired.' });
+      return res.status(403).json({ success: false, gateLocked: true, message: 'Gate session expired.' });
     }
     next();
   });
@@ -129,10 +129,14 @@ const checkGateAccess = (req, res, next) => {
 // ==========================================
 const authenticateEmployeeToken = (req, res, next) => {
   const token = req.cookies.corp_auth_token;
-  if (!token) return res.status(401).json({ success: false, message: 'Unauthorized session.' });
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
 
   jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
-    if (err) return res.status(403).json({ success: false, message: 'Session expired.' });
+    if (err) {
+      return res.status(403).json({ success: false, message: 'Session expired.' });
+    }
     req.user = decodedUser;
     next();
   });
@@ -140,11 +144,13 @@ const authenticateEmployeeToken = (req, res, next) => {
 
 const authenticateAdminToken = (req, res, next) => {
   const token = req.cookies.corp_admin_auth_token;
-  if (!token) return res.status(401).json({ success: false, message: 'Admin authorization required.' });
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Admin authentication required.' });
+  }
 
   jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
     if (err || decodedUser.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Privilege denied.' });
+      return res.status(403).json({ success: false, message: 'Access denied: Admin role required.' });
     }
     req.admin = decodedUser;
     next();
@@ -154,16 +160,23 @@ const authenticateAdminToken = (req, res, next) => {
 // ==========================================================================
 // 1. EMPLOYEE APIS
 // ==========================================================================
+
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ success: false, message: 'Username and password required.' });
+  if (!username || !password) {
+    return res.status(400).json({ success: false, message: 'Username and password required.' });
+  }
 
   try {
     const employee = await EmployeeAccount.findOne({ username: username.trim(), role: 'employee' });
-    if (!employee) return res.status(401).json({ success: false, message: 'Account not found.' });
+    if (!employee) {
+      return res.status(401).json({ success: false, message: 'Account not found.' });
+    }
 
     const isMatch = await bcrypt.compare(password, employee.password_hash);
-    if (!isMatch) return res.status(401).json({ success: false, message: 'Incorrect credentials.' });
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Incorrect credentials.' });
+    }
 
     const payload = {
       staff_id: employee.staff_id,
@@ -174,6 +187,7 @@ app.post('/api/auth/login', async (req, res) => {
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
     res.cookie('corp_auth_token', token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
@@ -183,14 +197,14 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({ success: true, message: 'Login successful', user: payload });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Login failed.' });
+    res.status(500).json({ success: false, message: 'Authentication error.' });
   }
 });
 
 app.get('/api/auth/session', authenticateEmployeeToken, async (req, res) => {
   try {
     const employee = await EmployeeAccount.findOne({ username: req.user.username });
-    if (!employee) return res.status(404).json({ success: false, message: 'Account not found.' });
+    if (!employee) return res.status(404).json({ success: false, message: 'User not found.' });
 
     res.json({
       success: true,
@@ -203,18 +217,20 @@ app.get('/api/auth/session', authenticateEmployeeToken, async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Session error.' });
+    res.status(500).json({ success: false, message: 'Error retrieving user data.' });
   }
 });
 
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie('corp_auth_token');
-  res.json({ success: true, message: 'Signed out.' });
+  res.json({ success: true, message: 'Logged out.' });
 });
 
 app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => {
   const { title, body } = req.body;
-  if (!title || !body) return res.status(400).json({ success: false, message: 'Title and body required.' });
+  if (!title || !body) {
+    return res.status(400).json({ success: false, message: 'Title and description required.' });
+  }
 
   try {
     const newRequest = new EmployeeRequest({
@@ -224,10 +240,11 @@ app.post('/api/requests/submit', authenticateEmployeeToken, async (req, res) => 
       request_title: title.trim(),
       request_body: body.trim()
     });
+
     await newRequest.save();
     res.json({ success: true, message: 'Request submitted.', data: newRequest });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Request submission failed.' });
+    res.status(500).json({ success: false, message: 'Failed to record request.' });
   }
 });
 
@@ -236,7 +253,7 @@ app.get('/api/requests/mine', authenticateEmployeeToken, async (req, res) => {
     const list = await EmployeeRequest.find({ applicant_username: req.user.username }).sort({ submitted_at: -1 });
     res.json({ success: true, data: list });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Fetch failed.' });
+    res.status(500).json({ success: false, message: 'Failed to fetch requests.' });
   }
 });
 
@@ -246,15 +263,20 @@ app.get('/api/tasks/list', authenticateEmployeeToken, async (req, res) => {
       { assigned_to_username: req.user.username },
       { 'attachments.data': 0, 'submissions.data': 0 }
     ).sort({ created_at: -1 });
+
     res.json({ success: true, data: tasks });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to retrieve tasks.' });
+    res.status(500).json({ success: false, message: 'Failed to fetch tasks.' });
   }
 });
 
 app.get('/api/tasks/:taskId/attachment/:fileId', authenticateEmployeeToken, async (req, res) => {
   try {
-    const task = await TaskItem.findOne({ _id: req.params.taskId, assigned_to_username: req.user.username });
+    const task = await TaskItem.findOne({
+      _id: req.params.taskId,
+      assigned_to_username: req.user.username
+    });
+
     if (!task) return res.status(404).json({ success: false, message: 'Task not found.' });
 
     const attachment = task.attachments.id(req.params.fileId);
@@ -270,11 +292,15 @@ app.get('/api/tasks/:taskId/attachment/:fileId', authenticateEmployeeToken, asyn
 
 app.get('/api/tasks/:taskId/submission/:fileId', authenticateEmployeeToken, async (req, res) => {
   try {
-    const task = await TaskItem.findOne({ _id: req.params.taskId, assigned_to_username: req.user.username });
+    const task = await TaskItem.findOne({
+      _id: req.params.taskId,
+      assigned_to_username: req.user.username
+    });
+
     if (!task) return res.status(404).json({ success: false, message: 'Task not found.' });
 
     const sub = task.submissions.id(req.params.fileId);
-    if (!sub) return res.status(404).json({ success: false, message: 'Submission not found.' });
+    if (!sub) return res.status(404).json({ success: false, message: 'File not found.' });
 
     res.setHeader('Content-Type', sub.mimetype);
     res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(sub.filename)}`);
@@ -294,9 +320,9 @@ app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => 
     task.claimed_at = new Date();
     await task.save();
 
-    res.json({ success: true, message: 'Task claimed successfully.', data: task });
+    res.json({ success: true, message: 'Task claimed successfully!', data: task });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Claim failed.' });
+    res.status(500).json({ success: false, message: 'Claim processing failed.' });
   }
 });
 
@@ -306,11 +332,11 @@ app.post('/api/tasks/submit-deliverables/:id', authenticateEmployeeToken, upload
     if (!task) return res.status(404).json({ success: false, message: 'Task not found.' });
 
     if (!['Claimed', 'Submitted'].includes(task.status)) {
-      return res.status(400).json({ success: false, message: 'Task must be in progress.' });
+      return res.status(400).json({ success: false, message: 'Please claim the task first or task already completed.' });
     }
 
     if (task.submission_deadline && new Date() > new Date(task.submission_deadline)) {
-      return res.status(400).json({ success: false, message: 'Deadline has passed. Upload blocked.' });
+      return res.status(400).json({ success: false, message: 'Submission deadline has passed.' });
     }
 
     const { notes } = req.body;
@@ -322,7 +348,7 @@ app.post('/api/tasks/submit-deliverables/:id', authenticateEmployeeToken, upload
     }));
 
     if (task.requires_submission && uploadedFiles.length === 0 && (!task.submissions || task.submissions.length === 0)) {
-      return res.status(400).json({ success: false, message: 'This task requires file deliverables.' });
+      return res.status(400).json({ success: false, message: 'Deliverable file submission is required for this task.' });
     }
 
     if (uploadedFiles.length > 0) {
@@ -334,18 +360,19 @@ app.post('/api/tasks/submit-deliverables/:id', authenticateEmployeeToken, upload
     task.submitted_at = new Date();
     await task.save();
 
-    res.json({ success: true, message: 'Deliverables submitted successfully.', data: task });
+    res.json({ success: true, message: 'Deliverables uploaded successfully!', data: task });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Submission failed.' });
   }
 });
 
 // ==========================================================================
-// 2. ADMIN APIS (Supporting Single & Bulk Batch Dispatch)
+// 2. ADMIN APIS
 // ==========================================================================
+
 app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ success: false, message: 'Credentials required.' });
+  if (!username || !password) return res.status(400).json({ success: false, message: 'Username and password required.' });
 
   try {
     const adminUser = await EmployeeAccount.findOne({ username: username.trim(), role: 'admin' });
@@ -363,6 +390,7 @@ app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
     res.cookie('corp_admin_auth_token', token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
@@ -370,9 +398,9 @@ app.post('/api/admin/auth/login', checkGateAccess, async (req, res) => {
       maxAge: 8 * 60 * 60 * 1000
     });
 
-    res.json({ success: true, message: 'Admin authenticated', user: payload });
+    res.json({ success: true, message: 'Admin session created', user: payload });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Auth server error.' });
+    res.status(500).json({ success: false, message: 'Authentication failure.' });
   }
 });
 
@@ -382,7 +410,7 @@ app.get('/api/admin/auth/session', checkGateAccess, authenticateAdminToken, (req
 
 app.post('/api/admin/auth/logout', (req, res) => {
   res.clearCookie('corp_admin_auth_token');
-  res.json({ success: true, message: 'Admin signed out.' });
+  res.json({ success: true, message: 'Admin logged out.' });
 });
 
 app.get('/api/admin/employees/list', checkGateAccess, authenticateAdminToken, async (req, res) => {
@@ -397,14 +425,14 @@ app.get('/api/admin/employees/list', checkGateAccess, authenticateAdminToken, as
 app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken, async (req, res) => {
   const { staff_id, username, password, full_name, department, initial_balance } = req.body;
   if (!staff_id || !username || !password || !full_name || !department) {
-    return res.status(400).json({ success: false, message: 'All fields are required.' });
+    return res.status(400).json({ success: false, message: 'All profile fields are required.' });
   }
 
   try {
     const existing = await EmployeeAccount.findOne({
       $or: [{ username: username.trim() }, { staff_id: staff_id.trim() }]
     });
-    if (existing) return res.status(409).json({ success: false, message: 'Staff ID or Username exists.' });
+    if (existing) return res.status(409).json({ success: false, message: 'Staff ID or username already exists.' });
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
@@ -420,16 +448,16 @@ app.post('/api/admin/employees/create', checkGateAccess, authenticateAdminToken,
     });
 
     await newStaff.save();
-    res.json({ success: true, message: 'Account created successfully.' });
+    res.json({ success: true, message: 'Employee account created successfully.' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Registration failed.' });
+    res.status(500).json({ success: false, message: 'Failed to save account.' });
   }
 });
 
 app.patch('/api/admin/employees/balance/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   const { balance } = req.body;
   if (balance === undefined || isNaN(parseFloat(balance))) {
-    return res.status(400).json({ success: false, message: 'Invalid balance value.' });
+    return res.status(400).json({ success: false, message: 'Valid balance numeric value required.' });
   }
 
   try {
@@ -438,9 +466,9 @@ app.patch('/api/admin/employees/balance/:id', checkGateAccess, authenticateAdmin
       { account_balance: parseFloat(balance) },
       { new: true }
     );
-    res.json({ success: true, message: 'Balance updated successfully.', data: emp });
+    res.json({ success: true, message: 'Balance updated successfully!', data: emp });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Update balance error.' });
+    res.status(500).json({ success: false, message: 'Failed to modify balance.' });
   }
 });
 
@@ -448,9 +476,9 @@ app.delete('/api/admin/employees/delete/:id', checkGateAccess, authenticateAdmin
   try {
     const target = await EmployeeAccount.findByIdAndDelete(req.params.id);
     if (!target) return res.status(404).json({ success: false, message: 'Account not found.' });
-    res.json({ success: true, message: 'Account deregistered.' });
+    res.json({ success: true, message: 'Employee account deregistered.' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Deregister error.' });
+    res.status(500).json({ success: false, message: 'Failed to delete account.' });
   }
 });
 
@@ -459,35 +487,30 @@ app.get('/api/admin/tasks/all', checkGateAccess, authenticateAdminToken, async (
     const tasks = await TaskItem.find({}, { 'attachments.data': 0, 'submissions.data': 0 }).sort({ created_at: -1 });
     res.json({ success: true, data: tasks });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Fetch tasks failed.' });
+    res.status(500).json({ success: false, message: 'Failed to fetch tasks.' });
   }
 });
 
-// Admin Single & Bulk Batch Task Creation
-app.post('/api/admin/tasks/create', checkGateAccess, authenticateAdminToken, upload.array('attachments', 5), async (req, res) => {
+// Admin: Bulk Dispatch Tasks to Multiple Users
+app.post('/api/admin/tasks/create-bulk', checkGateAccess, authenticateAdminToken, upload.array('attachments', 5), async (req, res) => {
   const { title, description, assignees, priority, reward_amount, requires_submission, submission_deadline } = req.body;
   
   if (!title || !description || !assignees) {
-    return res.status(400).json({ success: false, message: 'Title, description, and at least one assignee required.' });
+    return res.status(400).json({ success: false, message: 'Title, description, and assignees are required.' });
+  }
+
+  let assigneeList = [];
+  try {
+    assigneeList = typeof assignees === 'string' ? JSON.parse(assignees) : assignees;
+  } catch (e) {
+    assigneeList = [assignees];
+  }
+
+  if (!Array.isArray(assigneeList) || assigneeList.length === 0) {
+    return res.status(400).json({ success: false, message: 'At least one target assignee must be selected.' });
   }
 
   try {
-    // Parse assignees (array or comma-separated list)
-    let assigneeList = [];
-    if (typeof assignees === 'string') {
-      try {
-        assigneeList = JSON.parse(assignees);
-      } catch (e) {
-        assigneeList = assignees.split(',').map(s => s.trim()).filter(Boolean);
-      }
-    } else if (Array.isArray(assignees)) {
-      assigneeList = assignees;
-    }
-
-    if (!assigneeList || assigneeList.length === 0) {
-      return res.status(400).json({ success: false, message: 'Select at least one valid employee assignee.' });
-    }
-
     const fileAttachments = (req.files || []).map(f => ({
       filename: Buffer.from(f.originalname, 'latin1').toString('utf8'),
       mimetype: f.mimetype,
@@ -495,41 +518,34 @@ app.post('/api/admin/tasks/create', checkGateAccess, authenticateAdminToken, upl
       data: f.buffer
     }));
 
-    const parsedDeadline = submission_deadline ? new Date(submission_deadline) : null;
-    const isRequired = requires_submission === 'true' || requires_submission === true;
-    const parsedReward = parseFloat(reward_amount) || 0.00;
-
-    // Batch insertion for all selected staff
-    const tasksToInsert = assigneeList.map(username => ({
+    const taskDocuments = assigneeList.map(username => ({
       task_title: title.trim(),
       task_description: description.trim(),
-      assigned_to_username: username.trim(),
+      assigned_to_username: String(username).trim(),
       priority: priority || 'Normal',
-      reward_amount: parsedReward,
-      requires_submission: isRequired,
-      submission_deadline: parsedDeadline,
+      reward_amount: parseFloat(reward_amount) || 0.00,
+      requires_submission: requires_submission === 'true' || requires_submission === true,
+      submission_deadline: submission_deadline ? new Date(submission_deadline) : null,
       status: 'Assigned',
       attachments: fileAttachments
     }));
 
-    const result = await TaskItem.insertMany(tasksToInsert);
+    await TaskItem.insertMany(taskDocuments);
     res.json({
       success: true,
-      message: `Batch dispatch successful! ${result.length} task(s) dispatched to database.`,
-      count: result.length
+      message: `Successfully dispatched tasks to ${assigneeList.length} employee(s)!`,
+      count: assigneeList.length
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Failed to dispatch task(s).' });
+    res.status(500).json({ success: false, message: 'Bulk task dispatch failed.' });
   }
 });
 
-// Admin Complete Task & Auto Credit Reward
 app.post('/api/admin/tasks/complete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const task = await TaskItem.findById(req.params.id);
     if (!task) return res.status(404).json({ success: false, message: 'Task not found.' });
-    if (task.status === 'Completed') return res.status(400).json({ success: false, message: 'Task is already marked completed.' });
+    if (task.status === 'Completed') return res.status(400).json({ success: false, message: 'Task already completed.' });
 
     task.status = 'Completed';
     task.completed_at = new Date();
@@ -545,11 +561,11 @@ app.post('/api/admin/tasks/complete/:id', checkGateAccess, authenticateAdminToke
     await task.save();
     res.json({
       success: true,
-      message: `Task completed! Reward ¥${task.reward_amount.toFixed(2)} credited to ${task.assigned_to_username}.`,
+      message: `Task completed! Reward of ¥${task.reward_amount.toFixed(2)} credited to ${task.assigned_to_username}.`,
       data: task
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Completion failed.' });
+    res.status(500).json({ success: false, message: 'Completion processing failed.' });
   }
 });
 
@@ -557,9 +573,9 @@ app.delete('/api/admin/tasks/delete/:id', checkGateAccess, authenticateAdminToke
   try {
     const result = await TaskItem.findByIdAndDelete(req.params.id);
     if (!result) return res.status(404).json({ success: false, message: 'Task not found.' });
-    res.json({ success: true, message: 'Task deleted from MongoDB.' });
+    res.json({ success: true, message: 'Task deleted successfully.' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Revoke failed.' });
+    res.status(500).json({ success: false, message: 'Deletion failed.' });
   }
 });
 
@@ -568,21 +584,21 @@ app.get('/api/admin/requests/all', checkGateAccess, authenticateAdminToken, asyn
     const requests = await EmployeeRequest.find().sort({ submitted_at: -1 });
     res.json({ success: true, data: requests });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to retrieve requests.' });
+    res.status(500).json({ success: false, message: 'Failed to fetch requests.' });
   }
 });
 
 app.patch('/api/admin/requests/status/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   const { status } = req.body;
   if (!['approved', 'rejected', 'pending'].includes(status)) {
-    return res.status(400).json({ success: false, message: 'Invalid status.' });
+    return res.status(400).json({ success: false, message: 'Invalid status value.' });
   }
 
   try {
     const updated = await EmployeeRequest.findByIdAndUpdate(req.params.id, { status }, { new: true });
     res.json({ success: true, message: 'Status updated.', data: updated });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Status update failed.' });
+    res.status(500).json({ success: false, message: 'Failed to update status.' });
   }
 });
 
@@ -591,11 +607,42 @@ app.delete('/api/admin/requests/delete/:id', checkGateAccess, authenticateAdminT
     await EmployeeRequest.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Request purged.' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Purge failed.' });
+    res.status(500).json({ success: false, message: 'Failed to delete.' });
   }
 });
 
-// Fallback
+// Seed Initial Accounts
+async function initSeed() {
+  const salt = await bcrypt.genSalt(10);
+  const empCount = await EmployeeAccount.countDocuments({ role: 'employee' });
+  if (empCount === 0) {
+    const empHash = await bcrypt.hash('Employee@2026', salt);
+    await EmployeeAccount.create({
+      staff_id: 'EMP-9081',
+      username: 'corp_employee',
+      password_hash: empHash,
+      full_name: 'Alex Vance',
+      department: 'Infrastructure Operations',
+      account_balance: 150.00,
+      role: 'employee'
+    });
+  }
+
+  const adminCount = await EmployeeAccount.countDocuments({ role: 'admin' });
+  if (adminCount === 0) {
+    const adminHash = await bcrypt.hash('Admin@2026', salt);
+    await EmployeeAccount.create({
+      staff_id: 'ADM-0001',
+      username: 'corp_admin',
+      password_hash: adminHash,
+      full_name: 'Lead Operations Executive',
+      department: 'Headquarters System Control',
+      role: 'admin'
+    });
+  }
+}
+mongoose.connection.once('open', initSeed);
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
