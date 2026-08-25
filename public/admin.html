@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- ==========================================================================
+       METADATA & VIEWPORT SCALABILITY CONFIGURATION
+       ========================================================================== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#090d16">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Enterprise Management Console and Task Administration Platform">
   <title>Corporate Management Console - Superuser Administration Portal</title>
   
   <!-- ==========================================================================
-       GOOGLE SANS TYPOGRAPHY DEFINITIONS
+       GOOGLE SANS TYPOGRAPHY DEFINITIONS & CDN CONNECTIONS
        ========================================================================== -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,79 +21,92 @@
 
   <style>
     /* ==========================================================================
-       1. IOS GLASS DESIGN SYSTEM & CSS VARIABLES
+       1. EXTENDED DESIGN SYSTEM VARIABLES & GLASS THEME SPECIFICATIONS
        ========================================================================== */
     :root {
+      /* Background Canvas Gradients */
       --ios-bg-canvas: #090d16;
       --ios-bg-gradient: radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.85) 45%, #050811 100%);
+      --ios-bg-accent-glow: radial-gradient(circle at 85% 85%, rgba(191, 90, 242, 0.15) 0%, transparent 60%);
       
-      /* Liquid Glass Tokens */
+      /* Liquid Glass Surface Tokens */
       --glass-panel-bg: rgba(255, 255, 255, 0.06);
       --glass-panel-bg-hover: rgba(255, 255, 255, 0.09);
-      --glass-panel-bg-active: rgba(255, 255, 255, 0.12);
+      --glass-panel-bg-active: rgba(255, 255, 255, 0.13);
       --glass-panel-border: rgba(255, 255, 255, 0.12);
-      --glass-panel-border-hover: rgba(255, 255, 255, 0.22);
-      --glass-panel-border-glow: rgba(59, 130, 246, 0.35);
-      --glass-blur-strength: blur(28px) saturate(190%);
-      --glass-blur-subtle: blur(16px) saturate(160%);
-      --glass-specular-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 100%);
+      --glass-panel-border-hover: rgba(255, 255, 255, 0.24);
+      --glass-panel-border-glow: rgba(59, 130, 246, 0.45);
+      --glass-blur-strength: blur(32px) saturate(190%);
+      --glass-blur-subtle: blur(18px) saturate(160%);
+      --glass-specular-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 100%);
       
-      /* Vibrant Accents */
+      /* Vibrant Dynamic Accents */
       --ios-blue: #0a84ff;
       --ios-blue-hover: #0070e0;
       --ios-blue-active: #005bb5;
-      --ios-blue-glow: 0 0 20px rgba(10, 132, 255, 0.4);
+      --ios-blue-glow: 0 0 24px rgba(10, 132, 255, 0.45);
       --ios-blue-soft: rgba(10, 132, 255, 0.15);
       
       --ios-emerald: #30d158;
       --ios-emerald-soft: rgba(48, 209, 88, 0.15);
       --ios-emerald-hover: #28b84d;
+      --ios-emerald-glow: 0 0 24px rgba(48, 209, 88, 0.4);
       
       --ios-amber: #ffd60a;
       --ios-amber-soft: rgba(255, 214, 10, 0.15);
       --ios-amber-hover: #e6c009;
+      --ios-amber-glow: 0 0 24px rgba(255, 214, 10, 0.4);
       
       --ios-purple: #bf5af2;
       --ios-purple-soft: rgba(191, 90, 242, 0.15);
       --ios-purple-hover: #aa42df;
+      --ios-purple-glow: 0 0 24px rgba(191, 90, 242, 0.4);
       
       --ios-red: #ff453a;
       --ios-red-soft: rgba(255, 69, 58, 0.15);
       --ios-red-hover: #e0352b;
+      --ios-red-glow: 0 0 24px rgba(255, 69, 58, 0.4);
+
+      --ios-teal: #64d2ff;
+      --ios-teal-soft: rgba(100, 210, 255, 0.15);
       
-      /* Typography Colors */
+      /* Typography Palette */
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-subtle: #64748b;
       --text-dim: #475569;
       
-      /* Fonts */
-      --font-display: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-body: 'Google Sans Text', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      /* Fonts Configuration */
+      --font-display: 'Google Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-body: 'Google Sans Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       
-      /* Radii & Shadows */
+      /* Radii Definitions */
       --radius-xs: 4px;
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 22px;
+      --radius-xl: 30px;
       --radius-full: 9999px;
+
+      /* Depth Shadow Metrics */
       --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      --shadow-float: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      --shadow-float: 0 20px 40px -15px rgba(0, 0, 0, 0.65);
+      --shadow-card-elevated: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
       
-      /* Structural Measurements */
-      --sidebar-width: 280px;
-      --bottom-nav-height: 70px;
+      /* Dimension Variables */
+      --sidebar-width: 290px;
+      --bottom-nav-height: 72px;
       
-      /* Transitions */
+      /* Transition Timing Functions */
       --ios-spring: 380ms cubic-bezier(0.175, 0.885, 0.32, 1.15);
-      --transition-fast: 160ms ease;
-      --transition-normal: 260ms ease;
-      --transition-slow: 360ms ease;
+      --transition-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 260ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ==========================================================================
-       2. RESET & BASE LAYOUT
+       2. RESET & GLOBAL ELEMENT STYLING
        ========================================================================== */
     *, *::before, *::after {
       box-sizing: border-box;
@@ -107,7 +124,7 @@
       width: 100%;
       min-height: 100%;
       background: var(--ios-bg-canvas);
-      background-image: var(--ios-bg-gradient);
+      background-image: var(--ios-bg-gradient), var(--ios-bg-accent-glow);
       background-attachment: fixed;
       color: var(--text-main);
       font-family: var(--font-body);
@@ -121,7 +138,7 @@
     h1, h2, h3, h4, h5, h6, .brand-title {
       font-family: var(--font-display);
       font-weight: 700;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
     }
 
     input, select, textarea, button {
@@ -138,36 +155,40 @@
     }
 
     .pressable {
-      transition: transform var(--transition-fast), filter var(--transition-fast);
+      transition: transform var(--transition-fast), filter var(--transition-fast), opacity var(--transition-fast);
       will-change: transform;
     }
 
     .pressable:active {
       transform: scale(0.965);
-      filter: brightness(1.15);
+      filter: brightness(1.18);
     }
 
-    /* Custom Glass Scrollbar */
+    /* Scrollbar Aesthetics */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
     }
 
     ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.12);
     }
 
     ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.18);
       border-radius: var(--radius-full);
+      border: 2px solid transparent;
+      background-clip: padding-box;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.32);
+      border: 2px solid transparent;
+      background-clip: padding-box;
     }
 
     /* ==========================================================================
-       3. NOTIFICATION SYSTEM (IOS PILL TOAST)
+       3. NOTIFICATION SYSTEM (IOS FLOATING PILL TOAST)
        ========================================================================== */
     #toast-container {
       position: fixed;
@@ -181,22 +202,22 @@
       gap: 10px;
       pointer-events: none;
       width: 90%;
-      max-width: 440px;
+      max-width: 460px;
     }
 
     .toast-item {
       pointer-events: auto;
       width: 100%;
-      background: rgba(18, 24, 38, 0.85);
+      background: rgba(18, 24, 38, 0.88);
       backdrop-filter: var(--glass-blur-strength);
       -webkit-backdrop-filter: var(--glass-blur-strength);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: var(--radius-full);
-      padding: 12px 20px;
+      padding: 12px 22px;
       box-shadow: var(--shadow-float);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       transform: translateY(-40px) scale(0.92);
       opacity: 0;
       transition: transform var(--ios-spring), opacity var(--transition-normal);
@@ -208,8 +229,8 @@
     }
 
     .toast-icon {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       flex-shrink: 0;
     }
 
@@ -222,7 +243,7 @@
     }
 
     /* ==========================================================================
-       4. GATE SCREEN & ADMIN LOGIN OVERLAYS
+       4. SECURITY GATE & PRIVILEGE SIGN-IN VIEWS
        ========================================================================== */
     .glass-auth-overlay {
       position: fixed;
@@ -232,18 +253,18 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background: rgba(5, 8, 17, 0.75);
-      backdrop-filter: blur(35px) saturate(200%);
-      -webkit-backdrop-filter: blur(35px) saturate(200%);
+      background: rgba(5, 8, 17, 0.78);
+      backdrop-filter: blur(38px) saturate(200%);
+      -webkit-backdrop-filter: blur(38px) saturate(200%);
     }
 
     .glass-auth-card {
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       background: var(--glass-panel-bg);
       border: 1px solid var(--glass-panel-border);
       border-radius: var(--radius-lg);
-      padding: 40px 32px;
+      padding: 44px 34px;
       box-shadow: var(--shadow-glass);
       text-align: center;
       position: relative;
@@ -261,33 +282,33 @@
     }
 
     .glass-icon-wrapper {
-      width: 64px;
-      height: 64px;
+      width: 68px;
+      height: 68px;
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      margin-bottom: 22px;
+      box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.55);
     }
 
     .glass-auth-title {
-      font-size: 22px;
+      font-size: 23px;
       font-weight: 700;
       letter-spacing: -0.4px;
       margin-bottom: 6px;
     }
 
     .glass-auth-subtitle {
-      font-size: 13px;
+      font-size: 13.5px;
       color: var(--text-muted);
-      margin-bottom: 26px;
+      margin-bottom: 28px;
     }
 
     .glass-form-group {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       text-align: left;
     }
 
@@ -296,14 +317,14 @@
       font-size: 12.5px;
       font-weight: 600;
       color: var(--text-muted);
-      margin-bottom: 7px;
+      margin-bottom: 8px;
       margin-left: 2px;
     }
 
     .glass-input-field {
       width: 100%;
-      height: 46px;
-      padding: 0 16px;
+      height: 48px;
+      padding: 0 18px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--glass-panel-border);
       border-radius: var(--radius-md);
@@ -313,33 +334,33 @@
     }
 
     .glass-input-field:focus {
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.1);
       border-color: var(--ios-blue);
       box-shadow: var(--ios-blue-glow);
     }
 
     .glass-textarea {
       width: 100%;
-      padding: 12px 16px;
+      padding: 14px 18px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--glass-panel-border);
       border-radius: var(--radius-md);
       color: var(--text-main);
       font-size: 14px;
       resize: vertical;
-      min-height: 90px;
+      min-height: 96px;
       transition: all var(--transition-fast);
     }
 
     .glass-textarea:focus {
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.1);
       border-color: var(--ios-blue);
       box-shadow: var(--ios-blue-glow);
     }
 
     .btn-ios-primary {
       width: 100%;
-      height: 46px;
+      height: 48px;
       background: var(--ios-blue);
       color: #ffffff;
       font-size: 15px;
@@ -349,7 +370,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       box-shadow: var(--ios-blue-glow);
       transition: background-color var(--transition-fast);
     }
@@ -359,7 +380,7 @@
     }
 
     /* ==========================================================================
-       5. MAIN APPLICATION STRUCTURE (SIDEBAR & BOTTOM DOCK)
+       5. MAIN APPLICATION SHELL (SIDEBAR & BOTTOM DOCK)
        ========================================================================== */
     #admin-app-container {
       display: none;
@@ -367,14 +388,14 @@
       position: relative;
     }
 
-    /* Left Frosted Sidebar (Desktop) */
+    /* Desktop Sidebar Component */
     .ios-sidebar {
       position: fixed;
       top: 0;
       left: 0;
       bottom: 0;
       width: var(--sidebar-width);
-      background: rgba(15, 23, 42, 0.55);
+      background: rgba(15, 23, 42, 0.58);
       backdrop-filter: var(--glass-blur-strength);
       -webkit-backdrop-filter: var(--glass-blur-strength);
       border-right: 1px solid var(--glass-panel-border);
@@ -384,59 +405,60 @@
     }
 
     .sidebar-brand-box {
-      padding: 28px 22px;
+      padding: 30px 24px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .sidebar-avatar-logo {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       background: linear-gradient(135deg, var(--ios-blue), #1d4ed8);
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 16px;
-      box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
+      font-size: 17px;
+      box-shadow: 0 4px 14px rgba(10, 132, 255, 0.38);
     }
 
     .sidebar-brand-text h2 {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: -0.2px;
     }
 
     .sidebar-brand-text span {
-      font-size: 10.5px;
+      font-size: 11px;
       color: var(--ios-blue);
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.8px;
     }
 
     .sidebar-nav-list {
       list-style: none;
-      padding: 22px 14px;
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
       flex: 1;
+      overflow-y: auto;
     }
 
     .sidebar-nav-item-btn {
       width: 100%;
-      height: 44px;
+      height: 46px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 0 16px;
+      gap: 14px;
+      padding: 0 18px;
       border-radius: var(--radius-sm);
       color: var(--text-muted);
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
@@ -452,55 +474,54 @@
       background: rgba(10, 132, 255, 0.18);
       color: #ffffff;
       font-weight: 600;
-      border: 1px solid rgba(10, 132, 255, 0.3);
+      border: 1px solid rgba(10, 132, 255, 0.32);
     }
 
     .sidebar-nav-item-btn.music-btn.active {
       background: var(--ios-purple-soft);
-      color: #e9d5ff;
-      border-color: rgba(191, 90, 242, 0.35);
+      color: #f3e8ff;
+      border-color: rgba(191, 90, 242, 0.38);
     }
 
     .sidebar-nav-icon {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       flex-shrink: 0;
     }
 
     .sidebar-footer-card {
-      padding: 16px 20px;
+      padding: 18px 22px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.22);
     }
 
     .sidebar-user-name {
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 150px;
+      max-width: 155px;
     }
 
     .btn-logout-ghost {
-      font-size: 12.5px;
+      font-size: 13px;
       color: var(--ios-red);
       font-weight: 600;
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: var(--radius-sm);
-      transition: background-color var(--transition-fast);
     }
 
     .btn-logout-ghost:hover {
       background: var(--ios-red-soft);
     }
 
-    /* Bottom Glass Dock (Mobile) */
+    /* Mobile Bottom Glass Dock */
     .ios-bottom-dock {
       display: none;
       position: fixed;
@@ -508,7 +529,7 @@
       left: 16px;
       right: 16px;
       height: var(--bottom-nav-height);
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.72);
       backdrop-filter: var(--glass-blur-strength);
       -webkit-backdrop-filter: var(--glass-blur-strength);
       border: 1px solid var(--glass-panel-border);
@@ -517,7 +538,7 @@
       box-shadow: var(--shadow-float);
       justify-content: space-around;
       align-items: center;
-      padding: 0 12px;
+      padding: 0 14px;
     }
 
     .dock-nav-item {
@@ -527,9 +548,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 4px;
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: 11.5px;
       cursor: pointer;
       transition: color var(--transition-fast);
     }
@@ -544,24 +565,21 @@
     }
 
     .dock-nav-icon {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
     }
 
     /* Main Viewport Container */
     .ios-main-viewport {
       margin-left: var(--sidebar-width);
-      padding: 38px 44px;
+      padding: 40px 48px;
       min-height: 100vh;
-      max-width: 1440px;
+      max-width: 1480px;
     }
 
-    /* ==========================================================================
-       6. CONTENT PANELS & GLASS DATA CARDS
-       ========================================================================== */
     .view-content-pane {
       display: none;
-      animation: springFade 300ms ease forwards;
+      animation: springFade 320ms ease forwards;
     }
 
     .view-content-pane.active-pane {
@@ -571,7 +589,7 @@
     @keyframes springFade {
       from {
         opacity: 0;
-        transform: translateY(6px);
+        transform: translateY(8px);
       }
       to {
         opacity: 1;
@@ -580,22 +598,22 @@
     }
 
     .pane-header-titlebar {
-      margin-bottom: 28px;
+      margin-bottom: 30px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 18px;
     }
 
     .pane-header-titlebar h1 {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
       letter-spacing: -0.4px;
     }
 
     .pane-header-titlebar p {
-      font-size: 13.5px;
+      font-size: 14px;
       color: var(--text-muted);
       margin-top: 4px;
     }
@@ -607,9 +625,9 @@
       -webkit-backdrop-filter: var(--glass-blur-subtle);
       border: 1px solid var(--glass-panel-border);
       border-radius: var(--radius-lg);
-      padding: 26px;
+      padding: 28px;
       box-shadow: var(--shadow-glass);
-      margin-bottom: 26px;
+      margin-bottom: 28px;
       position: relative;
       overflow: hidden;
     }
@@ -628,18 +646,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 14px;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .glass-panel-header h2 {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 600;
       letter-spacing: -0.2px;
     }
 
-    /* Glass Tables */
+    /* Data Tables */
     .glass-table-scroller {
       overflow-x: auto;
     }
@@ -653,7 +671,7 @@
 
     .glass-table th {
       background: rgba(255, 255, 255, 0.03);
-      padding: 14px 16px;
+      padding: 16px 18px;
       font-weight: 600;
       color: var(--text-muted);
       border-bottom: 1px solid var(--glass-panel-border);
@@ -661,22 +679,22 @@
     }
 
     .glass-table td {
-      padding: 16px;
+      padding: 16px 18px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       color: var(--text-main);
     }
 
     .glass-table tbody tr:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.025);
     }
 
-    /* Badges */
+    /* Status Badges */
     .ios-status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      font-size: 11.5px;
+      gap: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
       font-weight: 600;
       border-radius: var(--radius-full);
       white-space: nowrap;
@@ -685,58 +703,58 @@
     .badge-blue {
       background: rgba(10, 132, 255, 0.15);
       color: #60a5fa;
-      border: 1px solid rgba(10, 132, 255, 0.3);
+      border: 1px solid rgba(10, 132, 255, 0.32);
     }
 
     .badge-green {
       background: var(--ios-emerald-soft);
       color: var(--ios-emerald);
-      border: 1px solid rgba(48, 209, 88, 0.3);
+      border: 1px solid rgba(48, 209, 88, 0.32);
     }
 
     .badge-amber {
       background: var(--ios-amber-soft);
       color: var(--ios-amber);
-      border: 1px solid rgba(255, 214, 10, 0.3);
+      border: 1px solid rgba(255, 214, 10, 0.32);
     }
 
     .badge-purple {
       background: var(--ios-purple-soft);
       color: #d8b4fe;
-      border: 1px solid rgba(191, 90, 242, 0.3);
+      border: 1px solid rgba(191, 90, 242, 0.32);
     }
 
     .badge-red {
       background: var(--ios-red-soft);
       color: var(--ios-red);
-      border: 1px solid rgba(255, 69, 58, 0.3);
+      border: 1px solid rgba(255, 69, 58, 0.32);
     }
 
-    /* Strict Non-wrapping Indicator for Financial Rewards */
+    /* Fixed No-Wrap Financial Indicator */
     .reward-indicator {
       font-family: var(--font-mono);
       font-weight: 700;
       color: #fde047;
       background: rgba(254, 224, 71, 0.12);
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-radius: var(--radius-sm);
-      border: 1px solid rgba(254, 224, 71, 0.25);
+      border: 1px solid rgba(254, 224, 71, 0.28);
       white-space: nowrap !important;
       display: inline-block;
       flex-shrink: 0;
       word-break: keep-all;
     }
 
-    /* Action Buttons in Tables */
+    /* Table Action Buttons */
     .btn-cell-action {
-      padding: 6px 12px;
+      padding: 7px 14px;
       border-radius: var(--radius-sm);
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       transition: all var(--transition-fast);
       white-space: nowrap;
     }
@@ -744,51 +762,51 @@
     .btn-cell-danger {
       background: var(--ios-red-soft);
       color: var(--ios-red);
-      border: 1px solid rgba(255, 69, 58, 0.3);
+      border: 1px solid rgba(255, 69, 58, 0.32);
     }
 
     .btn-cell-danger:hover {
-      background: rgba(255, 69, 58, 0.25);
+      background: rgba(255, 69, 58, 0.28);
     }
 
     .btn-cell-success {
       background: var(--ios-emerald-soft);
       color: var(--ios-emerald);
-      border: 1px solid rgba(48, 209, 88, 0.3);
+      border: 1px solid rgba(48, 209, 88, 0.32);
       margin-right: 6px;
     }
 
     .btn-cell-success:hover {
-      background: rgba(48, 209, 88, 0.25);
+      background: rgba(48, 209, 88, 0.28);
     }
 
     .btn-cell-amber {
       background: var(--ios-amber-soft);
       color: var(--ios-amber);
-      border: 1px solid rgba(255, 214, 10, 0.3);
+      border: 1px solid rgba(255, 214, 10, 0.32);
       margin-right: 6px;
     }
 
     .btn-cell-amber:hover {
-      background: rgba(255, 214, 10, 0.25);
+      background: rgba(255, 214, 10, 0.28);
     }
 
     .btn-cell-edit {
       background: rgba(255, 255, 255, 0.08);
       color: var(--text-main);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       margin-right: 6px;
     }
 
     .btn-cell-edit:hover {
-      background: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.15);
     }
 
-    /* JRmusic Embedded Frame */
+    /* JRmusic Frame Container */
     .music-frame-container {
       width: 100%;
-      height: calc(100vh - 200px);
-      min-height: 600px;
+      height: calc(100vh - 210px);
+      min-height: 620px;
       border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow-glass);
@@ -807,13 +825,13 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       z-index: 1000;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
     }
 
     .glass-modal-backdrop.open {
@@ -822,13 +840,13 @@
 
     .glass-modal-sheet {
       width: 100%;
-      max-width: 580px;
-      background: rgba(20, 28, 48, 0.9);
+      max-width: 600px;
+      background: rgba(20, 28, 48, 0.92);
       backdrop-filter: var(--glass-blur-strength);
       -webkit-backdrop-filter: var(--glass-blur-strength);
       border: 1px solid var(--glass-panel-border);
       border-radius: var(--radius-lg);
-      padding: 30px;
+      padding: 34px;
       box-shadow: var(--shadow-float);
       position: relative;
       animation: sheetPop 280ms cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
@@ -837,7 +855,7 @@
     @keyframes sheetPop {
       from {
         opacity: 0;
-        transform: scale(0.94) translateY(10px);
+        transform: scale(0.94) translateY(12px);
       }
       to {
         opacity: 1;
@@ -849,12 +867,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
 
     .btn-modal-close {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       background: rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-full);
       display: flex;
@@ -870,20 +888,19 @@
       margin-top: 6px;
     }
 
-    /* Switch Component */
     .switch-control-label {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       cursor: pointer;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     .ios-switch {
       position: relative;
-      width: 44px;
-      height: 26px;
-      background: rgba(255, 255, 255, 0.15);
+      width: 46px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.16);
       border-radius: var(--radius-full);
       transition: background-color var(--transition-fast);
     }
@@ -893,8 +910,8 @@
       position: absolute;
       top: 3px;
       left: 3px;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       background: #ffffff;
       border-radius: 50%;
       transition: transform var(--transition-fast);
@@ -909,39 +926,60 @@
       transform: translateX(18px);
     }
 
-    /* Bulk Assignee Box */
+    /* Bulk Assignee Container */
     .bulk-assign-container {
       border: 1px solid var(--glass-panel-border);
       border-radius: var(--radius-md);
       background: rgba(255, 255, 255, 0.04);
-      padding: 12px 14px;
-      max-height: 140px;
+      padding: 14px 16px;
+      max-height: 150px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .bulk-assign-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 13px;
+      gap: 12px;
+      font-size: 13.5px;
       cursor: pointer;
     }
 
     .bulk-assign-item input[type="checkbox"] {
       accent-color: var(--ios-blue);
-      width: 16px;
-      height: 16px;
+      width: 17px;
+      height: 17px;
       cursor: pointer;
+    }
+
+    /* Deliverable Download Item in Tables */
+    .deliverable-link-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.24);
+      border-radius: var(--radius-xs);
+      color: #93c5fd;
+      font-size: 11.5px;
+      text-decoration: none;
+      margin-top: 4px;
+      margin-right: 4px;
+      transition: background var(--transition-fast);
+    }
+
+    .deliverable-link-pill:hover {
+      background: rgba(10, 132, 255, 0.22);
     }
 
     @media (max-width: 768px) {
       .ios-sidebar { display: none; }
       .ios-bottom-dock { display: flex; }
-      .ios-main-viewport { margin-left: 0; padding: 20px 16px calc(var(--bottom-nav-height) + 38px) 16px; }
-      .glass-modal-sheet { padding: 22px 18px; }
+      .ios-main-viewport { margin-left: 0; padding: 20px 16px calc(var(--bottom-nav-height) + 40px) 16px; }
+      .glass-modal-sheet { padding: 24px 20px; }
     }
   </style>
 </head>
@@ -951,13 +989,13 @@
   <div id="toast-container" aria-live="polite"></div>
 
   <!-- ==========================================================================
-       SCREEN 1: MANDATORY GATE CHECK (Render Environment Access Code)
+       SCREEN 1: MANDATORY GATE CHECK (Passcode Verification)
        ========================================================================== -->
   <section id="gate-overlay" class="glass-auth-overlay">
     <div class="glass-auth-card">
       <div class="glass-icon-wrapper">
-        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+        <svg style="width:32px;height:32px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
       </div>
@@ -966,7 +1004,7 @@
       
       <form id="gate-form-element">
         <div class="glass-form-group">
-          <input type="password" id="gate-password-input" class="glass-input-field" placeholder="Enter Access Code" style="text-align:center; letter-spacing:2px;" required autofocus>
+          <input type="password" id="gate-password-input" class="glass-input-field" placeholder="Enter Access Code (e.g. congcong2012)" style="text-align:center; letter-spacing:2px;" required autofocus>
         </div>
         <button type="submit" id="btn-gate-submit" class="btn-ios-primary pressable" style="margin-top:10px;">
           <span>Unlock & Proceed</span>
@@ -976,12 +1014,12 @@
   </section>
 
   <!-- ==========================================================================
-       SCREEN 2: ADMIN CREDENTIALS LOGIN VIEW
+       SCREEN 2: ADMINISTRATOR LOGIN VIEW
        ========================================================================== -->
   <section id="admin-login-overlay" class="glass-auth-overlay" style="display:none;">
     <div class="glass-auth-card">
       <div class="glass-icon-wrapper">
-        <svg style="width:30px;height:30px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg style="width:32px;height:32px;color:var(--ios-blue);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
         </svg>
       </div>
@@ -991,13 +1029,13 @@
       <form id="admin-login-form">
         <div class="glass-form-group">
           <label class="glass-label">Username</label>
-          <input type="text" id="admin-user-input" class="glass-input-field" placeholder="Admin username" autocomplete="username" required>
+          <input type="text" id="admin-user-input" class="glass-input-field" placeholder="Admin username (e.g. corp_admin)" autocomplete="username" required>
         </div>
         <div class="glass-form-group">
           <label class="glass-label">Password</label>
           <input type="password" id="admin-pass-input" class="glass-input-field" placeholder="Admin password" autocomplete="current-password" required>
         </div>
-        <button type="submit" id="btn-admin-login-submit" class="btn-ios-primary pressable" style="margin-top:12px;">
+        <button type="submit" id="btn-admin-login-submit" class="btn-ios-primary pressable" style="margin-top:14px;">
           <span>Sign In to Console</span>
         </button>
       </form>
@@ -1005,9 +1043,10 @@
   </section>
 
   <!-- ==========================================================================
-       SCREEN 3: MAIN ADMIN WORKSPACE
+       SCREEN 3: MAIN ADMIN WORKSPACE SHELL
        ========================================================================== -->
   <div id="admin-app-container">
+    <!-- Desktop Left Sidebar -->
     <aside class="ios-sidebar">
       <div class="sidebar-brand-box">
         <div class="sidebar-avatar-logo">AD</div>
@@ -1020,7 +1059,7 @@
       <ul class="sidebar-nav-list">
         <li>
           <button type="button" class="sidebar-nav-item-btn pressable active" data-target-pane="pane-tasks-management">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 11l3 3L22 4"></path>
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
@@ -1029,25 +1068,29 @@
         </li>
         <li>
           <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-requests-audit">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
             <span>Staff Requests</span>
           </button>
         </li>
         <li>
           <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-employees-registry">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
             <span>Accounts & Balance</span>
           </button>
         </li>
         <li>
           <button type="button" class="sidebar-nav-item-btn music-btn pressable" data-target-pane="pane-jrmusic-player">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 18V5l12-2v13"></path>
               <circle cx="6" cy="18" r="3"></circle>
               <circle cx="18" cy="16" r="3"></circle>
@@ -1063,7 +1106,7 @@
       </div>
     </aside>
 
-    <!-- Mobile Navigation Dock -->
+    <!-- Mobile Bottom Navigation Dock -->
     <nav class="ios-bottom-dock">
       <button type="button" class="dock-nav-item pressable active" data-target-pane="pane-tasks-management">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
@@ -1093,7 +1136,7 @@
             <h1>Task Orchestration & Dispatch</h1>
             <p>Assign tasks in bulk or individually, set reward values, review deliverable attachments, and mark completed for automatic payout.</p>
           </div>
-          <button type="button" id="btn-open-task-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
+          <button type="button" id="btn-open-task-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 24px;">
             <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span>+ Bulk / Single Assign Task</span>
           </button>
@@ -1107,13 +1150,13 @@
             <table class="glass-table">
               <thead>
                 <tr>
-                  <th>Task Title</th>
+                  <th>Task Title & Files</th>
                   <th>Assignee</th>
-                  <th>Reward (No-wrap)</th>
+                  <th>Reward Amount</th>
                   <th>Deliverable Req.</th>
                   <th>Deadline</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th>Workflow Actions</th>
                 </tr>
               </thead>
               <tbody id="tasks-table-body">
@@ -1135,7 +1178,7 @@
         
         <div class="glass-card-panel">
           <div class="glass-panel-header">
-            <h2>Submitted Requests</h2>
+            <h2>Submitted Requests List</h2>
           </div>
           <div class="glass-table-scroller">
             <table class="glass-table">
@@ -1165,7 +1208,8 @@
             <h1>Employee Directory & Reward Balances</h1>
             <p>Manage staff authentication profiles, monitor earnings, and edit reward balances.</p>
           </div>
-          <button type="button" id="btn-open-employee-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 22px;">
+          <button type="button" id="btn-open-employee-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 24px;">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span>+ Register Employee</span>
           </button>
         </div>
@@ -1182,9 +1226,9 @@
                   <th>Username</th>
                   <th>Full Name</th>
                   <th>Department</th>
-                  <th>Balance</th>
+                  <th>Account Balance</th>
                   <th>Registered At</th>
-                  <th>Actions</th>
+                  <th>Management</th>
                 </tr>
               </thead>
               <tbody id="employees-table-body">
@@ -1212,7 +1256,7 @@
   </div>
 
   <!-- ==========================================================================
-       MODAL SHEETS
+       MODAL SHEETS: BULK TASK / REGISTER / BALANCE
        ========================================================================== -->
 
   <!-- BULK TASK MODAL SHEET -->
@@ -1230,8 +1274,8 @@
         </div>
 
         <div class="glass-form-group">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <label class="glass-label" style="margin-bottom:0;">Select Assignees (Bulk Support)</label>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label class="glass-label" style="margin-bottom:0;">Select Assignees (Multi-Select Supported)</label>
             <label style="font-size:12px; color:var(--ios-blue); cursor:pointer;">
               <input type="checkbox" id="select-all-assignees" style="accent-color:var(--ios-blue); vertical-align:middle;"> Select All
             </label>
@@ -1246,7 +1290,7 @@
           <textarea id="task-desc-input" class="glass-textarea" placeholder="Detail the task objectives, execution steps, and acceptance metrics..." required></textarea>
         </div>
         
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
           <div class="glass-form-group">
             <label class="glass-label">Reward Amount per User (¥)</label>
             <input type="number" step="0.01" id="task-reward-input" class="glass-input-field" placeholder="0.00" value="0.00" required>
@@ -1264,9 +1308,9 @@
         </label>
 
         <div class="glass-form-group">
-          <label class="glass-label">Reference Attachments (Max 5 files, ≤25MB each)</label>
+          <label class="glass-label">Reference Attachments (Max 5 files, ≤30MB each)</label>
           <input type="file" id="task-files-input" class="glass-input-field" style="padding:10px 14px;" multiple>
-          <div class="file-pill-tip">Stored as binary attachments and shared across all selected assignees.</div>
+          <div class="file-pill-tip">Stored as separate binary chunks and shared across all selected assignees.</div>
         </div>
 
         <button type="submit" id="btn-submit-task-action" class="btn-ios-primary pressable" style="margin-top:14px;">
@@ -1291,11 +1335,11 @@
         </div>
         <div class="glass-form-group">
           <label class="glass-label">Username</label>
-          <input type="text" id="emp-username-input" class="glass-input-field" placeholder="Username" required>
+          <input type="text" id="emp-username-input" class="glass-input-field" placeholder="Login username" required>
         </div>
         <div class="glass-form-group">
           <label class="glass-label">Password</label>
-          <input type="password" id="emp-password-input" class="glass-input-field" placeholder="Initial password" required>
+          <input type="password" id="emp-password-input" class="glass-input-field" placeholder="Initial access password" required>
         </div>
         <div class="glass-form-group">
           <label class="glass-label">Full Name</label>
@@ -1306,7 +1350,7 @@
           <input type="text" id="emp-dept-input" class="glass-input-field" placeholder="Department" required>
         </div>
         <div class="glass-form-group">
-          <label class="glass-label">Initial Balance (¥)</label>
+          <label class="glass-label">Initial Reward Balance (¥)</label>
           <input type="number" step="0.01" id="emp-balance-input" class="glass-input-field" value="0.00">
         </div>
         <button type="submit" id="btn-submit-emp-action" class="btn-ios-primary pressable" style="margin-top:14px;">
@@ -1316,7 +1360,7 @@
     </div>
   </div>
 
-  <!-- BALANCE MODAL SHEET -->
+  <!-- BALANCE EDIT MODAL SHEET -->
   <div class="glass-modal-backdrop" id="modal-balance-backdrop">
     <div class="glass-modal-sheet" style="max-width:440px;">
       <div class="modal-sheet-header">
@@ -1328,7 +1372,7 @@
         <input type="hidden" id="balance-emp-id">
         <div class="glass-form-group">
           <label class="glass-label">Staff Name</label>
-          <input type="text" id="balance-emp-name" class="glass-input-field" disabled style="opacity:0.7;">
+          <input type="text" id="balance-emp-name" class="glass-input-field" disabled style="opacity:0.75;">
         </div>
         <div class="glass-form-group">
           <label class="glass-label">New Reward Balance (¥)</label>
@@ -1342,7 +1386,7 @@
   </div>
 
   <!-- ==========================================================================
-       7. CLIENT JAVASCRIPT CONTROLLER ARCHITECTURE
+       7. CLIENT JAVASCRIPT CONTROLLER & STATE ENGINE
        ========================================================================== -->
   <script>
     (function (window, document) {
@@ -1375,7 +1419,7 @@
       };
 
       // ------------------------------------------------------------------------
-      // APPLICATION STATE STORE
+      // STATE STORE & REACTIVE DATA LAYER
       // ------------------------------------------------------------------------
       const State = {
         adminUser: null,
@@ -1386,7 +1430,7 @@
       };
 
       // ------------------------------------------------------------------------
-      // DOM REFS CACHE
+      // DOM ELEMENT CACHE
       // ------------------------------------------------------------------------
       const DOM = {
         toastContainer: document.getElementById('toast-container'),
@@ -1405,7 +1449,7 @@
         navButtons: document.querySelectorAll('.sidebar-nav-item-btn, .dock-nav-item'),
         panes: document.querySelectorAll('.view-content-pane'),
         
-        // Tasks
+        // Tasks UI
         tasksTbody: document.getElementById('tasks-table-body'),
         modalTaskBackdrop: document.getElementById('modal-task-backdrop'),
         btnOpenTaskSheet: document.getElementById('btn-open-task-sheet'),
@@ -1421,7 +1465,7 @@
         taskFilesInput: document.getElementById('task-files-input'),
         btnSubmitTaskAction: document.getElementById('btn-submit-task-action'),
         
-        // Requests & Employees
+        // Requests & Employees UI
         requestsTbody: document.getElementById('requests-table-body'),
         employeesTbody: document.getElementById('employees-table-body'),
         modalEmpBackdrop: document.getElementById('modal-emp-backdrop'),
@@ -1436,7 +1480,7 @@
         empBalanceInput: document.getElementById('emp-balance-input'),
         btnSubmitEmpAction: document.getElementById('btn-submit-emp-action'),
         
-        // Balance Modal
+        // Balance Modal UI
         modalBalanceBackdrop: document.getElementById('modal-balance-backdrop'),
         btnCloseBalanceModal: document.getElementById('btn-close-balance-modal'),
         formModifyBalance: document.getElementById('form-modify-balance'),
@@ -1447,7 +1491,7 @@
       };
 
       // ------------------------------------------------------------------------
-      // UTILITIES
+      // UTILITY HELPERS
       // ------------------------------------------------------------------------
       const Utils = {
         escapeHtml(str) {
@@ -1468,7 +1512,15 @@
           return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         },
         
-        showToast(message, type = 'info', duration = 3200) {
+        formatFileSize(bytes) {
+          if (typeof bytes !== 'number' || bytes === 0) return '0 B';
+          const k = 1024;
+          const sizes = ['B', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        },
+
+        showToast(message, type = 'info', duration = 3400) {
           const toast = document.createElement('div');
           toast.className = 'toast-item';
           
@@ -1481,8 +1533,8 @@
               ${type === 'success' 
                 ? '<polyline points="20 6 9 17 4 12"></polyline>' 
                 : (type === 'error' 
-                  ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>' 
-                  : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>')}
+                  ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line>' 
+                  : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line>')}
             </svg>
             <div class="toast-message">${Utils.escapeHtml(message)}</div>
           `;
@@ -1496,13 +1548,13 @@
           setTimeout(() => toast.classList.add('show'), 10);
           setTimeout(() => {
             toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
           }, duration);
         }
       };
 
       // ------------------------------------------------------------------------
-      // HTTP API SERVICE
+      // HTTP API INTERFACE CLIENT
       // ------------------------------------------------------------------------
       const AdminApi = {
         async verifyGate(password) {
@@ -1605,7 +1657,7 @@
       };
 
       // ------------------------------------------------------------------------
-      // UI RENDERERS & VIEW ROUTER
+      // UI CONTROLLERS & EVENT LISTENERS
       // ------------------------------------------------------------------------
       function switchPane(targetPaneId) {
         Haptics.light();
@@ -1644,8 +1696,6 @@
           }
         } catch (e) {
           DOM.gateOverlay.style.display = 'flex';
-          DOM.adminLoginOverlay.style.display = 'none';
-          DOM.appContainer.style.display = 'none';
         }
       }
 
@@ -1660,7 +1710,7 @@
         switchPane('pane-tasks-management');
       }
 
-      // --- TASKS MODULE ---
+      // --- TASKS LOGIC ---
       async function loadTasks() {
         try {
           const res = await AdminApi.getTasks();
@@ -1676,20 +1726,8 @@
       function renderTasksTable(tasks) {
         DOM.tasksTbody.innerHTML = '';
         if (!tasks || !tasks.length) {
-          DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No active tasks found in database.</td></tr>';
+          DOM.tasksTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:36px;">No active tasks found in the database.</td></tr>';
           return;
-        // 在 renderTasksTable(tasks) 中：
-let submissionsList = '';
-if (t.submissions && t.submissions.length > 0) {
-  submissionsList = t.submissions.map(sub => `
-    <div style="margin-top:4px;">
-      <a href="/api/files/download/${sub.file_id || sub._id}" target="_blank" download style="color:#60a5fa; text-decoration:underline; font-size:12px;">
-        📥 Download: ${Utils.escapeHtml(sub.filename)} (${(sub.size / (1024*1024)).toFixed(1)}MB)
-      </a>
-    </div>
-  `).join('');
-}
-
         }
 
         tasks.forEach(t => {
@@ -1702,19 +1740,50 @@ if (t.submissions && t.submissions.length > 0) {
           if (isSubmitted) statusBadge = '<span class="ios-status-badge badge-purple">Submitted (Review)</span>';
           if (isCompleted) statusBadge = '<span class="ios-status-badge badge-green">✓ Completed</span>';
 
+          // Admin Reference Files List
+          let adminFilesHtml = '';
+          if (t.attachments && t.attachments.length > 0) {
+            adminFilesHtml = `
+              <div style="margin-top:6px;">
+                <span style="font-size:11px; color:var(--text-muted);">Admin Files:</span>
+                ${t.attachments.map(att => `
+                  <a class="deliverable-link-pill" href="/api/files/download/${att.file_id || att._id}" target="_blank" download>
+                    📎 ${Utils.escapeHtml(att.filename)} (${Utils.formatFileSize(att.size)})
+                  </a>
+                `).join('')}
+              </div>
+            `;
+          }
+
+          // User Submitted Deliverables Download Links (Fix: Allows direct download for Admins)
+          let userSubmissionsHtml = '';
+          if (t.submissions && t.submissions.length > 0) {
+            userSubmissionsHtml = `
+              <div style="margin-top:6px; padding:6px 10px; background:rgba(191,90,242,0.08); border-radius:6px; border:1px dashed rgba(191,90,242,0.25);">
+                <div style="font-size:11.5px; font-weight:600; color:#d8b4fe;">User Deliverables (${t.submissions.length}):</div>
+                ${t.submissions.map(sub => `
+                  <a class="deliverable-link-pill" style="background:rgba(191,90,242,0.18); border-color:rgba(191,90,242,0.35); color:#f3e8ff;" href="/api/files/download/${sub.file_id || sub._id}" target="_blank" download>
+                    📥 ${Utils.escapeHtml(sub.filename)} (${Utils.formatFileSize(sub.size)})
+                  </a>
+                `).join('')}
+                ${t.submission_notes ? `<div style="font-size:11.5px; color:#e9d5ff; margin-top:4px;">Note: ${Utils.escapeHtml(t.submission_notes)}</div>` : ''}
+              </div>
+            `;
+          }
+
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>
               <strong style="color:#ffffff; font-size:14.5px;">${Utils.escapeHtml(t.task_title)}</strong>
-              <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">
-                ${(t.attachments || []).length} admin files | ${(t.submissions || []).length} deliverable files
-              </div>
+              <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px; max-width:320px;">${Utils.escapeHtml(t.task_description)}</div>
+              ${adminFilesHtml}
+              ${userSubmissionsHtml}
             </td>
             <td><code>${Utils.escapeHtml(t.assigned_to_username)}</code></td>
             <td style="white-space:nowrap;"><span class="reward-indicator">¥ ${(parseFloat(t.reward_amount) || 0).toFixed(2)}</span></td>
             <td>
               <span class="ios-status-badge ${t.requires_submission ? 'badge-purple' : 'badge-blue'}">
-                ${t.requires_submission ? 'Required (≤25MB)' : 'None'}
+                ${t.requires_submission ? 'Required (≤30MB)' : 'None'}
               </span>
             </td>
             <td style="font-size:12px;">${Utils.formatDate(t.submission_deadline)}</td>
@@ -1755,12 +1824,12 @@ if (t.submissions && t.submissions.length > 0) {
 
       async function revokeTask(id) {
         Haptics.medium();
-        if (!confirm('Permanently revoke and delete this task from MongoDB? This action cannot be undone.')) return;
+        if (!confirm('Permanently revoke and delete this task and its binary attachments from MongoDB?')) return;
         
         try {
           const res = await AdminApi.deleteTask(id);
           if (res.success) {
-            Utils.showToast('Task removed from MongoDB', 'success');
+            Utils.showToast('Task removed from cluster', 'success');
             loadTasks();
           } else {
             Utils.showToast(res.message || 'Delete failed', 'error');
@@ -1770,7 +1839,7 @@ if (t.submissions && t.submissions.length > 0) {
         }
       }
 
-      // --- REQUESTS MODULE ---
+      // --- REQUESTS LOGIC ---
       async function loadRequests() {
         try {
           const res = await AdminApi.getRequests();
@@ -1786,7 +1855,7 @@ if (t.submissions && t.submissions.length > 0) {
       function renderRequestsTable(reqs) {
         DOM.requestsTbody.innerHTML = '';
         if (!reqs || !reqs.length) {
-          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No employee requests found.</td></tr>';
+          DOM.requestsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:36px;">No employee requests found.</td></tr>';
           return;
         }
 
@@ -1800,7 +1869,7 @@ if (t.submissions && t.submissions.length > 0) {
             <td><strong style="color:#ffffff;">${Utils.escapeHtml(r.request_title)}</strong></td>
             <td>${Utils.escapeHtml(r.applicant_name)} (${Utils.escapeHtml(r.applicant_username)})</td>
             <td>${Utils.escapeHtml(r.department)}</td>
-            <td style="max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(r.request_body)}</td>
+            <td style="max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${Utils.escapeHtml(r.request_body)}</td>
             <td>${statusBadge}</td>
             <td>${Utils.formatDate(r.submitted_at)}</td>
             <td style="white-space:nowrap;">
@@ -1846,7 +1915,7 @@ if (t.submissions && t.submissions.length > 0) {
         }
       }
 
-      // --- EMPLOYEES MODULE ---
+      // --- EMPLOYEES LOGIC ---
       async function loadEmployees() {
         try {
           const res = await AdminApi.getEmployees();
@@ -1863,7 +1932,7 @@ if (t.submissions && t.submissions.length > 0) {
       function renderEmployeesTable(emps) {
         DOM.employeesTbody.innerHTML = '';
         if (!emps || !emps.length) {
-          DOM.employeesTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:32px;">No registered employees.</td></tr>';
+          DOM.employeesTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:36px;">No registered staff accounts.</td></tr>';
           return;
         }
 
@@ -1920,7 +1989,7 @@ if (t.submissions && t.submissions.length > 0) {
 
       async function deregisterEmployee(id, name) {
         Haptics.medium();
-        if (!confirm(`Warning: Are you sure you want to delete [${name}]? They will immediately lose login access.`)) return;
+        if (!confirm(`Warning: Are you sure you want to deregister [${name}]? They will lose all portal access immediately.`)) return;
 
         try {
           const res = await AdminApi.deleteEmployee(id);
@@ -1936,7 +2005,7 @@ if (t.submissions && t.submissions.length > 0) {
       }
 
       // ------------------------------------------------------------------------
-      // EVENT LISTENERS & FORM BINDINGS
+      // EVENT BINDINGS
       // ------------------------------------------------------------------------
       function bindEvents() {
         // Navigation Switching
@@ -1947,7 +2016,7 @@ if (t.submissions && t.submissions.length > 0) {
           });
         });
 
-        // Gate Form Submission
+        // Gate Verification Submit
         DOM.gateForm.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -1974,7 +2043,7 @@ if (t.submissions && t.submissions.length > 0) {
           }
         });
 
-        // Admin Login Submission
+        // Admin Credentials Login Submit
         DOM.adminLoginForm.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -2000,7 +2069,7 @@ if (t.submissions && t.submissions.length > 0) {
           }
         });
 
-        // Sign Out Action
+        // Desktop Logout
         DOM.btnDesktopLogout.addEventListener('click', async () => {
           Haptics.medium();
           await AdminApi.logout();
@@ -2030,7 +2099,7 @@ if (t.submissions && t.submissions.length > 0) {
           DOM.modalBalanceBackdrop.classList.remove('open');
         });
 
-        // Bulk Selection Logic
+        // Select All Assignees Toggle
         DOM.selectAllAssignees.addEventListener('change', function () {
           const boxes = DOM.bulkAssigneesContainer.querySelectorAll('input[name="bulk_assignee"]');
           boxes.forEach(b => b.checked = this.checked);
@@ -2056,8 +2125,8 @@ if (t.submissions && t.submissions.length > 0) {
           }
 
           for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 25 * 1024 * 1024) {
-              Utils.showToast(`File "${files[i].name}" exceeds the 25MB limit`, 'error');
+            if (files[i].size > 30 * 1024 * 1024) {
+              Utils.showToast(`File "${files[i].name}" exceeds the 30MB limit`, 'error');
               return;
             }
           }
@@ -2097,7 +2166,7 @@ if (t.submissions && t.submissions.length > 0) {
           }
         });
 
-        // Register Employee Profile Submission
+        // Register Employee Submission
         DOM.formRegisterEmployee.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -2132,7 +2201,7 @@ if (t.submissions && t.submissions.length > 0) {
           }
         });
 
-        // Edit Balance Submission
+        // Modify Balance Submission
         DOM.formModifyBalance.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
