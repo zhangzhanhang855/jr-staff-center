@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多AI作业答案共识校验系统</title>
+<style>
+/* ============================================================
+   全局变量 & 基础样式（iOS 风格毛玻璃 + 深色科技风）
+   iOS 玻璃质感三要素：
+   1. backdrop-filter: blur(28px) saturate(180%) —— 大模糊+提饱和
+   2. 半透明蓝灰底 + 顶部内高光(inset 1px) —— 玻璃反光
+   3. 背景多彩色光斑 —— 让玻璃后面"有内容可模糊"
+   ============================================================ */
+:root {
+  --bg: #0A0E1C;            /* 页面主背景（更深，衬托玻璃） */
+  --bg-2: #0D1222;
+  /* 玻璃面板（iOS 深色模式质感） */
+  --glass: rgba(32, 38, 58, 0.52);
+  --glass-strong: rgba(30, 36, 55, 0.66);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.14);   /* 顶部高光 */
+  --line: rgba(255, 255, 255, 0.08);              /* 通用分隔线 */
+  --text: #F5F7FA;
+  --text-2: #9AA4B2;
+  --blue: #3B82F6;
+  --blue-2: #1E5FD0;
+  --red: #FF5C5C;
+  --green: #4ADE80;
+  --yellow: #FBBF24;
+  --radius: 20px;           /* 大圆角（iOS 感） */
+  --radius-sm: 12px;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 var(--glass-highlight);
+  --font: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "SF Mono", "Cascadia Code", "Consolas", monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  /* 多色光斑背景：毛玻璃必须有东西可模糊，iOS 效果才出得来 */
+  background:
+    radial-gradient(900px 520px at 12% -6%,  rgba(59, 130, 246, 0.30), transparent 62%),
+    radial-gradient(760px 460px at 92% 4%,   rgba(139, 92, 246, 0.26), transparent 60%),
+    radial-gradient(700px 500px at 78% 96%,  rgba(56, 189, 248, 0.20), transparent 62%),
+    radial-gradient(640px 460px at 8% 88%,   rgba(236, 72, 153, 0.14), transparent 62%),
+    linear-gradient(160deg, var(--bg) 0%, var(--bg-2) 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* 背景装饰网格（科技感） */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 24px 18px 80px; }
+
+/* ============================================================
+   通用玻璃面板（核心类 —— iOS 毛玻璃）
+   ============================================================ */
+.panel {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ============================================================
+   顶栏
+   ============================================================ */
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 20px 24px;
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+/* 顶部霓虹渐变线装饰 */
+.header::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-2), var(--blue), #8B5CF6);
+  box-shadow: 0 0 14px rgba(59,130,246,.6);
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.brand-icon {
+  width: 42px; height: 42px;
+  display: grid; place-items: center;
+  font-size: 21px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--blue-2), var(--blue), #8B5CF6);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.brand h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+.brand p { font-size: 12px; color: var(--text-2); }
+
+.header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* 模式切换 */
+.mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--glass-border);
+  font-size: 13px;
+  color: var(--text-2);
+}
+.mode-switch .badge {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: var(--yellow);
+  color: #1a1a1a;
+  transition: all .25s;
+}
+.mode-switch.real .badge { background: linear-gradient(135deg, var(--blue), #8B5CF6); color: #fff; }
+
+/* 开关 */
+.switch { position: relative; width: 44px; height: 26px; flex-shrink: 0; cursor: pointer; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .track {
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0.16);
+  border-radius: 999px;
+  transition: background .25s;
+}
+.switch .track::after {
+  content: "";
+  position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.35);
+  transition: transform .25s;
+}
+.switch input:checked + .track { background: linear-gradient(135deg, var(--blue-2), var(--blue)); }
+.switch input:checked + .track::after { transform: translateX(18px); }
+
+/* 按钮（iOS 圆润） */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(59,130,246,.35);
+  background: rgba(59,130,246,.12);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: var(--font);
+}
+.btn:hover { background: rgba(59,130,246,.22); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(59,130,246,.3); }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--blue-2), var(--blue));
+  border: none;
+  box-shadow: 0 6px 20px rgba(59,130,246,.45);
+  font-weight: 600;
+}
+.btn-primary:hover { filter: brightness(1.12); box-shadow: 0 6px 26px rgba(59,130,246,.6); }
+.btn-danger { border-color: rgba(255,92,92,.4); color: var(--red); background: rgba(255,92,92,.1); }
+.btn-danger:hover { background: rgba(255,92,92,.18); }
+.btn-sm { padding: 8px 12px; font-size: 12px; border-radius: 10px; }
+
+/* ============================================================
+   上传区
+   ============================================================ */
+.upload-panel { padding: 26px; margin-bottom: 22px; text-align: center; }
+
+.drop-zone {
+  border: 2px dashed rgba(59,130,246,.4);
+  border-radius: 16px;
+  padding: 46px 20px;
+  cursor: pointer;
+  transition: all .25s;
+  background: rgba(255,255,255,0.03);
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--blue);
+  background: rgba(59,130,246,0.1);
+  box-shadow: inset 0 0 30px rgba(59,130,246,.1), 0 0 22px rgba(59,130,246,.25);
+}
+.drop-zone .dz-icon { font-size: 42px; margin-bottom: 10px; }
+.drop-zone .dz-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.drop-zone .dz-sub { font-size: 13px; color: var(--text-2); }
+
+/* 上传预览 */
+.preview-box { display: none; margin-top: 18px; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+.preview-box.show { display: flex; }
+.preview-img-wrap {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  max-width: 320px;
+  flex-shrink: 0;
+}
+.preview-img-wrap img { display: block; width: 100%; max-height: 300px; object-fit: contain; background: rgba(0,0,0,.35); }
+.preview-info { flex: 1; min-width: 240px; text-align: left; }
+.preview-info .file-name { font-size: 15px; font-weight: 600; word-break: break-all; }
+.preview-info .file-meta { font-size: 12px; color: var(--text-2); margin: 6px 0 14px; }
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ============================================================
+   步骤进度条
+   ============================================================ */
+.progress-wrap { padding: 20px 16px; margin-bottom: 22px; display: none; }
+.progress-wrap.show { display: block; }
+
+.progress-bar { display: flex; align-items: flex-start; justify-content: space-between; position: relative; }
+
+/* 连接线 */
+.progress-bar::before {
+  content: "";
+  position: absolute;
+  top: 16px; left: 8%; right: 8%;
+  height: 3px;
+  background: rgba(255,255,255,0.09);
+  border-radius: 2px;
+}
+.progress-bar .line-fill {
+  position: absolute;
+  top: 16px; left: 8%;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--blue-2), var(--blue), #8B5CF6);
+  border-radius: 2px;
+  transition: width .6s ease;
+  box-shadow: 0 0 12px rgba(59,130,246,.7);
+}
+
+.p-node {
+  position: relative;
+  z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  width: 20%;
+  gap: 8px;
+  cursor: default;
+}
+.p-node .dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;            /* 圆形节点（iOS 圆润） */
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 700;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  color: var(--text-2);
+  transition: all .35s;
+}
+.p-node .p-label { font-size: 11.5px; color: var(--text-2); text-align: center; transition: color .3s; }
+
+.p-node.active .dot {
+  border-color: var(--blue);
+  color: var(--text);
+  background: rgba(59,130,246,.22);
+  box-shadow: 0 0 18px rgba(59,130,246,.65);
+  animation: pulse 1.2s infinite;
+}
+.p-node.active .p-label { color: var(--text); font-weight: 600; }
+.p-node.done .dot { background: var(--green); border-color: var(--green); color: #0B0F1A; box-shadow: 0 0 14px rgba(74,222,128,.55); }
+.p-node.done .p-label { color: var(--green); }
+.p-node.failed .dot { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 14px rgba(255,92,92,.55); }
+.p-node.failed .p-label { color: var(--red); }
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,.5); }
+  50% { box-shadow: 0 0 0 9px rgba(59,130,246,0); }
+}
+
+/* ============================================================
+   步骤卡片
+   ============================================================ */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.step-card {
+  position: relative;
+  padding: 20px;
+  overflow: hidden;
+  transition: border-color .3s, transform .3s, box-shadow .3s;
+}
+/* 卡片顶部主题色短线装饰 */
+.step-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 20px;
+  width: 46px; height: 2px;
+  background: linear-gradient(90deg, var(--blue), transparent);
+  opacity: .75;
+}
+.step-card:hover { transform: translateY(-3px); border-color: rgba(59,130,246,.45); }
+.step-card.running { border-color: var(--blue); box-shadow: 0 0 30px rgba(59,130,246,.35), var(--shadow); }
+.step-card.done { border-color: rgba(74,222,128,.45); }
+.step-card.failed { border-color: rgba(255,92,92,.6); box-shadow: 0 0 26px rgba(255,92,92,.25), var(--shadow); }
+
+.step-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.step-no {
+  width: 32px; height: 32px; flex-shrink: 0;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  font-size: 14px; font-weight: 700;
+  background: linear-gradient(135deg, var(--blue-2), var(--blue));
+  box-shadow: 0 4px 12px rgba(59,130,246,.4);
+}
+.step-title { flex: 1; }
+.step-title h3 { font-size: 14.5px; font-weight: 600; }
+.step-title .step-sub { font-size: 11.5px; color: var(--text-2); }
+
+/* 状态徽章 */
+.st-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  letter-spacing: .5px;
+  flex-shrink: 0;
+}
+.st-badge.wait { background: rgba(154,164,178,.14); color: var(--text-2); }
+.st-badge.run { background: rgba(59,130,246,.2); color: var(--blue); animation: blink 1s infinite; }
+.st-badge.ok { background: rgba(74,222,128,.16); color: var(--green); }
+.st-badge.err { background: rgba(255,92,92,.18); color: var(--red); }
+
+@keyframes blink { 50% { opacity: .5; } }
+
+/* 步骤输出内容 */
+.step-body { font-size: 13px; color: var(--text-2); }
+.step-body .prompt {
+  background: rgba(59,130,246,0.06);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--blue);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  max-height: 150px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.step-body .output {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 12.5px;
+  line-height: 1.75;
+  max-height: 320px;
+  overflow-y: auto;
+  word-break: break-word;
+}
+.step-body .output ul { padding-left: 18px; margin: 6px 0; }
+.step-body .output li { margin: 3px 0; }
+.step-body .output strong { color: var(--text); }
+.step-body .output h4 { color: var(--blue); font-size: 13px; margin: 8px 0 4px; }
+.step-body .output code {
+  font-family: var(--mono);
+  background: rgba(59,130,246,.12);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11.5px;
+}
+.step-body .output blockquote {
+  border-left: 3px solid var(--yellow);
+  padding-left: 10px;
+  margin: 6px 0;
+  color: var(--text-2);
+}
+
+.step-foot { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
+.step-cost { font-size: 11px; color: var(--text-2); }
+.step-cost b { color: var(--yellow); }
+
+/* ============================================================
+   最终结论区
+   ============================================================ */
+.conclusion {
+  display: none;
+  padding: 26px;
+  margin-bottom: 22px;
+}
+.conclusion.show { display: block; animation: slideUp .5s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.conclusion-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 17px; font-weight: 700;
+  margin-bottom: 16px;
+}
+.conclusion-title .tag {
+  font-size: 11px; font-weight: 700;
+  background: linear-gradient(135deg, var(--blue), #8B5CF6);
+  padding: 3px 12px; border-radius: 999px;
+  color: #fff;
+}
+
+.conclusion-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.conclusion-box h4 { font-size: 13.5px; color: var(--blue); margin-bottom: 10px; }
+.conclusion-box ul { padding-left: 20px; font-size: 13.5px; line-height: 2; }
+.conclusion-box li::marker { color: var(--blue); }
+
+/* 醒目"正确决策"区块（霓虹渐变描边 + 辉光） */
+.decision-box {
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 18px 20px;
+  background: linear-gradient(rgba(24, 32, 52, 0.85), rgba(24, 32, 52, 0.85)) padding-box,
+              linear-gradient(135deg, var(--green), var(--blue), #8B5CF6) border-box;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.9;
+  box-shadow: 0 6px 28px rgba(74,222,128,.14), 0 0 34px rgba(59,130,246,.12);
+  animation: glow 2.2s ease-in-out infinite;
+}
+.decision-box .db-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 6px;
+}
+@keyframes glow {
+  0%, 100% { box-shadow: 0 6px 28px rgba(74,222,128,.14), 0 0 34px rgba(59,130,246,.12); }
+  50% { box-shadow: 0 6px 36px rgba(74,222,128,.24), 0 0 46px rgba(59,130,246,.2); }
+}
+
+/* ============================================================
+   日志面板
+   ============================================================ */
+.log-panel { overflow: hidden; }
+.log-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.log-head h3 { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.log-head .dot-live { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.log-head .log-actions { display: flex; gap: 8px; }
+.log-body {
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.9;
+  background: rgba(0,0,0,0.28);
+}
+.log-body.collapsed { display: none; }
+.log-line { display: flex; gap: 8px; word-break: break-all; }
+.log-time { color: var(--text-2); flex-shrink: 0; }
+.log-tag { flex-shrink: 0; font-weight: 700; min-width: 40px; }
+.log-tag.info { color: var(--blue); }
+.log-tag.ok { color: var(--green); }
+.log-tag.err { color: var(--red); }
+.log-tag.api { color: var(--yellow); }
+.log-msg { color: var(--text-2); }
+
+/* ============================================================
+   设置弹窗（iOS 毛玻璃）
+   ============================================================ */
+.modal-mask {
+  display: none;
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(5,8,15,0.7);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-mask.show { display: flex; }
+.modal {
+  width: 100%; max-width: 540px;
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 22px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.15);
+  padding: 26px;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+.modal h2 { font-size: 17px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.modal .modal-sub { font-size: 12px; color: var(--text-2); margin-bottom: 18px; }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12.5px; color: var(--text-2); margin-bottom: 6px; font-weight: 600; }
+.field label small { font-weight: 400; opacity: .75; margin-left: 4px; }
+.field input, .field select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--mono);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 14px rgba(59,130,246,.3); }
+.field input::placeholder { color: rgba(154,164,178,.5); }
+.field select { cursor: pointer; }
+.field select option { background: #151B2C; color: var(--text); }
+
+/* 模型获取行：下拉 + 获取按钮 */
+.model-row { display: flex; gap: 8px; }
+.model-row select { flex: 1; min-width: 0; }
+/* 获取状态提示 */
+.mstatus { font-size: 11.5px; margin-top: 5px; min-height: 15px; }
+.mstatus.ok { color: var(--green); }
+.mstatus.err { color: var(--red); }
+.mstatus.loading { color: var(--yellow); }
+
+.modal .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* 安全提示条 */
+.sec-note {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: rgba(251,191,36,.1);
+  border: 1px solid rgba(251,191,36,.28);
+  color: var(--yellow);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+/* 全流程状态条 */
+.run-status {
+  display: none;
+  align-items: center; gap: 10px;
+  padding: 13px 20px;
+  border-radius: 14px;
+  background: rgba(59,130,246,.12);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(59,130,246,.4);
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+.run-status.show { display: flex; }
+.run-status .spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(59,130,246,.3);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   响应式适配
+   ============================================================ */
+@media (max-width: 720px) {
+  .header { flex-direction: column; align-items: flex-start; }
+  .progress-bar::before, .progress-bar .line-fill { left: 5%; right: 5%; }
+  .p-node .p-label { font-size: 10px; }
+  .p-node .dot { width: 28px; height: 28px; font-size: 11px; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .drop-zone { padding: 30px 14px; }
+  .brand h1 { font-size: 16px; }
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.28); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== 顶栏 ===================== -->
+  <header class="header panel">
+    <div class="brand">
+      <div class="brand-icon">📝</div>
+      <div>
+        <h1>多AI作业答案共识校验系统</h1>
+        <p>Gemini → ChatGPT → Claude → Grok → Gemini 五步交叉批改作业答案</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <!-- 模拟 / 真实 一键切换 -->
+      <div class="mode-switch" id="modeSwitch">
+        <span id="modeLabel">模拟模式</span>
+        <label class="switch" title="切换到真实API模式">
+          <input type="checkbox" id="modeToggle">
+          <span class="track"></span>
+        </label>
+        <span class="badge" id="modeBadge">MOCK</span>
+      </div>
+      <button class="btn" id="openSettingsBtn" title="配置各模型 API Key 与模型名">⚙️ API设置</button>
+    </div>
+  </header>
+
+  <!-- ===================== 上传区 ===================== -->
+  <section class="upload-panel panel">
+    <div class="drop-zone" id="dropZone">
+      <div class="dz-icon">📚</div>
+      <div class="dz-title">拖拽作业题目 / 答题过程截图到这里，或点击选择文件</div>
+      <div class="dz-sub">支持 JPG / PNG / WEBP，最大 10MB（前端自动压缩后提交）</div>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" hidden>
+    </div>
+
+    <!-- 上传预览 & 操作 -->
+    <div class="preview-box" id="previewBox">
+      <div class="preview-img-wrap">
+        <img id="previewImg" alt="预览图">
+      </div>
+      <div class="preview-info">
+        <div class="file-name" id="fileName">-</div>
+        <div class="file-meta" id="fileMeta">-</div>
+        <div class="action-row">
+          <button class="btn btn-primary" id="startBtn">🚀 开始五步校验</button>
+          <button class="btn" id="changeImgBtn">🔄 更换图片</button>
+          <button class="btn btn-danger" id="cancelBtn" style="display:none">⏹ 停止</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 全流程状态条 ===================== -->
+  <div class="run-status" id="runStatus">
+    <div class="spinner"></div>
+    <span id="runStatusText">正在执行第 1/5 步：Gemini 识别题目…</span>
+  </div>
+
+  <!-- ===================== 步骤进度条 ===================== -->
+  <section class="progress-wrap panel" id="progressWrap">
+    <div class="progress-bar">
+      <div class="line-fill" id="lineFill"></div>
+      <!-- 5 个节点 -->
+      <div class="p-node" data-step="0"><div class="dot">1</div><div class="p-label">Gemini<br>识别题目</div></div>
+      <div class="p-node" data-step="1"><div class="dot">2</div><div class="p-label">ChatGPT<br>批改审核</div></div>
+      <div class="p-node" data-step="2"><div class="dot">3</div><div class="p-label">Claude<br>二次复核</div></div>
+      <div class="p-node" data-step="3"><div class="dot">4</div><div class="p-label">Grok<br>交叉验证</div></div>
+      <div class="p-node" data-step="4"><div class="dot">5</div><div class="p-label">Gemini<br>汇总答案</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== 步骤卡片 ===================== -->
+  <section class="steps-grid" id="stepsGrid"></section>
+
+  <!-- ===================== 最终结论 ===================== -->
+  <section class="conclusion panel" id="conclusion">
+    <div class="conclusion-title">🏁 最终作业答案 <span class="tag">5-AI CONSENSUS</span></div>
+    <div id="conclusionContent"></div>
+  </section>
+
+  <!-- ===================== 日志面板 ===================== -->
+  <section class="log-panel panel">
+    <div class="log-head" id="logHead">
+      <h3><span class="dot-live"></span> 实时日志</h3>
+      <div class="log-actions">
+        <button class="btn btn-sm" id="clearLogBtn">清空</button>
+        <button class="btn btn-sm" id="toggleLogBtn">收起</button>
+      </div>
+    </div>
+    <div class="log-body" id="logBody"></div>
+  </section>
+</div>
+
+<!-- ===================== API 设置弹窗 ===================== -->
+<div class="modal-mask" id="settingsModal">
+  <div class="modal">
+    <h2>⚙️ API 配置</h2>
+    <div class="modal-sub">真实模式下调用各厂商接口。Key 仅保存在本地浏览器（localStorage）。填写 Key 后可点击"🔄 获取"从各厂商 API 拉取可用模型列表。</div>
+
+    <div class="sec-note">⚠️ 注意：真实模式会向各 AI 厂商发送你的图片与数据。请确认图片内容允许外发。调用会产生 API 费用，费用由各厂商计费。</div>
+
+    <div class="field">
+      <label>🌐 运行模式 <small>切换后立即生效</small></label>
+      <select id="cfgMode">
+        <option value="mock">模拟模式（内置假数据，适合调试 UI）</option>
+        <option value="real">真实模式（需填写下方 API Key）</option>
+      </select>
+    </div>
+
+    <!-- Gemini -->
+    <div class="field">
+      <label>🤖 Gemini API Key <small>Google AI Studio 获取</small></label>
+      <input type="password" id="cfgGeminiKey" placeholder="AIza...">
+    </div>
+    <div class="field">
+      <label>Gemini 模型 <small>从 API 获取</small></label>
+      <div class="model-row">
+        <select id="cfgGeminiModel"><option value="">— 点击右侧获取 —</option></select>
+        <button class="btn btn-sm" type="button" data-fetch="gemini">🔄 获取</button>
+      </div>
+      <div class="mstatus" id="modelStatus-gemini"></div>
+    </div>
+
+    <!-- OpenAI -->
+    <div class="field">
+      <label>💬 ChatGPT (OpenAI) API Key</label>
+      <input type="password" id="cfgOpenAIKey" placeholder="sk-...">
+    </div>
+    <div class="field">
+      <label>ChatGPT 模型 <small>从 API 获取（自动过滤视觉/对话模型）</small></label>
+      <div class="model-row">
+        <select id="cfgOpenAIModel"><option value="">— 点击右侧获取 —</option></select>
+        <button class="btn btn-sm" type="button" data-fetch="openai">🔄 获取</button>
+      </div>
+      <div class="mstatus" id="modelStatus-openai"></div>
+    </div>
+
+    <!-- Anthropic -->
+    <div class="field">
+      <label>🎨 Claude (Anthropic) API Key</label>
+      <input type="password" id="cfgClaudeKey" placeholder="sk-ant-...">
+    </div>
+    <div class="field">
+      <label>Claude 模型 <small>从 API 获取</small></label>
+      <div class="model-row">
+        <select id="cfgClaudeModel"><option value="">— 点击右侧获取 —</option></select>
+        <button class="btn btn-sm" type="button" data-fetch="claude">🔄 获取</button>
+      </div>
+      <div class="mstatus" id="modelStatus-claude"></div>
+    </div>
+
+    <!-- xAI -->
+    <div class="field">
+      <label>🚀 Grok (xAI) API Key</label>
+      <input type="password" id="cfgGrokKey" placeholder="xai-...">
+    </div>
+    <div class="field">
+      <label>Grok 模型 <small>从 API 获取</small></label>
+      <div class="model-row">
+        <select id="cfgGrokModel"><option value="">— 点击右侧获取 —</option></select>
+        <button class="btn btn-sm" type="button" data-fetch="grok">🔄 获取</button>
+      </div>
+      <div class="mstatus" id="modelStatus-grok"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" id="clearKeysBtn">清除全部 Key</button>
+      <button class="btn" id="closeSettingsBtn">取消</button>
+      <button class="btn btn-primary" id="saveSettingsBtn">💾 保存配置</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   多AI作业答案共识校验系统 —— 核心逻辑
+   流程：上传作业题截图 → Gemini识别题目 → ChatGPT批改审核
+        → Claude二次复核 → Grok交叉验证 → Gemini汇总最终答案
+   特性：模型列表从各厂商 API 动态获取（下拉选择）
+   ============================================================ */
+'use strict';
+
+/* ---------- 1. 全局配置 ---------- */
+const CONFIG = {
+  // 各模型默认名称（拉取失败时的兜底值）
+  geminiModel: 'gemini-2.5-flash',
+  openaiModel: 'gpt-4o',
+  claudeModel: 'claude-sonnet-4-20250514',
+  grokModel: 'grok-2-vision-1212',
+  // 图片压缩参数
+  maxImageEdge: 1024,
+  jpegQuality: 0.85,
+  // 模拟模式下每步的延迟（毫秒）
+  mockDelays: [1400, 1600, 1800, 1700, 2000],
+};
+
+/* 厂商元数据：key 字段名、下拉 select id、状态区 id */
+const VENDORS = {
+  gemini: { keyField: 'geminiKey', modelField: 'geminiModel', select: 'cfgGeminiModel', status: 'modelStatus-gemini', label: 'Gemini' },
+  openai: { keyField: 'openAIKey', modelField: 'openaiModel', select: 'cfgOpenAIModel', status: 'modelStatus-openai', label: 'ChatGPT' },
+  claude: { keyField: 'claudeKey', modelField: 'claudeModel', select: 'cfgClaudeModel', status: 'modelStatus-claude', label: 'Claude' },
+  grok:   { keyField: 'grokKey',   modelField: 'grokModel',   select: 'cfgGrokModel',   status: 'modelStatus-grok',   label: 'Grok' },
+};
+
+/* ---------- 2. 运行时状态 ---------- */
+const state = {
+  mode: 'mock',            // 'mock' | 'real'
+  imageBase64: null,
+  imageMime: null,
+  imageDataUrl: null,
+  fileName: '',
+  fileSize: 0,
+  results: [null, null, null, null, null],
+  running: false,
+  abort: false,
+  logs: [],
+};
+
+/* ---------- 3. 步骤元数据（作业批改场景提示词） ---------- */
+const STEPS = [
+  {
+    id: 'gemini1', title: 'Gemini 识别题目', sub: '识别题型、考点与初步思路',
+    icon: '🔍',
+    prompt: (img) => `你是一名经验丰富的作业批改助手。请识别并分析这张作业题/答题过程图片，输出：
+1. 【题目识别】题型（数学/物理/化学/语文/英语等）、难度、考察的知识点；
+2. 【关键信息】题干摘录、已知条件、数据或选项（如有）；
+3. 【初步思路】若图片是题目：给出解题思路；若图片是答题过程：点评其步骤是否清晰合理。
+请结构化输出，标注【题目识别】【关键信息】【初步思路】三部分。`,
+  },
+  {
+    id: 'chatgpt', title: 'ChatGPT 批改审核', sub: '以批改老师视角找错与补漏',
+    icon: '💬',
+    prompt: (img, prev) => `以下是一位 AI 对这道作业题的分析：\n\n<分析内容>\n${prev || '（无）'}\n</分析内容>\n\n请以"批改老师"身份审核该分析与解题过程，要求：
+1. 【错误与偏差】指出解答中的计算错误、公式误用、概念性偏差（务必逐项核对数值）；
+2. 【遗漏步骤】指出缺失的必要步骤：定义域/取值范围、单位、验证、分类讨论等；
+3. 【总体评价】给出分数段评价（满分/优秀/良好/需订正）与修改建议；若原解答错误，给出正确思路。
+请结构化输出，标注【错误与偏差】【遗漏步骤】【总体评价】三部分。`,
+  },
+  {
+    id: 'claude', title: 'Claude 二次复核', sub: '第三方视角交叉比对答案',
+    icon: '🎨',
+    prompt: (img, prev) => {
+      prev = prev || [];
+      return `以下是两位 AI 对同一道作业题的分析记录：\n\n<记录一>\n${prev[0] || '（无）'}\n</记录一>\n\n<记录二>\n${prev[1] || '（无）'}\n</记录二>\n\n请以独立第三方视角复核这道作业题：
+1. 【共识】指出两份分析中相互印证、更可能正确的结论与最终答案；
+2. 【存疑】指出两份分析矛盾之处（尤其最终答案数字不一致时，逐项核算谁对谁错）；
+3. 【独立判断】给出你的最终答案判定，并说明哪种解法更优、更符合考试标准。
+请结构化输出，标注【共识】【存疑】【独立判断】三部分。`;
+    },
+  },
+  {
+    id: 'grok', title: 'Grok 交叉验证', sub: '标记易错点与最终答案置信度',
+    icon: '🚀',
+    prompt: (img, prev) => {
+      prev = prev || [];
+      return `以下是三位 AI 对同一道作业题的分析记录：\n\n<记录一>\n${prev[0] || '（无）'}\n</记录一>\n\n<记录二>\n${prev[1] || '（无）'}\n</记录二>\n\n<记录三>\n${prev[2] || '（无）'}\n</记录三>\n\n请作为最终验证者交叉验证这道作业题：
+1. 【风险点】标记易错点与陷阱：计算失误风险、审题陷阱（如区间开闭、单位、符号）、过度自信的结论；
+2. 【置信度】对最终答案逐项给出置信度（高/中/低）并说明依据；
+3. 【最终答案】给出确认后的最终答案与关键步骤。
+请结构化输出，标注【风险点】【置信度】【最终答案】三部分。`;
+    },
+  },
+  {
+    id: 'gemini2', title: 'Gemini 汇总答案', sub: '融合全部意见输出最终结论',
+    icon: '🏁',
+    prompt: (img, prev) => {
+      prev = prev || [];
+      return `以下是四位 AI 对同一道作业题的完整分析链（识别 + 三次批改复核）：\n\n<初析>\n${prev[0] || '（无）'}\n</初析>\n\n<批改一>\n${prev[1] || '（无）'}\n</批改一>\n\n<复核二>\n${prev[2] || '（无）'}\n</复核二>\n\n<验证三>\n${prev[3] || '（无）'}\n</验证三>\n\n请综合所有意见，输出这道作业题的最终结论，格式必须包含：
+1. 一个无序列表（"- "开头），列出最终确定的答案、关键步骤与易错提醒；
+2. 一个醒目的"正确路径/正确决策"区块，用 "【正确决策】" 开头并加粗，给出最终答案与最推荐的解题路径（含关键步骤要点）。`;
+    },
+  },
+];
+
+/* ---------- 4. 工具函数 ---------- */
+
+function nowTime() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/** 极简 Markdown → HTML 渲染器 */
+function mdToHtml(md) {
+  if (!md) return '';
+  const lines = String(md).split(/\r?\n/);
+  let html = '', inList = false;
+  for (let raw of lines) {
+    const line = raw.trimEnd();
+    let esc = escapeHtml(line);
+    esc = esc.replace(/`([^`]+)`/g, '<code>$1</code>');
+    esc = esc.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    esc = esc.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    let m = esc.match(/^(#{1,4})\s+(.*)/);
+    if (m) {
+      if (inList) { html += '</ul>'; inList = false; }
+      const lv = m[1].length + 2;
+      html += `<h${Math.min(lv, 4)}>${m[2]}</h${Math.min(lv, 4)}>`;
+      continue;
+    }
+    m = esc.match(/^\s*[-*•]\s+(.*)/);
+    if (m) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      html += `<li>${m[1]}</li>`;
+      continue;
+    }
+    m = esc.match(/^\s*\d+[.、)]\s*(.*)/);
+    if (m) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<div style="padding-left:6px">${esc}</div>`;
+      continue;
+    }
+    m = esc.match(/^&gt;\s*(.*)/);
+    if (m) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<blockquote>${m[1]}</blockquote>`;
+      continue;
+    }
+    if (/^[-=]{3,}$/.test(line)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += '<hr style="border:none;border-top:1px solid var(--line);margin:8px 0">';
+      continue;
+    }
+    if (line.trim() === '') {
+      if (inList) { html += '</ul>'; inList = false; }
+      continue;
+    }
+    if (inList) { html += '</ul>'; inList = false; }
+    html += `<div>${esc}</div>`;
+  }
+  if (inList) html += '</ul>';
+  return html;
+}
+
+/** 日志 */
+function log(tag, msg) {
+  const entry = { time: nowTime(), tag, msg: String(msg) };
+  state.logs.push(entry);
+  renderLogs();
+}
+
+function renderLogs() {
+  const body = document.getElementById('logBody');
+  body.innerHTML = state.logs.map(e =>
+    `<div class="log-line"><span class="log-time">${e.time}</span><span class="log-tag ${e.tag}">${e.tag.toUpperCase()}</span><span class="log-msg">${escapeHtml(e.msg)}</span></div>`
+  ).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+function sleep(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+/** 通用 JSON GET 请求（供模型列表拉取） */
+async function getJson(url, headers = {}) {
+  const resp = await fetch(url, { headers });
+  if (!resp.ok) {
+    let detail = '';
+    try { detail = JSON.stringify(await resp.json()).slice(0, 200); } catch (_) {}
+    throw new Error(`HTTP ${resp.status} ${detail || resp.statusText}`);
+  }
+  return resp.json();
+}
+
+/* ---------- 5. 模型列表获取（从各厂商 API 拉取） ---------- */
+
+/** 模拟模式的假模型列表（便于无 Key 时调试 UI） */
+const MOCK_MODELS = {
+  gemini: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'],
+  openai: ['gpt-4o', 'gpt-4o-mini', 'gpt-4.1', 'gpt-4.1-mini', 'o3-mini'],
+  claude: ['claude-sonnet-4-20250514', 'claude-opus-4-20250514', 'claude-haiku-4-20250514'],
+  grok:   ['grok-2-vision-1212', 'grok-4', 'grok-3-mini'],
+};
+
+/**
+ * 从各厂商 API 获取可用模型列表
+ * @param {string} vendor 'gemini' | 'openai' | 'claude' | 'grok'
+ * @returns {Promise<string[]>} 模型 id 数组
+ */
+async function fetchVendorModels(vendor) {
+  // 模拟模式：返回内置假列表
+  if (state.mode === 'mock') {
+    await sleep(600);
+    return MOCK_MODELS[vendor] || [];
+  }
+
+  const key = settings[VENDORS[vendor].keyField].trim();
+  if (!key) throw new Error('请先填写该厂商 API Key');
+
+  switch (vendor) {
+    case 'gemini': {
+      // Google Generative AI: GET /v1beta/models?key=xxx
+      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`;
+      const data = await getJson(url);
+      return (data.models || [])
+        .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+        .map(m => m.name.replace(/^models\//, ''));
+    }
+    case 'openai': {
+      // OpenAI: GET /v1/models（过滤出对话/视觉模型，排除 embedding/tts/whisper 等）
+      const data = await getJson('https://api.openai.com/v1/models', { Authorization: `Bearer ${key}` });
+      return (data.data || [])
+        .map(m => m.id)
+        .filter(id => /^(gpt-4|gpt-4o|gpt-4\.1|gpt-4\.5|o1|o3|o4|chatgpt-)/i.test(id));
+    }
+    case 'claude': {
+      // Anthropic: GET /v1/models（新版端点；旧版 /v1/models 已支持）
+      const data = await getJson('https://api.anthropic.com/v1/models', {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+      });
+      return (data.data || []).map(m => m.id).filter(Boolean);
+    }
+    case 'grok': {
+      // xAI: GET /v1/models（兼容 OpenAI 格式）
+      const data = await getJson('https://api.x.ai/v1/models', { Authorization: `Bearer ${key}` });
+      return (data.data || []).map(m => m.id).filter(Boolean);
+    }
+    default:
+      throw new Error('未知厂商: ' + vendor);
+  }
+}
+
+/**
+ * 刷新某个厂商的下拉模型列表
+ * @param {string} vendor
+ * @param {boolean} auto 是否自动调用（静默模式，不弹错误）
+ */
+async function refreshModelList(vendor, auto = false) {
+  const meta = VENDORS[vendor];
+  const btn = document.querySelector(`[data-fetch="${vendor}"]`);
+  const status = document.getElementById(meta.status);
+  const sel = document.getElementById(meta.select);
+  const cur = settings[meta.modelField]; // 当前保存的模型
+
+  btn.disabled = true;
+  btn.textContent = '⏳ 获取中…';
+  status.className = 'mstatus loading';
+  status.textContent = auto ? '正在获取可用模型…' : '';
+
+  try {
+    const models = await fetchVendorModels(vendor);
+    if (!models.length) throw new Error('该 API 未返回可用模型');
+    // 重建下拉选项
+    sel.innerHTML = models.map(id => `<option value="${escapeHtml(id)}">${escapeHtml(id)}</option>`).join('');
+    // 保留当前选择（若还在列表中）；否则置顶为"自定义"
+    if (cur && models.includes(cur)) {
+      sel.value = cur;
+    } else if (cur) {
+      sel.insertAdjacentHTML('afterbegin', `<option value="${escapeHtml(cur)}">${escapeHtml(cur)}（自定义）</option>`);
+      sel.value = cur;
+    }
+    status.className = 'mstatus ok';
+    status.textContent = `✓ 已获取 ${models.length} 个可用模型`;
+    log('ok', `${meta.label} 模型列表获取成功（${models.length} 个）`);
+  } catch (err) {
+    status.className = 'mstatus err';
+    status.textContent = `✗ ${err.message}`;
+    if (!auto) log('err', `获取 ${meta.label} 模型列表失败：${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔄 获取';
+  }
+}
+
+/* ---------- 6. 图片上传与压缩 ---------- */
+
+function handleFile(file) {
+  if (!file) return;
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    alert('仅支持 JPG / PNG / WEBP 格式图片');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert('图片大小不能超过 10MB');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, CONFIG.maxImageEdge / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', CONFIG.jpegQuality);
+      const base64 = dataUrl.split(',')[1];
+
+      state.imageDataUrl = dataUrl;
+      state.imageBase64 = base64;
+      state.imageMime = 'image/jpeg';
+      state.fileName = file.name;
+      state.fileSize = dataUrl.length;
+
+      document.getElementById('previewImg').src = dataUrl;
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileMeta').textContent =
+        `原始: ${(file.size / 1024).toFixed(1)} KB → 压缩: ${(state.fileSize / 1024).toFixed(1)} KB（Base64） · ${w}×${h}`;
+      document.getElementById('previewBox').classList.add('show');
+      document.getElementById('startBtn').disabled = false;
+      log('info', `图片已加载：${file.name}，压缩后 ${(state.fileSize/1024).toFixed(1)} KB`);
+    };
+    img.onerror = () => alert('图片解析失败，请更换文件');
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---------- 7. API 调用封装（真实模式） ---------- */
+
+async function apiRequest(url, headers, body, label, extract) {
+  const t0 = performance.now();
+  log('api', `${label} 请求发送 → ${url}`);
+  let resp;
+  try {
+    resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    throw new Error(`${label} 网络错误：${err.message}`);
+  }
+  const cost = ((performance.now() - t0) / 1000).toFixed(1);
+  if (!resp.ok) {
+    let detail = '';
+    try {
+      const j = await resp.json();
+      detail = JSON.stringify(j).slice(0, 300);
+    } catch (_) { detail = await resp.text().then(t => t.slice(0, 200)).catch(() => ''); }
+    throw new Error(`${label} HTTP ${resp.status}：${detail || resp.statusText}`);
+  }
+  const data = await resp.json();
+  const text = extract(data);
+  log('api', `${label} 响应完成（${cost}s），正文 ${text.length} 字符`);
+  return text;
+}
+
+async function callGemini1() {
+  const prompt = STEPS[0].prompt();
+  if (state.mode === 'mock') return await mockCall(0, prompt);
+  const key = settings.geminiKey.trim();
+  if (!key) throw new Error('未配置 Gemini API Key，请打开 API 设置');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${settings.geminiModel}:generateContent?key=${encodeURIComponent(key)}`;
+  const body = {
+    contents: [{
+      parts: [
+        { text: prompt },
+        { inline_data: { mime_type: state.imageMime, data: state.imageBase64 } },
+      ],
+    }],
+  };
+  return apiRequest(url, {}, body, 'Gemini(步骤1)',
+    (d) => d?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '（空响应）');
+}
+
+async function callChatGPT(prev) {
+  const prompt = STEPS[1].prompt(null, prev);
+  if (state.mode === 'mock') return await mockCall(1, prompt);
+  const key = settings.openAIKey.trim();
+  if (!key) throw new Error('未配置 ChatGPT API Key，请打开 API 设置');
+  const url = 'https://api.openai.com/v1/chat/completions';
+  const body = {
+    model: settings.openaiModel,
+    max_tokens: 1500,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: state.imageDataUrl, detail: 'high' } },
+      ],
+    }],
+  };
+  return apiRequest(url, { Authorization: `Bearer ${key}` }, body, 'ChatGPT(步骤2)',
+    (d) => d?.choices?.[0]?.message?.content || '（空响应）');
+}
+
+async function callClaude(prev) {
+  const prompt = STEPS[2].prompt(null, prev);
+  if (state.mode === 'mock') return await mockCall(2, prompt);
+  const key = settings.claudeKey.trim();
+  if (!key) throw new Error('未配置 Claude API Key，请打开 API 设置');
+  const url = 'https://api.anthropic.com/v1/messages';
+  const body = {
+    model: settings.claudeModel,
+    max_tokens: 1500,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt },
+        { type: 'image', source: { type: 'base64', media_type: state.imageMime, data: state.imageBase64 } },
+      ],
+    }],
+  };
+  return apiRequest(url,
+    { 'x-api-key': key, 'anthropic-version': '2023-06-01' }, body, 'Claude(步骤3)',
+    (d) => d?.content?.filter(b => b.type === 'text').map(b => b.text).join('') || '（空响应）');
+}
+
+async function callGrok(prev) {
+  const prompt = STEPS[3].prompt(null, prev);
+  if (state.mode === 'mock') return await mockCall(3, prompt);
+  const key = settings.grokKey.trim();
+  if (!key) throw new Error('未配置 Grok API Key，请打开 API 设置');
+  const url = 'https://api.x.ai/v1/chat/completions';
+  const body = {
+    model: settings.grokModel,
+    max_tokens: 1500,
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: prompt },
+        { type: 'image_url', image_url: { url: state.imageDataUrl, detail: 'high' } },
+      ],
+    }],
+  };
+  return apiRequest(url, { Authorization: `Bearer ${key}` }, body, 'Grok(步骤4)',
+    (d) => d?.choices?.[0]?.message?.content || '（空响应）');
+}
+
+async function callGemini2(prev) {
+  const prompt = STEPS[4].prompt(null, prev);
+  if (state.mode === 'mock') return await mockCall(4, prompt);
+  const key = settings.geminiKey.trim();
+  if (!key) throw new Error('未配置 Gemini API Key，请打开 API 设置');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${settings.geminiModel}:generateContent?key=${encodeURIComponent(key)}`;
+  const body = {
+    contents: [{
+      parts: [
+        { text: prompt },
+        { inline_data: { mime_type: state.imageMime, data: state.imageBase64 } },
+      ],
+    }],
+  };
+  return apiRequest(url, {}, body, 'Gemini(步骤5)',
+    (d) => d?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '（空响应）');
+}
+
+/* ---------- 8. 模拟模式 ---------- */
+
+/* 模拟数据（演示题：f(x)=x³-3x+1 在 [-2,2] 上的最值） */
+const MOCK_DATA = [
+  `【题目识别】
+
+- **题型**：高中数学 / 导数与函数最值（大题第（2）问难度）
+- **考点**：导数求单调区间、极值判定、闭区间最值比较
+- **题目**：求 f(x) = x³ - 3x + 1 在区间 [-2, 2] 上的最大值与最小值
+
+【关键信息】
+
+- f'(x) = 3x² - 3 = 3(x² - 1)，驻点 x = ±1（均在区间内）
+- 需比较端点值 f(-2)、f(2) 与极值 f(-1)、f(1)
+
+【初步思路】
+
+- 思路正确：闭区间最值只可能在驻点或端点取得
+- 初步估算：f(-2)=-1，f(-1)=3，f(1)=-1，f(2)=3 → 最大值 3，最小值 -1`,
+  `【错误与偏差】
+
+- 无原则性错误：求导正确、驻点计算正确、端点值计算无误；
+- 过程跳跃：未先说明单调性就直接比较各点值，考试中会扣"过程分"；
+- 表述不严谨：未明确指出"两个点同时取得最值"。
+
+【遗漏步骤】
+
+- 遗漏：f'(x) 符号表 → 单调性（x < -1 递增、-1 < x < 1 递减、x > 1 递增）；
+- 遗漏：最后的"综上"结论句（须写明取得最值的 x 值）。
+
+【总体评价】
+
+- 答案正确（最大 3、最小 -1），但过程不够完整；
+- 评分建议：**良好**（过程完整则满分）；补充符号表后即为标准满分答法。`,
+  `【共识】
+
+- 两位 AI 均得出：最大值 3（x=-1 或 x=2 处），最小值 -1（x=1 或 x=-2 处）；
+- 求导、驻点、端点值完全一致，答案互证，可信度高。
+
+【存疑】
+
+- 无答案数值矛盾；唯一分歧是"是否必须写单调性符号表"，属于评分风格而非正确性问题；
+- 步骤1 说"最大值 3"，步骤2 也确认 3，一致。
+
+【独立判断】
+
+- **最终答案**：最大值 3、最小值 -1；
+- **更优解法**：列出导数符号表（区间分段标注 +/−），结合端点比较，是考试标准答法；
+- 注意：本题 f 图像关于点 (0,1) 中心对称，最值成对出现，可作为验算手段。`,
+  `【风险点】
+
+- ⚠️ 高：最值对应点易写反——x=-1 与 x=2 同时取最大值 3，若只写一个点会扣分；
+- ⚠️ 中：若审题不清把区间看成开区间 (-2,2)，端点值将失效（本题闭区间，无影响）；
+- ⚠️ 低：书写"最大值对应点"时注意 f(2)=3 是端点值，非极值。
+
+【置信度】
+
+- 最大值 3 / 最小值 -1：高（98%）✓
+- 求导与驻点 x=±1：高 ✓
+- 单调性结论：高 ✓
+
+【最终答案】
+
+- **最大值 3**（x=-1 或 x=2 时取得）
+- **最小值 -1**（x=1 或 x=-2 时取得）
+- 关键步骤：求导 → 驻点 → 符号表定单调 → 比较端点与极值 → 下结论`,
+  `- **最终答案**：f(x) 在 [-2,2] 上最大值为 **3**，最小值为 **-1**（四模型一致，置信度 98%）。
+- **关键步骤**：f'(x) = 3(x²-1)，驻点 x=±1 均在区间内；f(-2)=-1、f(-1)=3、f(1)=-1、f(2)=3。
+- **解题要点**：最值 = max(端点值, 极值)；本题由对称性，最大值在 x=-1 与 x=2 同时取得。
+- **易错提醒**：勿漏比端点值；勿把最值对应点只写一个；写单调性符号表更显严谨、不扣过程分。
+- **评分参考**：答案正确，过程若含符号表即为标准满分答法。
+
+【正确决策】
+
+- **最终答案**：最大值 **3**（x=-1 或 x=2），最小值 **-1**（x=1 或 x=-2）。
+- **推荐解题路径**：① 求导 f'(x)=3x²-3 → ② 求驻点 x=±1 → ③ 列符号表判断单调性 → ④ 比较 f(-2)、f(-1)、f(1)、f(2) → ⑤ 下结论并检查端点是否漏写。`,
+];
+
+/**
+ * 模拟调用：记录"请求/响应"摘要日志并返回假数据
+ */
+async function mockCall(stepIndex, prompt) {
+  const delay = CONFIG.mockDelays[stepIndex] || 1500;
+  const label = `模拟[${STEPS[stepIndex].title}]`;
+  log('api', `${label} 请求发送（mock，延迟 ${delay}ms）`);
+  await sleep(delay);
+  const data = MOCK_DATA[stepIndex] || '（模拟数据缺失）';
+  log('api', `${label} 响应完成（模拟），正文 ${data.length} 字符`);
+  return data;
+}
+
+/* ---------- 9. 流程编排（串行执行 5 步） ---------- */
+
+async function runPipeline(fromStep = 0) {
+  if (state.running) return;
+  if (!state.imageBase64) { alert('请先上传图片'); return; }
+  if (state.mode === 'real' && !hasAllKeys()) {
+    alert('真实模式需要配置全部 4 个 API Key，请点击右上角"API 设置"完成配置');
+    return;
+  }
+
+  state.running = true;
+  state.abort = false;
+  for (let i = fromStep; i < 5; i++) state.results[i] = null;
+  document.getElementById('conclusion').classList.remove('show');
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('cancelBtn').style.display = 'inline-flex';
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('runStatus').classList.add('show');
+
+  const callers = [callGemini1, callChatGPT, callClaude, callGrok, callGemini2];
+
+  for (let i = fromStep; i < 5; i++) {
+    if (state.abort) break;
+    setStepState(i, 'running');
+    setProgress(i, 'running');
+    document.getElementById('runStatusText').textContent =
+      `正在执行第 ${i + 1}/5 步：${STEPS[i].title}…`;
+    log('info', `—— 开始第 ${i + 1} 步：${STEPS[i].title} ——`);
+    try {
+      const t0 = performance.now();
+      const prev = state.results.slice(0, i).filter(Boolean);
+      const text = await callers[i](prev.length ? prev : null);
+      state.results[i] = text;
+      const secs = ((performance.now() - t0) / 1000).toFixed(1);
+      setStepState(i, 'done', text, secs);
+      setProgress(i, 'done');
+      log('ok', `第 ${i + 1} 步完成（${secs}s），结果 ${text.length} 字符`);
+    } catch (err) {
+      const msg = err.message || String(err);
+      setStepState(i, 'failed', null, null, msg);
+      setProgress(i, 'failed');
+      log('err', `第 ${i + 1} 步失败：${msg}`);
+      break;
+    }
+  }
+
+  state.running = false;
+  document.getElementById('cancelBtn').style.display = 'none';
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('runStatus').classList.remove('show');
+
+  if (state.abort) {
+    log('info', '⏹ 流程已手动停止');
+    setProgress(-1, 'abort');
+    state.abort = false;
+    return;
+  }
+
+  if (state.results.every(Boolean)) {
+    setProgress(4, 'done');
+    renderConclusion(state.results[4]);
+    log('ok', '✅ 五步共识流程全部完成');
+  }
+}
+
+function hasAllKeys() {
+  return settings.geminiKey.trim() && settings.openAIKey.trim() &&
+         settings.claudeKey.trim() && settings.grokKey.trim();
+}
+
+/* ---------- 10. 步骤卡片 / 进度条 UI ---------- */
+
+function setStepState(i, st, text, secs, errMsg) {
+  const card = document.querySelector(`.step-card[data-step="${i}"]`);
+  if (!card) return;
+  card.className = `step-card panel ${st}`;
+
+  const badge = card.querySelector('.st-badge');
+  const badgeMap = {
+    wait:   ['等待中', 'wait'],
+    running:['进行中…', 'run'],
+    done:   ['已完成', 'ok'],
+    failed: ['失败', 'err'],
+  };
+  badge.textContent = badgeMap[st][0];
+  badge.className = `st-badge ${badgeMap[st][1]}`;
+
+  const out = card.querySelector('.output');
+  const foot = card.querySelector('.step-foot');
+  if (st === 'done') {
+    out.innerHTML = mdToHtml(text);
+    out.style.display = 'block';
+    foot.innerHTML = `<span class="step-cost">⏱ 耗时 <b>${secs}s</b></span>`;
+  } else if (st === 'failed') {
+    out.innerHTML = `<div style="color:var(--red)">❌ ${escapeHtml(errMsg || '未知错误')}</div>`;
+    out.style.display = 'block';
+    foot.innerHTML = `<button class="btn btn-danger" data-retry="${i}" style="padding:5px 12px;font-size:12px">🔄 重试本步</button>`;
+    foot.querySelector('button').addEventListener('click', () => {
+      state.results[i] = null;
+      setStepState(i, 'wait');
+      runPipeline(i);
+    });
+  } else if (st === 'wait') {
+    out.style.display = 'none';
+    foot.innerHTML = '';
+  }
+  if (st === 'running') {
+    foot.innerHTML = '<span class="step-cost">⏳ 正在调用 API…</span>';
+  }
+}
+
+function setProgress(i, st) {
+  const nodes = document.querySelectorAll('.p-node');
+  nodes.forEach(n => n.classList.remove('active', 'done', 'failed'));
+  const line = document.getElementById('lineFill');
+
+  if (st === 'abort') {
+    line.style.width = '0%';
+    return;
+  }
+  for (let k = 0; k < i; k++) nodes[k].classList.add('done');
+  if (i >= 0 && i < nodes.length) {
+    if (st === 'done') nodes[i].classList.add('done');
+    else if (st === 'failed') nodes[i].classList.add('failed');
+    else nodes[i].classList.add('active');
+  }
+  const fill = (i + (st === 'running' ? 0.5 : st === 'done' ? 1 : 0)) / 5 * 100;
+  line.style.width = `${Math.min(fill, 100)}%`;
+}
+
+function initSteps() {
+  const grid = document.getElementById('stepsGrid');
+  grid.innerHTML = STEPS.map((s, i) => `
+    <div class="step-card panel" data-step="${i}">
+      <div class="step-head">
+        <div class="step-no">${i + 1}</div>
+        <div class="step-title">
+          <h3>${s.icon} ${s.title}</h3>
+          <div class="step-sub">${s.sub}</div>
+        </div>
+        <span class="st-badge wait">等待中</span>
+      </div>
+      <div class="step-body">
+        <div class="prompt" style="display:none">${escapeHtml(s.prompt().slice(0, 120))}…</div>
+        <div class="output" style="display:none"></div>
+      </div>
+      <div class="step-foot"></div>
+    </div>
+  `).join('');
+}
+
+/** 渲染最终结论（无序列表 + 醒目正确决策区块） */
+function renderConclusion(text) {
+  const box = document.getElementById('conclusion');
+  const content = document.getElementById('conclusionContent');
+  let body = text;
+  let decision = '';
+  const m = text.match(/(?:【正确决策】|\*\*【正确决策】\*\*|正确决策[:：])[^\n]*\n?([\s\S]*)/);
+  if (m) {
+    decision = m[1].trim();
+    body = text.replace(m[0], '');
+  }
+
+  content.innerHTML = `
+    <div class="conclusion-box">
+      <h4>📋 关键结论（多模型共识批改）</h4>
+      ${mdToHtml(body)}
+    </div>
+    <div class="decision-box">
+      <div class="db-label">✅ 正确路径 / 正确决策</div>
+      <div>${mdToHtml(decision) || '（未检测到决策区块，请查看上方分析）'}</div>
+    </div>
+  `;
+  box.classList.add('show');
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ---------- 11. 设置面板 / 模式切换 ---------- */
+
+let settings = {
+  geminiKey: '',
+  openAIKey: '',
+  claudeKey: '',
+  grokKey: '',
+  geminiModel: CONFIG.geminiModel,
+  openaiModel: CONFIG.openaiModel,
+  claudeModel: CONFIG.claudeModel,
+  grokModel: CONFIG.grokModel,
+};
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('multi_ai_settings') || '{}');
+    settings = { ...settings, ...saved };
+  } catch (_) {}
+  document.getElementById('cfgGeminiKey').value = settings.geminiKey;
+  document.getElementById('cfgOpenAIKey').value = settings.openAIKey;
+  document.getElementById('cfgClaudeKey').value = settings.claudeKey;
+  document.getElementById('cfgGrokKey').value = settings.grokKey;
+  document.getElementById('cfgMode').value = state.mode;
+  // 模型下拉：先填充当前已保存值
+  Object.keys(VENDORS).forEach(v => {
+    const sel = document.getElementById(VENDORS[v].select);
+    sel.innerHTML = `<option value="${escapeHtml(settings[VENDORS[v].modelField])}">${escapeHtml(settings[VENDORS[v].modelField])}（已保存）</option>`;
+  });
+}
+
+function saveSettings() {
+  settings = {
+    geminiKey: document.getElementById('cfgGeminiKey').value.trim(),
+    openAIKey: document.getElementById('cfgOpenAIKey').value.trim(),
+    claudeKey: document.getElementById('cfgClaudeKey').value.trim(),
+    grokKey: document.getElementById('cfgGrokKey').value.trim(),
+    // 模型值从下拉读取
+    geminiModel: document.getElementById('cfgGeminiModel').value || CONFIG.geminiModel,
+    openaiModel: document.getElementById('cfgOpenAIModel').value || CONFIG.openaiModel,
+    claudeModel: document.getElementById('cfgClaudeModel').value || CONFIG.claudeModel,
+    grokModel: document.getElementById('cfgGrokModel').value || CONFIG.grokModel,
+  };
+  localStorage.setItem('multi_ai_settings', JSON.stringify(settings));
+  applyMode(settings.geminiKey ? 'real' : 'mock', true);
+}
+
+function applyMode(mode, silent = false) {
+  state.mode = mode;
+  const sw = document.getElementById('modeSwitch');
+  document.getElementById('modeToggle').checked = (mode === 'real');
+  document.getElementById('modeLabel').textContent = (mode === 'real') ? '真实模式' : '模拟模式';
+  document.getElementById('modeBadge').textContent = (mode === 'real') ? 'REAL' : 'MOCK';
+  sw.classList.toggle('real', mode === 'real');
+  document.getElementById('cfgMode').value = mode;
+  if (!silent) {
+    log('info', `运行模式已切换为：${mode === 'real' ? '🌐 真实模式' : '🧪 模拟模式'}`);
+  }
+}
+
+/* ---------- 12. 事件绑定 & 初始化 ---------- */
+
+function init() {
+  initSteps();
+  loadSettings();
+  applyMode(state.mode, true);
+
+  // ---- 上传 ----
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+  ['dragenter', 'dragover'].forEach(ev => dropZone.addEventListener(ev, (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  }));
+  ['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+  }));
+  dropZone.addEventListener('drop', (e) => {
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+
+  // ---- 操作按钮 ----
+  document.getElementById('startBtn').addEventListener('click', () => runPipeline(0));
+  document.getElementById('changeImgBtn').addEventListener('click', () => {
+    document.getElementById('previewBox').classList.remove('show');
+    fileInput.value = '';
+  });
+  document.getElementById('cancelBtn').addEventListener('click', () => {
+    state.abort = true;
+    log('info', '正在停止…');
+  });
+
+  // ---- 模式切换开关（顶栏） ----
+  document.getElementById('modeToggle').addEventListener('change', (e) => {
+    const mode = e.target.checked ? 'real' : 'mock';
+    if (mode === 'real' && !hasAllKeys()) {
+      alert('请先在"API 设置"中填写各模型 Key 再切换到真实模式');
+      e.target.checked = false;
+      return;
+    }
+    applyMode(mode);
+  });
+
+  // ---- 设置弹窗 ----
+  const modal = document.getElementById('settingsModal');
+  document.getElementById('openSettingsBtn').addEventListener('click', () => {
+    modal.classList.add('show');
+    // 打开时自动拉取各厂商模型列表（mock 模式直接给假列表，方便调试）
+    Object.keys(VENDORS).forEach(v => refreshModelList(v, true));
+  });
+  document.getElementById('closeSettingsBtn').addEventListener('click', () => modal.classList.remove('show'));
+
+  // 各厂商"获取模型"按钮
+  document.querySelectorAll('[data-fetch]').forEach(btn => {
+    btn.addEventListener('click', () => refreshModelList(btn.dataset.fetch));
+  });
+
+  document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+    saveSettings();
+    modal.classList.remove('show');
+    log('ok', '配置已保存（Key 仅存于本地浏览器）');
+  });
+  document.getElementById('clearKeysBtn').addEventListener('click', () => {
+    if (!confirm('确定清除全部 API Key？')) return;
+    ['cfgGeminiKey', 'cfgOpenAIKey', 'cfgClaudeKey', 'cfgGrokKey'].forEach(id =>
+      document.getElementById(id).value = '');
+    saveSettings();
+    alert('已清除全部 Key 并切回模拟模式');
+  });
+  document.getElementById('cfgMode').addEventListener('change', (e) => {
+    const mode = e.target.value;
+    if (mode === 'real' && !hasAllKeys()) {
+      alert('请先填写 4 个 API Key 再选择真实模式');
+      e.target.value = state.mode;
+      return;
+    }
+    applyMode(mode);
+  });
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+
+  // ---- 日志 ----
+  document.getElementById('clearLogBtn').addEventListener('click', () => {
+    state.logs = [];
+    renderLogs();
+  });
+  document.getElementById('toggleLogBtn').addEventListener('click', () => {
+    const body = document.getElementById('logBody');
+    body.classList.toggle('collapsed');
+    document.getElementById('toggleLogBtn').textContent = body.classList.contains('collapsed') ? '展开' : '收起';
+  });
+
+  log('info', '系统就绪，请上传作业截图开始五步校验');
+  log('info', `当前模式：${state.mode === 'mock' ? '🧪 模拟（内置假数据）' : '🌐 真实（调用各厂商 API）'}`);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
