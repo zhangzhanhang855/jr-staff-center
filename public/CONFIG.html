@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <!-- iOS 27 viewport: fit=cover 让底栏吃满安全区, interactive-widget 键盘弹出时自适应 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="color-scheme" content="light">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="企业协同办公">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="企业协同办公">
+  <title>企业协同办公系统 - 员工端工作台</title>
+
+  <!-- PWA & 图标 -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/apple-touch-icon-167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/apple-touch-icon-152.png">
+
+  <!-- PWA 启动屏（按机型媒体查询匹配） -->
+  <link rel="apple-touch-startup-image" href="splash/splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="splash/splash-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="splash/splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="splash/splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="splash/splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)">
+  <link rel="apple-touch-startup-image" href="splash/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+
+  <style>
+    /* ==========================================================================
+       1. GLOBAL DESIGN SYSTEM VARIABLES (iOS 27 增强)
+       ========================================================================== */
+    :root {
+      --color-primary-50: #eff6ff;
+      --color-primary-100: #dbeafe;
+      --color-primary-200: #bfdbfe;
+      --color-primary-300: #93c5fd;
+      --color-primary-400: #60a5fa;
+      --color-primary-500: #3b82f6;
+      --color-primary-600: #2563eb;
+      --color-primary-700: #1d4ed8;
+      --color-primary-800: #1e40af;
+      --color-primary-900: #1e3a8a;
+      --color-primary-950: #172554;
+
+      --color-slate-50: #f8fafc;
+      --color-slate-100: #f1f5f9;
+      --color-slate-200: #e2e8f0;
+      --color-slate-300: #cbd5e1;
+      --color-slate-400: #94a3b8;
+      --color-slate-500: #64748b;
+      --color-slate-600: #475569;
+      --color-slate-700: #334155;
+      --color-slate-800: #1e293b;
+      --color-slate-900: #0f172a;
+      --color-slate-950: #020617;
+
+      --color-emerald-50: #ecfdf5;
+      --color-emerald-100: #d1fae5;
+      --color-emerald-500: #10b981;
+      --color-emerald-600: #059669;
+      --color-emerald-700: #047857;
+
+      --color-amber-50: #fffbeb;
+      --color-amber-100: #fef3c7;
+      --color-amber-500: #f59e0b;
+      --color-amber-600: #d97706;
+      --color-amber-700: #b45309;
+
+      --color-rose-50: #fff1f2;
+      --color-rose-100: #ffe4e6;
+      --color-rose-500: #f43f5e;
+      --color-rose-600: #e11d48;
+      --color-rose-700: #be123c;
+
+      --color-purple-50: #faf5ff;
+      --color-purple-100: #f3e8ff;
+      --color-purple-500: #a855f7;
+      --color-purple-600: #9333ea;
+      --color-purple-700: #7e22ce;
+
+      --color-surface-white: #ffffff;
+      --color-surface-card: #ffffff;
+      --color-surface-subtle: #f8fafc;
+      --color-border-subtle: #e2e8f0;
+      --color-border-hover: #cbd5e1;
+
+      --font-family-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 1.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+      --radius-xs: 4px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+
+      --sidebar-width: 270px;
+      --bottom-nav-height: 64px;
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* iOS 27 safe-area 引用 */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ==========================================================================
+       2. RESET & BASE ELEMENTS (iOS 27 增强)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      width: 100%;
+      height: 100%;
+      height: -webkit-fill-available;  /* iOS Safari 旧版兼容 */
+      /* 防止 iOS 横竖屏字号自动缩放 */
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      /* 关闭链接长按弹出的"呼叫/复制"菜单（图标/按钮） */
+      -webkit-touch-callout: none;
+    }
+
+    html.ios-standalone {
+      /* 独立运行模式：拒绝拖动边缘 rubber-band */
+      overscroll-behavior: none;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;        /* iOS 27 动态视口高度，排除地址栏 */
+      font-family: var(--font-family-sans);
+      background-color: var(--color-slate-100);
+      color: var(--color-slate-900);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      /* iOS: 阻止整页 rubber-band（下拉刷新与底栏上拉） */
+      overscroll-behavior-y: none;
+    }
+
+    /* 防止图片被长按选中（不影响 input/textarea） */
+    img, svg { -webkit-user-drag: none; }
+
+    input, textarea, select, button {
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      border: none;
+      outline: none;
+      background: none;
+    }
+
+    /* iOS 27: input/textarea 强制 16px，避免聚焦时 Safari 自动放大 */
+    input[type="text"], input[type="password"], input[type="email"],
+    input[type="number"], input[type="tel"], input[type="search"],
+    textarea {
+      font-size: 16px;
+    }
+
+    /* iOS 27: 覆盖 Safari 默认 autofill 黄色背景 */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px var(--color-slate-50) inset !important;
+      -webkit-text-fill-color: var(--color-slate-900) !important;
+      caret-color: var(--color-slate-900);
+    }
+
+    /* 所有可点击控件关闭 300ms 双击缩放延迟 */
+    button, a, .nav-link-btn, .mobile-nav-item, .btn-action-primary,
+    .btn-submit-login, .btn-claim-action, .btn-submit-deliverable-modal,
+    .btn-danger-logout, .btn-modal-close, .btn-download-attachment {
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ==========================================================================
+       3. NOTIFICATION (TOAST) ENGINE
+       ========================================================================== */
+    #toast-container {
+      position: fixed;
+      top: calc(20px + var(--safe-top));
+      right: 20px;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+      max-width: calc(100vw - 40px);
+    }
+
+    .toast-item {
+      pointer-events: auto;
+      min-width: 320px;
+      max-width: 440px;
+      background-color: var(--color-surface-white);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      box-shadow: var(--shadow-xl);
+      border-left: 4px solid var(--color-primary-500);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transform: translateX(120%);
+      opacity: 0;
+      transition: transform var(--transition-normal), opacity var(--transition-normal);
+    }
+
+    .toast-item.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .toast-item.toast-success { border-left-color: var(--color-emerald-500); }
+    .toast-item.toast-error { border-left-color: var(--color-rose-500); }
+    .toast-item.toast-warning { border-left-color: var(--color-amber-500); }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .toast-content { flex: 1; }
+    .toast-title { font-size: 13px; font-weight: 600; color: var(--color-slate-900); margin-bottom: 2px; }
+    .toast-message { font-size: 12.5px; color: var(--color-slate-600); line-height: 1.4; }
+
+    /* ==========================================================================
+       4. AUTHENTICATION VIEW (LOGIN) — iOS 27: 顶部安全区让出
+       ========================================================================== */
+    #login-view-container {
+      position: fixed;
+      inset: 0;
+      z-index: 50000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 10% 20%, #1e3a8a 0%, #0f172a 90%);
+      padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom));
+      overflow-y: auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .login-wrapper {
+      width: 100%;
+      max-width: 440px;
+      background: var(--color-surface-white);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .login-brand-box { text-align: center; margin-bottom: 32px; }
+    .login-brand-icon-wrapper {
+      width: 60px;
+      height: 60px;
+      background: var(--color-primary-50);
+      color: var(--color-primary-700);
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .login-brand-icon-wrapper svg { width: 32px; height: 32px; }
+    .login-brand-title { font-size: 22px; font-weight: 700; color: var(--color-slate-900); letter-spacing: -0.3px; }
+    .login-brand-desc { font-size: 13px; color: var(--color-slate-500); margin-top: 6px; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--color-slate-700); margin-bottom: 8px; }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-icon-left { position: absolute; left: 14px; width: 18px; height: 18px; color: var(--color-slate-400); pointer-events: none; }
+
+    .form-control-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 16px 0 42px;
+      background-color: var(--color-slate-50);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--color-slate-900);
+      font-size: 16px;  /* iOS 27 强制 16px 防聚焦放大 */
+      transition: all var(--transition-fast);
+    }
+    .form-control-input:focus {
+      background-color: var(--color-surface-white);
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    .form-control-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: var(--color-slate-50);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--color-slate-900);
+      font-size: 16px;
+      resize: vertical;
+      min-height: 120px;
+      transition: all var(--transition-fast);
+    }
+    .form-control-textarea:focus {
+      background-color: var(--color-surface-white);
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    .btn-submit-login {
+      width: 100%;
+      height: 46px;
+      background-color: var(--color-primary-900);
+      color: var(--color-surface-white);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      transition: all var(--transition-fast);
+    }
+    .btn-submit-login:hover { background-color: var(--color-primary-950); }
+    .btn-submit-login:active { transform: scale(0.99); }
+
+    .login-footer-disclaimer {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--color-border-subtle);
+      text-align: center;
+      font-size: 12px;
+      color: var(--color-slate-400);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       5. MAIN APPLICATION LAYOUT & NAVIGATION (iOS 27 增强)
+       ========================================================================== */
+    #app-container {
+      display: none;
+      min-height: 100vh;
+      min-height: 100dvh;
+      position: relative;
+    }
+
+    /* Left Sidebar */
+    .app-desktop-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background-color: var(--color-surface-white);
+      border-right: 1px solid var(--color-border-subtle);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-header-brand {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--color-border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-brand-avatar {
+      width: 40px;
+      height: 40px;
+      background-color: var(--color-primary-900);
+      color: var(--color-surface-white);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-brand-text h2 { font-size: 15px; font-weight: 700; color: var(--color-slate-900); }
+    .sidebar-brand-text span { font-size: 11px; font-weight: 600; color: var(--color-slate-400); text-transform: uppercase; letter-spacing: 0.6px; }
+
+    .sidebar-nav-menu {
+      list-style: none;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-link-btn {
+      width: 100%;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 16px;
+      border-radius: var(--radius-sm);
+      color: var(--color-slate-600);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all var(--transition-fast);
+    }
+    .nav-link-btn:hover { background-color: var(--color-primary-50); color: var(--color-primary-900); }
+    .nav-link-btn.active { background-color: var(--color-primary-50); color: var(--color-primary-800); font-weight: 600; }
+    .nav-link-icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+    .nav-link-btn.music-btn.active {
+      background-color: var(--color-purple-50);
+      color: var(--color-purple-700);
+    }
+
+    .sidebar-user-card {
+      padding: 16px 20px;
+      border-top: 1px solid var(--color-border-subtle);
+      background-color: var(--color-slate-50);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary-200);
+      color: var(--color-primary-900);
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-info-text { flex: 1; min-width: 0; }
+    .user-display-name { font-size: 13px; font-weight: 600; color: var(--color-slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-display-dept { font-size: 11.5px; color: var(--color-slate-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Bottom Mobile Navigation — iOS 27 Liquid Glass 风格 */
+    .app-mobile-navbar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      /* iOS 27 Liquid Glass 风格毛玻璃底栏 */
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-top: 0.5px solid rgba(15, 23, 42, 0.08);
+      box-shadow: 0 -1px 0 rgba(15, 23, 42, 0.04), 0 -10px 30px rgba(15, 23, 42, 0.05);
+      z-index: 100;
+      justify-content: space-around;
+      align-items: stretch;
+      padding: 6px 4px calc(6px + var(--safe-bottom));
+      min-height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+    }
+
+    /* Liquid Glass 顶部高光线 */
+    .app-mobile-navbar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 8%;
+      right: 8%;
+      height: 0.5px;
+      background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.95) 50%,
+        rgba(255, 255, 255, 0) 100%);
+      pointer-events: none;
+    }
+
+    .mobile-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--color-slate-500);
+      font-size: 11px;
+      cursor: pointer;
+      border-radius: 10px;
+      padding: 6px 4px;
+      transition: color var(--transition-fast), background-color var(--transition-fast);
+    }
+    .mobile-nav-item.active {
+      color: var(--color-primary-600);
+      font-weight: 600;
+    }
+    .mobile-nav-item.music-btn.active {
+      color: var(--color-purple-600);
+      font-weight: 600;
+    }
+    .mobile-nav-icon { width: 22px; height: 22px; }
+
+    /* Main Viewport */
+    .app-main-content {
+      margin-left: var(--sidebar-width);
+      padding: 36px 44px;
+      padding-top: calc(36px + var(--safe-top));
+      padding-bottom: calc(36px + var(--safe-bottom));
+      min-height: 100vh;
+      min-height: 100dvh;
+      max-width: 1400px;
+    }
+
+    /* ==========================================================================
+       6. VIEW SECTIONS & INTERACTIVE COMPONENTS
+       ========================================================================== */
+    .view-content-pane {
+      display: none;
+      animation: fadeInView var(--transition-normal) forwards;
+    }
+    .view-content-pane.active-pane { display: block; }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* iOS 27: 减少动画以尊重用户的"减少动态效果"设置 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .view-header-titlebar {
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .view-header-titlebar h1 { font-size: 24px; font-weight: 700; color: var(--color-slate-900); letter-spacing: -0.4px; }
+    .view-header-titlebar p { font-size: 13.5px; color: var(--color-slate-500); margin-top: 4px; }
+
+    .btn-action-primary {
+      height: 40px;
+      padding: 0 20px;
+      background-color: var(--color-primary-600);
+      color: var(--color-surface-white);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: var(--shadow-xs);
+      transition: all var(--transition-fast);
+    }
+    .btn-action-primary:hover { background-color: var(--color-primary-700); }
+    .btn-action-primary:active { transform: scale(0.98); }
+
+    .card-panel {
+      background-color: var(--color-surface-card);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xs);
+      padding: 26px;
+      margin-bottom: 24px;
+    }
+
+    .card-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .card-panel-header h2 { font-size: 16px; font-weight: 600; color: var(--color-slate-900); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+    .badge-assigned { background-color: var(--color-primary-50); color: var(--color-primary-800); }
+    .badge-claimed { background-color: var(--color-amber-50); color: var(--color-amber-700); border: 1px solid var(--color-amber-200); }
+    .badge-submitted { background-color: var(--color-purple-50); color: var(--color-purple-700); border: 1px solid var(--color-purple-200); }
+    .badge-completed { background-color: var(--color-emerald-100); color: var(--color-emerald-700); }
+    .badge-pending { background-color: var(--color-amber-100); color: var(--color-amber-700); }
+    .badge-approved { background-color: var(--color-emerald-100); color: var(--color-emerald-700); }
+    .badge-rejected { background-color: var(--color-rose-100); color: var(--color-rose-700); }
+
+    .reward-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+      color: #854d0e;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 12.5px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .tasks-grid-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 24px;
+    }
+
+    .task-interactive-card {
+      background-color: var(--color-surface-white);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all var(--transition-fast);
+    }
+    .task-interactive-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      border-color: var(--color-border-hover);
+    }
+
+    .task-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .task-title-text { font-size: 16px; font-weight: 600; color: var(--color-slate-900); line-height: 1.4; }
+    .task-description-body { font-size: 13.5px; color: var(--color-slate-600); line-height: 1.6; margin-bottom: 16px; white-space: pre-wrap; word-break: break-word; }
+
+    .task-attachments-panel {
+      margin: 12px 0 14px 0;
+      padding: 12px 14px;
+      background-color: var(--color-slate-50);
+      border: 1px dashed var(--color-border-subtle);
+      border-radius: var(--radius-sm);
+    }
+    .attachment-header-title { font-size: 12px; font-weight: 600; color: var(--color-slate-500); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .attachment-row-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; font-size: 12.5px; border-bottom: 1px solid var(--color-slate-200); gap: 8px; }
+    .attachment-row-item:last-child { border-bottom: none; }
+    .attachment-file-meta { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+    .attachment-name { font-weight: 500; color: var(--color-slate-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .attachment-size { font-size: 11px; color: var(--color-slate-400); flex-shrink: 0; }
+
+    .btn-download-attachment {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background-color: var(--color-primary-50);
+      color: var(--color-primary-700);
+      border-radius: var(--radius-xs);
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-download-attachment:hover { background-color: var(--color-primary-100); }
+
+    .task-meta-banner {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 14px;
+      background: var(--color-slate-50);
+      border-radius: var(--radius-sm);
+      margin-bottom: 14px;
+      font-size: 12px;
+    }
+    .deadline-urgent { color: var(--color-rose-600); font-weight: 600; }
+    .deadline-normal { color: var(--color-slate-600); }
+
+    .task-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--color-slate-100);
+      font-size: 12px;
+      color: var(--color-slate-400);
+      gap: 8px;
+    }
+
+    .btn-claim-action {
+      padding: 8px 18px;
+      background-color: var(--color-primary-600);
+      color: var(--color-surface-white);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-claim-action:hover { background-color: var(--color-primary-700); }
+    .btn-claim-action:disabled { background-color: var(--color-slate-300); cursor: notallowed; }
+
+    .btn-submit-deliverable-modal {
+      padding: 8px 16px;
+      background-color: var(--color-purple-600);
+      color: var(--color-surface-white);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-submit-deliverable-modal:hover { background-color: var(--color-purple-700); }
+
+    /* JRmusic Player Iframe View — iOS 27 dvh 视口 */
+    .music-iframe-wrapper {
+      width: 100%;
+      height: calc(100dvh - 200px);
+      min-height: 520px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--color-border-subtle);
+      background-color: #000000;
+    }
+    .music-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Modal Component — iOS 27: 底部安全区 */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      padding-top: calc(20px + var(--safe-top));
+      padding-bottom: calc(20px + var(--safe-bottom));
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 560px;
+      max-height: calc(100dvh - 40px - var(--safe-top) - var(--safe-bottom));
+      overflow-y: auto;
+      background: var(--color-surface-white);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      box-shadow: var(--shadow-xl);
+      animation: modalPop 240ms ease forwards;
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .btn-modal-close { width: 32px; height: 32px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; background: var(--color-slate-100); cursor: pointer; color: var(--color-slate-500); }
+    .btn-modal-close:hover { background: var(--color-slate-200); }
+
+    .account-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .account-meta-box { padding: 20px; background-color: var(--color-slate-50); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); }
+    .account-balance-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      color: #ffffff;
+      border: none;
+      box-shadow: var(--shadow-md);
+    }
+    .balance-amount-display {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fde047;
+      margin-top: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .data-table-scroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table-main { width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left; }
+    .data-table-main th { background-color: var(--color-slate-50); padding: 14px 16px; font-weight: 600; color: var(--color-slate-600); border-bottom: 1px solid var(--color-border-subtle); white-space: nowrap; }
+    .data-table-main td { padding: 16px; border-bottom: 1px solid var(--color-border-subtle); color: var(--color-slate-800); }
+
+    .btn-danger-logout {
+      padding: 12px 24px;
+      background-color: var(--color-rose-50);
+      color: var(--color-rose-600);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-danger-logout:hover { background-color: var(--color-rose-100); }
+
+    /* Responsive Design — iOS 27 增强：底栏高度 + 安全区 */
+    @media (max-width: 768px) {
+      .app-desktop-sidebar { display: none; }
+      .app-mobile-navbar { display: flex; }
+      .app-main-content {
+        margin-left: 0;
+        padding: 20px 16px;
+        padding-top: calc(20px + var(--safe-top));
+        /* 关键：底部预留底栏高度 + Home Indicator 安全区 */
+        padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 20px);
+      }
+      .tasks-grid-layout { grid-template-columns: 1fr; }
+      .music-iframe-wrapper {
+        height: calc(100dvh - 180px - var(--safe-top) - var(--safe-bottom));
+        min-height: 460px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- ==========================================================================
+       LOGIN VIEW REGION
+       ========================================================================== -->
+  <section id="login-view-container">
+    <div class="login-wrapper">
+      <div class="login-brand-box">
+        <div class="login-brand-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+            <path d="M9 22v-4h6v4"></path>
+            <path d="M8 6h.01"></path><path d="M16 6h.01"></path>
+            <path d="M8 10h.01"></path><path d="M16 10h.01"></path>
+            <path d="M8 14h.01"></path><path d="M16 14h.01"></path>
+          </svg>
+        </div>
+        <h1 class="login-brand-title">企业协同办公系统</h1>
+        <p class="login-brand-desc">内网员工统一身份认证通道</p>
+      </div>
+
+      <form id="login-form-element" autocomplete="on">
+        <div class="form-group">
+          <label class="form-label" for="login-username-input">员工账号 / 工号</label>
+          <div class="input-wrapper">
+            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <input type="text" id="login-username-input" class="form-control-input" placeholder="输入您的登录用户名" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="login-password-input">访问密码</label>
+          <div class="input-wrapper">
+            <svg class="input-icon-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input type="password" id="login-password-input" class="form-control-input" placeholder="输入身份认证密码" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-login-action" class="btn-submit-login">
+          <span>安全登录</span>
+          <svg style="width:18px;height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+
+      <div class="login-footer-disclaimer">
+        <span>🔒 本系统采用专属数据存储，不开放外网自主注册。<br>新入职员工请联系综合运维管理员统一分配工号。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       MAIN WORKSPACE APPLICATION REGION
+       ========================================================================== -->
+  <div id="app-container">
+    <aside class="app-desktop-sidebar">
+      <div class="sidebar-header-brand">
+        <div class="sidebar-brand-avatar">CP</div>
+        <div class="sidebar-brand-text">
+          <h2>企业内网协同</h2>
+          <span>WORKSPACE 2026</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav-menu">
+        <li>
+          <button type="button" class="nav-link-btn active" data-view-target="pane-task-overview">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>任务查看</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="nav-link-btn" data-view-target="pane-request-submission">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>提交申请</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="nav-link-btn music-btn" data-view-target="pane-jrmusic">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+            <span>JRmusic</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" class="nav-link-btn" data-view-target="pane-account-profile">
+            <svg class="nav-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>账户中心</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-user-card">
+        <div class="user-avatar-circle" id="sidebar-user-avatar-letter">U</div>
+        <div class="user-info-text">
+          <div class="user-display-name" id="sidebar-user-fullname">加载中...</div>
+          <div class="user-display-dept" id="sidebar-user-deptname">--</div>
+        </div>
+      </div>
+    </aside>
+
+    <nav class="app-mobile-navbar">
+      <button type="button" class="mobile-nav-item active" data-view-target="pane-task-overview">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>任务</span>
+      </button>
+      <button type="button" class="mobile-nav-item" data-view-target="pane-request-submission">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <span>申请</span>
+      </button>
+      <button type="button" class="mobile-nav-item music-btn" data-view-target="pane-jrmusic">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        <span>音乐</span>
+      </button>
+      <button type="button" class="mobile-nav-item" data-view-target="pane-account-profile">
+        <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>账户</span>
+      </button>
+    </nav>
+
+    <main class="app-main-content">
+
+      <!-- PANE 1: 任务查看 -->
+      <section id="pane-task-overview" class="view-content-pane active-pane">
+        <div class="view-header-titlebar">
+          <div>
+            <h1>待办与任务协同</h1>
+            <p>查看派发任务，在截止时间前提交成果文件（最多5份，单个≤25MB），完成后将获得报酬入账。</p>
+          </div>
+          <button type="button" class="btn-action-primary" id="btn-refresh-task-pool">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>刷新任务池</span>
+          </button>
+        </div>
+
+        <div id="tasks-stream-container" class="tasks-grid-layout">
+          <!-- Dynamically Rendered Tasks -->
+        </div>
+      </section>
+
+      <!-- PANE 2: 提交申请 -->
+      <section id="pane-request-submission" class="view-content-pane">
+        <div class="view-header-titlebar">
+          <div>
+            <h1>提交办公申请</h1>
+            <p>撰写您的业务需求、资源审批或行政请示，数据将实时同步至云端。</p>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>新建申请单据</h2>
+          </div>
+          <form id="application-form-element">
+            <div class="form-group">
+              <label class="form-label" for="input-request-title">申请主题 / 标题</label>
+              <input type="text" id="input-request-title" class="form-control-input" placeholder="例：关于申请采购开发设备及云服务资源的请示" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="input-request-body">详细说明 / 申请正文</label>
+              <textarea id="input-request-body" class="form-control-textarea" placeholder="请详述申请原因、预算规模、实施计划与期望交付节点..." required></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end;">
+              <button type="submit" id="btn-submit-request-action" class="btn-action-primary">
+                <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                <span>提交申请至数据库</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>我提交的历史申请</h2>
+          </div>
+          <div class="data-table-scroller">
+            <table class="data-table-main">
+              <thead>
+                <tr>
+                  <th>申请标题</th>
+                  <th>提交时间</th>
+                  <th>当前流转状态</th>
+                </tr>
+              </thead>
+              <tbody id="my-requests-table-body">
+                <!-- Dynamically Rendered History -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PANE 3: JRMUSIC EMBEDDED PLAYER -->
+      <section id="pane-jrmusic" class="view-content-pane">
+        <div class="view-header-titlebar">
+          <div>
+            <h1>JRmusic 音乐电台</h1>
+            <p>办公沉浸式音频播放终端，支持在线音乐流式畅听。</p>
+          </div>
+        </div>
+        <div class="music-iframe-wrapper">
+          <iframe
+            class="music-iframe"
+            src="https://musicplayer-ruby-delta.vercel.app"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </section>
+
+      <!-- PANE 4: 账户中心 -->
+      <section id="pane-account-profile" class="view-content-pane">
+        <div class="view-header-titlebar">
+          <div>
+            <h1>个人账户中心</h1>
+            <p>查看当前账户信息、组织架构及任务完成报酬累计余额。</p>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>报酬余额与身份信息</h2>
+          </div>
+          <div class="account-meta-grid">
+            <div class="account-meta-box account-balance-card">
+              <div style="font-size:12px; opacity:0.8; text-transform:uppercase; font-weight:600;">任务报酬累计余额</div>
+              <div class="balance-amount-display" id="profile-display-balance">¥ 0.00</div>
+              <div style="font-size:11.5px; opacity:0.7; margin-top:4px;">任务由管理员审核"完成"后自动结算发放</div>
+            </div>
+            <div class="account-meta-box">
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">员工工号</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-staffid">--</div>
+            </div>
+            <div class="account-meta-box">
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">系统登录名</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-username">--</div>
+            </div>
+            <div class="account-meta-box">
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">真实姓名</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-fullname">--</div>
+            </div>
+            <div class="account-meta-box">
+              <div style="font-size:12px; font-weight:600; color:var(--color-slate-500); text-transform:uppercase;">所属部门</div>
+              <div style="font-size:16px; font-weight:700; margin-top:6px;" id="profile-display-dept">--</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <h2>安全会话与登出</h2>
+          </div>
+          <p style="font-size:13.5px; color:var(--color-slate-500); margin-bottom:16px;">
+            注销后将销毁当前设备上的认证 Cookie，下次访问需重新输入员工凭证。
+          </p>
+          <button type="button" id="btn-logout-session-action" class="btn-danger-logout">
+            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>安全登出系统</span>
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: TASK DELIVERABLE SUBMISSION
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-deliverable-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="font-size:18px; font-weight:700;">提交任务完成成果</h3>
+        <button type="button" class="btn-modal-close" id="btn-close-deliverable-modal">✕</button>
+      </div>
+      <form id="form-submit-deliverable">
+        <input type="hidden" id="deliverable-task-id">
+        <div class="form-group">
+          <label class="form-label">成果简述与交付备注</label>
+          <textarea id="deliverable-notes" class="form-control-textarea" style="min-height:90px;" placeholder="说明本次提交成果的主要完成内容与验收要点..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">上传成果附件 (最多5份，每份≤25MB)</label>
+          <input type="file" id="deliverable-files" class="form-control-input" style="padding-top:9px;" multiple>
+          <div style="font-size:12px; color:var(--color-slate-500); margin-top:6px;">支持各类型打包产物、文档、报表与工程附件。</div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+          <button type="button" class="btn-modal-close" id="btn-cancel-deliverable" style="width:auto; padding:0 16px; border-radius:var(--radius-sm);">取消</button>
+          <button type="submit" id="btn-confirm-upload-deliverable" class="btn-action-primary">确认提交成果</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function (window, document) {
+      'use strict';
+
+      // --------------------------------------------------------------------
+      // iOS 27 适配: 标记独立运行模式 (添加到主屏后的全屏状态)
+      // --------------------------------------------------------------------
+      try {
+        if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+          document.documentElement.classList.add('ios-standalone');
+        }
+      } catch (e) { /* noop */ }
+
+      const AppStore = {
+        state: { currentUser: null, currentViewId: 'pane-task-overview', tasks: [], requests: [] },
+        listeners: [],
+        subscribe(listener) { if (typeof listener === 'function') this.listeners.push(listener); },
+        setState(newState) {
+          this.state = Object.assign({}, this.state, newState);
+          for (let i = 0; i < this.listeners.length; i++) this.listeners[i](this.state);
+        },
+        getState() { return this.state; }
+      };
+
+      const DOM = {
+        toastContainer: document.getElementById('toast-container'),
+        loginContainer: document.getElementById('login-view-container'),
+        appContainer: document.getElementById('app-container'),
+        loginForm: document.getElementById('login-form-element'),
+        loginUsernameInput: document.getElementById('login-username-input'),
+        loginPasswordInput: document.getElementById('login-password-input'),
+        btnLoginSubmit: document.getElementById('btn-login-action'),
+        sidebarAvatarLetter: document.getElementById('sidebar-user-avatar-letter'),
+        sidebarUserFullName: document.getElementById('sidebar-user-fullname'),
+        sidebarUserDeptName: document.getElementById('sidebar-user-deptname'),
+        profileStaffId: document.getElementById('profile-display-staffid'),
+        profileUsername: document.getElementById('profile-display-username'),
+        profileFullname: document.getElementById('profile-display-fullname'),
+        profileDept: document.getElementById('profile-display-dept'),
+        profileBalance: document.getElementById('profile-display-balance'),
+        btnLogout: document.getElementById('btn-logout-session-action'),
+        navButtons: document.querySelectorAll('.nav-link-btn, .mobile-nav-item'),
+        viewPanes: document.querySelectorAll('.view-content-pane'),
+        btnRefreshTasks: document.getElementById('btn-refresh-task-pool'),
+        tasksStreamContainer: document.getElementById('tasks-stream-container'),
+        requestForm: document.getElementById('application-form-element'),
+        reqTitleInput: document.getElementById('input-request-title'),
+        reqBodyInput: document.getElementById('input-request-body'),
+        btnSubmitRequest: document.getElementById('btn-submit-request-action'),
+        myRequestsTableBody: document.getElementById('my-requests-table-body'),
+        modalDeliverable: document.getElementById('modal-deliverable-backdrop'),
+        formDeliverable: document.getElementById('form-submit-deliverable'),
+        deliverableTaskId: document.getElementById('deliverable-task-id'),
+        deliverableNotes: document.getElementById('deliverable-notes'),
+        deliverableFiles: document.getElementById('deliverable-files'),
+        btnCloseDeliverable: document.getElementById('btn-close-deliverable-modal'),
+        btnCancelDeliverable: document.getElementById('btn-cancel-deliverable'),
+        btnConfirmDeliverable: document.getElementById('btn-confirm-upload-deliverable')
+      };
+
+      const Utils = {
+        escapeHtml(str) {
+          if (!str) return '';
+          return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        },
+        formatDate(dateString) {
+          if (!dateString) return '--';
+          const d = new Date(dateString);
+          if (isNaN(d.getTime())) return '--';
+          const pad = (n) => (n < 10 ? '0' + n : n);
+          return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+                 ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        },
+        formatFileSize(bytes) {
+          if (typeof bytes !== 'number' || bytes === 0) return '0 B';
+          const k = 1024;
+          const sizes = ['B', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        },
+        showToast(message, type = 'info', duration = 3400) {
+          const toast = document.createElement('div');
+          toast.className = 'toast-item toast-' + type;
+          let iconSvg = '';
+          if (type === 'success') {
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-emerald-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+          } else if (type === 'error') {
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-rose-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
+          } else {
+            iconSvg = '<svg class="toast-icon" style="color:var(--color-primary-600);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
+          }
+          toast.innerHTML = iconSvg +
+            '<div class="toast-content">' +
+            '  <div class="toast-title">' + (type === 'success' ? '操作成功' : (type === 'error' ? '提示错误' : '系统提示')) + '</div>' +
+            '  <div class="toast-message">' + Utils.escapeHtml(message) + '</div>' +
+            '</div>';
+          DOM.toastContainer.appendChild(toast);
+          setTimeout(() => toast.classList.add('show'), 10);
+          setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+          }, duration);
+        }
+      };
+
+      const ApiService = {
+        // iOS 27 适配: onrender 免费实例冷启动期间首次请求可能超时，
+        // 网络层失败自动重试 1 次（间隔 2.5s），并输出可诊断日志
+        async request(endpoint, options = {}, retry = 1) {
+          options.headers = options.headers || {};
+          try {
+            const response = await fetch(endpoint, options);
+            const data = await response.json();
+            return { ok: response.ok, status: response.status, data };
+          } catch (err) {
+            if (retry > 0) {
+              console.warn('[ApiService] 首次请求失败，2.5s 后自动重试:', endpoint, err && err.message);
+              await new Promise(function (resolve) { setTimeout(resolve, 2500); });
+              return this.request(endpoint, options, retry - 1);
+            }
+            console.error('[ApiService] 网络请求失败:', endpoint, err && err.message);
+            return { ok: false, status: 0, data: { success: false, message: '网络请求异常，无法连接至业务网关（若为首次打开，服务可能正在唤醒，请稍候重试）' } };
+          }
+        },
+        async checkSession() { return await this.request('/api/auth/session'); },
+        async login(username, password) {
+          return await this.request('/api/auth/login', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+        },
+        async logout() { return await this.request('/api/auth/logout', { method: 'POST' }); },
+        async fetchTasks() { return await this.request('/api/tasks/list'); },
+        async claimTask(taskId) {
+          return await this.request('/api/tasks/claim/' + encodeURIComponent(taskId), { method: 'POST' });
+        },
+        async submitDeliverables(taskId, formData) {
+          return await fetch('/api/tasks/submit-deliverables/' + encodeURIComponent(taskId), {
+            method: 'POST', body: formData
+          }).then(res => res.json());
+        },
+        async fetchMyRequests() { return await this.request('/api/requests/mine'); },
+        async submitRequest(title, body) {
+          return await this.request('/api/requests/submit', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, body })
+          });
+        }
+      };
+
+      const ViewRenderer = {
+        switchView(targetPaneId) {
+          AppStore.setState({ currentViewId: targetPaneId });
+          DOM.navButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-view-target') === targetPaneId));
+          DOM.viewPanes.forEach(pane => pane.classList.toggle('active-pane', pane.id === targetPaneId));
+          if (targetPaneId === 'pane-task-overview') TaskController.loadTasks();
+          else if (targetPaneId === 'pane-request-submission') RequestController.loadHistoryRequests();
+          else if (targetPaneId === 'pane-account-profile') AuthController.refreshUserProfile();
+        },
+        renderUserProfile(user) {
+          if (!user) return;
+          const initial = (user.full_name || user.username || 'U').charAt(0).toUpperCase();
+          DOM.sidebarAvatarLetter.textContent = initial;
+          DOM.sidebarUserFullName.textContent = user.full_name || user.username;
+          DOM.sidebarUserDeptName.textContent = user.department || '未分配部门';
+          DOM.profileStaffId.textContent = user.staff_id || 'N/A';
+          DOM.profileUsername.textContent = user.username || 'N/A';
+          DOM.profileFullname.textContent = user.full_name || 'N/A';
+          DOM.profileDept.textContent = user.department || 'N/A';
+          DOM.profileBalance.textContent = '¥ ' + (parseFloat(user.account_balance) || 0).toFixed(2);
+        },
+        renderTasksGrid(tasks) {
+          DOM.tasksStreamContainer.innerHTML = '';
+          if (!tasks || tasks.length === 0) {
+            DOM.tasksStreamContainer.innerHTML = (
+              '<div style="grid-column:1/-1; text-align:center; padding:48px 24px; color:var(--color-slate-400);">' +
+              '  <svg style="width:48px;height:48px;margin:0 auto 12px;color:var(--color-slate-300);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' +
+              '  <p style="font-size:15px; font-weight:600; color:var(--color-slate-700);">暂无指派给您的工作协同任务</p>' +
+              '  <span style="font-size:12px; margin-top:4px; display:block;">管理员下发新任务后将在此处实时呈现</span>' +
+              '</div>'
+            );
+            return;
+          }
+          tasks.forEach(task => {
+            const isAssigned = task.status === 'Assigned';
+            const isClaimed = task.status === 'Claimed';
+            const isSubmitted = task.status === 'Submitted';
+            const isCompleted = task.status === 'Completed';
+            let statusBadge = '<span class="status-badge badge-assigned">待领取</span>';
+            if (isClaimed) statusBadge = '<span class="status-badge badge-claimed">已领取 (推进中)</span>';
+            if (isSubmitted) statusBadge = '<span class="status-badge badge-submitted">成果已提交 (待核审)</span>';
+            if (isCompleted) statusBadge = '<span class="status-badge badge-completed">✓ 已结项结算</span>';
+
+            const card = document.createElement('div');
+            card.className = 'task-interactive-card';
+
+            let attachmentsMarkup = '';
+            if (task.attachments && task.attachments.length > 0) {
+              const rows = task.attachments.map(att => `
+                <div class="attachment-row-item">
+                  <div class="attachment-file-meta">
+                    <svg style="width:14px;height:14px;color:var(--color-primary-600);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    <span class="attachment-name">${Utils.escapeHtml(att.filename)}</span>
+                    <span class="attachment-size">(${Utils.formatFileSize(att.size)})</span>
+                  </div>
+                  <a class="btn-download-attachment" href="/api/tasks/${encodeURIComponent(task._id)}/attachment/${encodeURIComponent(att._id)}" target="_blank" download>下载</a>
+                </div>`).join('');
+              attachmentsMarkup = `
+                <div class="task-attachments-panel">
+                  <div class="attachment-header-title">
+                    <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    <span>管理员下发附件 (${task.attachments.length}个):</span>
+                  </div>
+                  ${rows}
+                </div>`;
+            }
+
+            let submissionsMarkup = '';
+            if (task.submissions && task.submissions.length > 0) {
+              const rows = task.submissions.map(sub => `
+                <div class="attachment-row-item">
+                  <div class="attachment-file-meta">
+                    <svg style="width:14px;height:14px;color:var(--color-purple-600);flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span class="attachment-name">${Utils.escapeHtml(sub.filename)}</span>
+                    <span class="attachment-size">(${Utils.formatFileSize(sub.size)})</span>
+                  </div>
+                  <a class="btn-download-attachment" href="/api/tasks/${encodeURIComponent(task._id)}/submission/${encodeURIComponent(sub._id)}" target="_blank" download>查看</a>
+                </div>`).join('');
+              submissionsMarkup = `
+                <div class="task-attachments-panel" style="border-color:var(--color-purple-200); background:var(--color-purple-50);">
+                  <div class="attachment-header-title" style="color:var(--color-purple-700);">
+                    <span>📦 我提交的交付成果 (${task.submissions.length}个文件):</span>
+                  </div>
+                  ${rows}
+                  ${task.submission_notes ? `<div style="font-size:12px; color:var(--color-purple-800); margin-top:6px;">备注: ${Utils.escapeHtml(task.submission_notes)}</div>` : ''}
+                </div>`;
+            }
+
+            let deadlineHtml = '';
+            if (task.submission_deadline) {
+              const isPast = new Date() > new Date(task.submission_deadline);
+              deadlineHtml = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>提交截止时间:</span>
+                  <span class="${isPast ? 'deadline-urgent' : 'deadline-normal'}">
+                    ${Utils.formatDate(task.submission_deadline)} ${isPast ? '(已截止)' : ''}
+                  </span>
+                </div>`;
+            }
+
+            const requirementHtml = `
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span>成果交付要求:</span>
+                <span style="font-weight:600; color:${task.requires_submission ? 'var(--color-purple-600)' : 'var(--color-slate-600)'};">
+                  ${task.requires_submission ? '必须提交成果文件 (≤25MB)' : '无需提交文件'}
+                </span>
+              </div>`;
+
+            let actionButtonHtml = '';
+            if (isAssigned) {
+              actionButtonHtml = `<button type="button" class="btn-claim-action" data-task-id="${task._id}">立即领取任务</button>`;
+            } else if (isClaimed || isSubmitted) {
+              if (task.requires_submission) {
+                actionButtonHtml = `
+                  <button type="button" class="btn-submit-deliverable-modal" data-task-id="${task._id}">
+                    ${isSubmitted ? '重新更新成果文件' : '📤 提交成果文件'}
+                  </button>`;
+              } else {
+                actionButtonHtml = `<span style="font-weight:600; color:var(--color-amber-600);">推进中 (等待管理员审核)</span>`;
+              }
+            } else if (isCompleted) {
+              actionButtonHtml = `<span style="font-weight:600; color:var(--color-emerald-600);">✓ 任务已完结结算</span>`;
+            }
+
+            card.innerHTML = `
+              <div>
+                <div class="task-header-row">
+                  <div>
+                    <h3 class="task-title-text">${Utils.escapeHtml(task.task_title)}</h3>
+                    <div style="margin-top:4px;">${statusBadge}</div>
+                  </div>
+                  <div class="reward-pill">
+                    <span>¥</span>
+                    <span>${(parseFloat(task.reward_amount) || 0).toFixed(2)}</span>
+                  </div>
+                </div>
+                <div class="task-description-body">${Utils.escapeHtml(task.task_description)}</div>
+                ${attachmentsMarkup}
+                <div class="task-meta-banner">
+                  ${requirementHtml}
+                  ${deadlineHtml}
+                </div>
+                ${submissionsMarkup}
+              </div>
+              <div class="task-card-footer">
+                <span>发布: ${Utils.formatDate(task.created_at)}</span>
+                <div>${actionButtonHtml}</div>
+              </div>`;
+
+            const claimBtn = card.querySelector('.btn-claim-action');
+            if (claimBtn) claimBtn.addEventListener('click', () => TaskController.handleClaimTask(task._id, claimBtn));
+            const deliverableBtn = card.querySelector('.btn-submit-deliverable-modal');
+            if (deliverableBtn) deliverableBtn.addEventListener('click', () => TaskController.openDeliverableModal(task._id));
+            DOM.tasksStreamContainer.appendChild(card);
+          });
+        },
+        renderRequestsHistory(requests) {
+          DOM.myRequestsTableBody.innerHTML = '';
+          if (!requests || requests.length === 0) {
+            DOM.myRequestsTableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--color-slate-400); padding:32px;">暂无提交的事务审批申请记录</td></tr>';
+            return;
+          }
+          requests.forEach(req => {
+            const tr = document.createElement('tr');
+            let badgeClass = 'badge-pending', badgeLabel = '审批流转中';
+            if (req.status === 'approved') { badgeClass = 'badge-approved'; badgeLabel = '已核准通过'; }
+            if (req.status === 'rejected') { badgeClass = 'badge-rejected'; badgeLabel = '已予以驳回'; }
+            tr.innerHTML = `
+              <td><strong style="color:var(--color-slate-900);">${Utils.escapeHtml(req.request_title)}</strong></td>
+              <td>${Utils.formatDate(req.submitted_at)}</td>
+              <td><span class="status-badge ${badgeClass}">${badgeLabel}</span></td>`;
+            DOM.myRequestsTableBody.appendChild(tr);
+          });
+        }
+      };
+
+      const AuthController = {
+        async initSession() {
+          const res = await ApiService.checkSession();
+          if (res.ok && res.data && res.data.success) this.handleAuthSuccess(res.data.user, false);
+          else this.showLoginView();
+        },
+        async refreshUserProfile() {
+          const res = await ApiService.checkSession();
+          if (res.ok && res.data && res.data.success) {
+            AppStore.setState({ currentUser: res.data.user });
+            ViewRenderer.renderUserProfile(res.data.user);
+          }
+        },
+        showLoginView() {
+          DOM.appContainer.style.display = 'none';
+          DOM.loginContainer.style.display = 'flex';
+        },
+        handleAuthSuccess(user, isInteractive) {
+          AppStore.setState({ currentUser: user });
+          DOM.loginContainer.style.display = 'none';
+          DOM.appContainer.style.display = 'block';
+          ViewRenderer.renderUserProfile(user);
+          if (isInteractive) Utils.showToast('欢迎登录协同办公平台，' + (user.full_name || user.username), 'success');
+          ViewRenderer.switchView('pane-task-overview');
+        },
+        async performLogin(username, password) {
+          DOM.btnLoginSubmit.disabled = true;
+          DOM.btnLoginSubmit.innerHTML = '<span>认证中...</span>';
+          const res = await ApiService.login(username, password);
+          DOM.btnLoginSubmit.disabled = false;
+          DOM.btnLoginSubmit.innerHTML = '<span>安全登录</span>';
+          if (res.ok && res.data && res.data.success) this.handleAuthSuccess(res.data.user, true);
+          else Utils.showToast(res.data.message || '登录失败', 'error');
+        },
+        async performLogout() {
+          await ApiService.logout();
+          AppStore.setState({ currentUser: null, tasks: [], requests: [] });
+          this.showLoginView();
+          Utils.showToast('您已成功安全登出系统', 'info');
+        }
+      };
+
+      const TaskController = {
+        async loadTasks() {
+          const res = await ApiService.fetchTasks();
+          if (res.ok && res.data && res.data.success) {
+            AppStore.setState({ tasks: res.data.data });
+            ViewRenderer.renderTasksGrid(res.data.data);
+          } else Utils.showToast('获取任务失败', 'error');
+        },
+        async handleClaimTask(taskId, btnElement) {
+          btnElement.disabled = true;
+          btnElement.textContent = '同步中...';
+          const res = await ApiService.claimTask(taskId);
+          if (res.ok && res.data && res.data.success) {
+            Utils.showToast('任务已成功领取！', 'success');
+            this.loadTasks();
+          } else {
+            Utils.showToast(res.data.message || '领取失败', 'error');
+            btnElement.disabled = false;
+            btnElement.textContent = '立即领取任务';
+          }
+        },
+        openDeliverableModal(taskId) {
+          DOM.deliverableTaskId.value = taskId;
+          DOM.deliverableNotes.value = '';
+          DOM.deliverableFiles.value = '';
+          DOM.modalDeliverable.classList.add('open');
+        },
+        closeDeliverableModal() { DOM.modalDeliverable.classList.remove('open'); },
+        async submitDeliverableForm() {
+          const taskId = DOM.deliverableTaskId.value;
+          const files = DOM.deliverableFiles.files;
+          if (files.length > 5) { Utils.showToast('最多允许同时上传 5 份成果文件', 'error'); return; }
+          for (let i = 0; i < files.length; i++) {
+            if (files[i].size > 25 * 1024 * 1024) { Utils.showToast('文件 "' + files[i].name + '" 超过 25MB 上限', 'error'); return; }
+          }
+          DOM.btnConfirmDeliverable.disabled = true;
+          DOM.btnConfirmDeliverable.textContent = '正在上传成果至云端...';
+          const formData = new FormData();
+          formData.append('notes', DOM.deliverableNotes.value.trim());
+          for (let i = 0; i < files.length; i++) formData.append('deliverables', files[i]);
+          try {
+            const data = await ApiService.submitDeliverables(taskId, formData);
+            if (data.success) {
+              Utils.showToast('成果文件已成功提交并同步！', 'success');
+              this.closeDeliverableModal();
+              this.loadTasks();
+            } else Utils.showToast(data.message || '提交失败', 'error');
+          } catch (e) { Utils.showToast('上传错误', 'error'); }
+          finally {
+            DOM.btnConfirmDeliverable.disabled = false;
+            DOM.btnConfirmDeliverable.textContent = '确认提交成果';
+          }
+        }
+      };
+
+      const RequestController = {
+        async loadHistoryRequests() {
+          const res = await ApiService.fetchMyRequests();
+          if (res.ok && res.data && res.data.success) {
+            AppStore.setState({ requests: res.data.data });
+            ViewRenderer.renderRequestsHistory(res.data.data);
+          }
+        },
+        async handleFormSubmit(title, body) {
+          DOM.btnSubmitRequest.disabled = true;
+          DOM.btnSubmitRequest.innerHTML = '<span>提交中...</span>';
+          const res = await ApiService.submitRequest(title, body);
+          DOM.btnSubmitRequest.disabled = false;
+          DOM.btnSubmitRequest.innerHTML = '<span>提交申请至数据库</span>';
+          if (res.ok && res.data && res.data.success) {
+            Utils.showToast('申请单据已成功提交至数据库！', 'success');
+            DOM.reqTitleInput.value = '';
+            DOM.reqBodyInput.value = '';
+            this.loadHistoryRequests();
+          } else Utils.showToast(res.data.message || '提交失败', 'error');
+        }
+      };
+
+      function bindEvents() {
+        DOM.navButtons.forEach(btn => {
+          btn.addEventListener('click', function () {
+            const target = this.getAttribute('data-view-target');
+            if (target) ViewRenderer.switchView(target);
+          });
+        });
+        DOM.loginForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const u = DOM.loginUsernameInput.value.trim();
+          const p = DOM.loginPasswordInput.value;
+          if (u && p) AuthController.performLogin(u, p);
+        });
+        DOM.btnLogout.addEventListener('click', () => AuthController.performLogout());
+        DOM.btnRefreshTasks.addEventListener('click', () => {
+          Utils.showToast('正在向云端拉取最新任务...', 'info', 1200);
+          TaskController.loadTasks();
+          AuthController.refreshUserProfile();
+        });
+        DOM.requestForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const title = DOM.reqTitleInput.value.trim();
+          const body = DOM.reqBodyInput.value.trim();
+          if (title && body) RequestController.handleFormSubmit(title, body);
+        });
+        DOM.btnCloseDeliverable.addEventListener('click', () => TaskController.closeDeliverableModal());
+        DOM.btnCancelDeliverable.addEventListener('click', () => TaskController.closeDeliverableModal());
+        DOM.formDeliverable.addEventListener('submit', function (e) {
+          e.preventDefault();
+          TaskController.submitDeliverableForm();
+        });
+      }
+
+      window.addEventListener('DOMContentLoaded', function () {
+        bindEvents();
+        AuthController.initSession();
+
+        // iOS 27: 键盘弹出时把聚焦的 input 滚动进可视区
+        // (interactive-widget=resizes-content 已自动收缩视口，此处仅做最后保险)
+        // 注意：箭头函数后接 .bind() 在 setTimeout 参数列表中会被 JS 解析器误判，需用闭包
+        document.querySelectorAll('input, textarea').forEach(function (el) {
+          el.addEventListener('focus', function () {
+            var target = this;
+            setTimeout(function () {
+              try { target.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+            }, 250);
+          });
+        });
+      });
+
+      // --------------------------------------------------------------------
+      // iOS 27: 注册 Service Worker（PWA 缓存壳层 + 离线兜底；API 始终走网络）
+      // --------------------------------------------------------------------
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('sw.js').catch(function (err) {
+            console.warn('SW register failed:', err);
+          });
+        });
+      }
+    })(window, document);
+  </script>
+</body>
+</html>
