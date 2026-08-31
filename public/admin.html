@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#090d16">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Enterprise Management Console and Task Administration Platform">
+  <meta name="description" content="Enterprise Management Console and Task Administration Platform with Optical Liquid Glass Interface">
   <title>Corporate Management Console - Superuser Administration Portal</title>
   
   <!-- ==========================================================================
@@ -21,54 +21,52 @@
 
   <style>
     /* ==========================================================================
-       1. EXTENDED DESIGN SYSTEM VARIABLES & GLASS THEME SPECIFICATIONS
+       1. EXTENDED DESIGN SYSTEM & OPTICAL LIQUID GLASS TOKENS
        ========================================================================== */
     :root {
       /* Background Canvas Gradients */
       --ios-bg-canvas: #090d16;
-      --ios-bg-gradient: radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.85) 45%, #050811 100%);
-      --ios-bg-accent-glow: radial-gradient(circle at 85% 85%, rgba(191, 90, 242, 0.15) 0%, transparent 60%);
+      --ios-bg-gradient: radial-gradient(circle at 15% 15%, rgba(30, 58, 138, 0.5) 0%, rgba(15, 23, 42, 0.9) 45%, #050811 100%);
+      --ios-bg-accent-glow: radial-gradient(circle at 85% 85%, rgba(191, 90, 242, 0.2) 0%, transparent 60%);
       
-      /* Liquid Glass Surface Tokens */
-      --glass-panel-bg: rgba(255, 255, 255, 0.06);
-      --glass-panel-bg-hover: rgba(255, 255, 255, 0.09);
-      --glass-panel-bg-active: rgba(255, 255, 255, 0.13);
-      --glass-panel-border: rgba(255, 255, 255, 0.12);
-      --glass-panel-border-hover: rgba(255, 255, 255, 0.24);
-      --glass-panel-border-glow: rgba(59, 130, 246, 0.45);
-      --glass-blur-strength: blur(32px) saturate(190%);
-      --glass-blur-subtle: blur(18px) saturate(160%);
-      --glass-specular-highlight: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.02) 100%);
+      /* Optical Liquid Glass Core Specifications */
+      --liquid-glass-substrate: rgba(255, 255, 255, 0.05);
+      --liquid-glass-refraction-index: blur(34px) saturate(210%) contrast(110%);
+      --liquid-glass-rim-convex: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1.5px 1px 0 rgba(0, 0, 0, 0.35);
+      --liquid-glass-rim-concave: inset 0 3px 6px 0 rgba(0, 0, 0, 0.45), inset 0 -2px 4px 0 rgba(255, 255, 255, 0.2);
+      --liquid-glass-edge-border: 1px solid rgba(255, 255, 255, 0.16);
+      --liquid-specular-bloom: radial-gradient(circle at var(--flare-x, 50%) var(--flare-y, 50%), rgba(255, 255, 255, 0.38) 0%, rgba(10, 132, 255, 0.18) 35%, transparent 70%);
+
+      /* Chromatic Dispersion Layering */
+      --dispersion-shadow: 
+        -0.8px -0.8px 0 rgba(255, 69, 58, 0.35),
+        0.8px 0.8px 0 rgba(100, 210, 255, 0.35);
       
       /* Vibrant Dynamic Accents */
       --ios-blue: #0a84ff;
       --ios-blue-hover: #0070e0;
       --ios-blue-active: #005bb5;
-      --ios-blue-glow: 0 0 24px rgba(10, 132, 255, 0.45);
-      --ios-blue-soft: rgba(10, 132, 255, 0.15);
+      --ios-blue-glow: 0 0 26px rgba(10, 132, 255, 0.48);
+      --ios-blue-soft: rgba(10, 132, 255, 0.16);
       
       --ios-emerald: #30d158;
-      --ios-emerald-soft: rgba(48, 209, 88, 0.15);
+      --ios-emerald-soft: rgba(48, 209, 88, 0.16);
       --ios-emerald-hover: #28b84d;
-      --ios-emerald-glow: 0 0 24px rgba(48, 209, 88, 0.4);
       
       --ios-amber: #ffd60a;
-      --ios-amber-soft: rgba(255, 214, 10, 0.15);
+      --ios-amber-soft: rgba(255, 214, 10, 0.16);
       --ios-amber-hover: #e6c009;
-      --ios-amber-glow: 0 0 24px rgba(255, 214, 10, 0.4);
       
       --ios-purple: #bf5af2;
-      --ios-purple-soft: rgba(191, 90, 242, 0.15);
+      --ios-purple-soft: rgba(191, 90, 242, 0.16);
       --ios-purple-hover: #aa42df;
-      --ios-purple-glow: 0 0 24px rgba(191, 90, 242, 0.4);
       
       --ios-red: #ff453a;
-      --ios-red-soft: rgba(255, 69, 58, 0.15);
+      --ios-red-soft: rgba(255, 69, 58, 0.16);
       --ios-red-hover: #e0352b;
-      --ios-red-glow: 0 0 24px rgba(255, 69, 58, 0.4);
 
       --ios-teal: #64d2ff;
-      --ios-teal-soft: rgba(100, 210, 255, 0.15);
+      --ios-teal-soft: rgba(100, 210, 255, 0.16);
       
       /* Typography Palette */
       --text-main: #f8fafc;
@@ -90,19 +88,18 @@
       --radius-full: 9999px;
 
       /* Depth Shadow Metrics */
-      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      --shadow-float: 0 20px 40px -15px rgba(0, 0, 0, 0.65);
-      --shadow-card-elevated: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+      --shadow-glass: 0 10px 36px 0 rgba(0, 0, 0, 0.42);
+      --shadow-float: 0 24px 48px -12px rgba(0, 0, 0, 0.75);
       
       /* Dimension Variables */
       --sidebar-width: 290px;
       --bottom-nav-height: 72px;
       
-      /* Transition Timing Functions */
-      --ios-spring: 380ms cubic-bezier(0.175, 0.885, 0.32, 1.15);
+      /* Fluid Optical Physics Transitions */
+      --liquid-spring-press: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      --liquid-spring-rebound: 560ms cubic-bezier(0.175, 1.25, 0.32, 1.35);
       --transition-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-normal: 260ms cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 280ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* ==========================================================================
@@ -154,41 +151,163 @@
       font-size: 12.5px;
     }
 
-    .pressable {
-      transition: transform var(--transition-fast), filter var(--transition-fast), opacity var(--transition-fast);
-      will-change: transform;
+    /* ==========================================================================
+       3. LIQUID GLASS BUTTON ENGINE (3-PHASE INTERACTION)
+       ========================================================================== */
+    .liquid-glass-btn {
+      position: relative;
+      background: var(--liquid-glass-substrate);
+      backdrop-filter: var(--liquid-glass-refraction-index);
+      -webkit-backdrop-filter: var(--liquid-glass-refraction-index);
+      border: var(--liquid-glass-edge-border);
+      box-shadow: var(--liquid-glass-rim-convex), var(--shadow-glass);
+      border-radius: var(--radius-md);
+      color: #ffffff;
+      font-family: var(--font-display);
+      font-weight: 600;
+      cursor: pointer;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform var(--liquid-spring-rebound), box-shadow var(--liquid-spring-rebound), border-color var(--transition-normal);
+      will-change: transform, box-shadow;
     }
 
-    .pressable:active {
-      transform: scale(0.965);
-      filter: brightness(1.18);
+    /* Internal Luminance Flare Overlay */
+    .liquid-glass-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--liquid-specular-bloom);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-fast);
+      mix-blend-mode: screen;
+      z-index: 1;
     }
 
-    /* Custom Glass Scrollbar */
-    ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
+    /* Specular Bevel Refraction Glare */
+    .liquid-glass-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+      opacity: 0.8;
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
     }
 
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.12);
+    .liquid-glass-btn:hover {
+      border-color: rgba(255, 255, 255, 0.28);
+      box-shadow: var(--liquid-glass-rim-convex), var(--ios-blue-glow);
     }
 
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.18);
-      border-radius: var(--radius-full);
-      border: 2px solid transparent;
-      background-clip: padding-box;
+    /* Phase 1: Contact Deformation & Convex-to-Concave Indent */
+    .liquid-glass-btn:active,
+    .liquid-glass-btn.liquid-pressed {
+      transform: scale(0.962) perspective(600px) translateZ(-4px);
+      box-shadow: var(--liquid-glass-rim-concave), 0 4px 12px rgba(0, 0, 0, 0.5);
+      border-color: rgba(255, 255, 255, 0.35);
+      transition: transform var(--liquid-spring-press), box-shadow var(--liquid-spring-press);
     }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.32);
-      border: 2px solid transparent;
-      background-clip: padding-box;
+    .liquid-glass-btn:active::before,
+    .liquid-glass-btn.liquid-pressed::before {
+      opacity: 1;
+    }
+
+    .liquid-glass-btn:active::after,
+    .liquid-glass-btn.liquid-pressed::after {
+      opacity: 1;
+      transform: scaleX(0.85) translateY(1px);
+    }
+
+    /* Primary Filled Variant */
+    .liquid-glass-btn.primary {
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.75), rgba(29, 78, 216, 0.85));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: var(--liquid-glass-rim-convex), var(--ios-blue-glow);
     }
 
     /* ==========================================================================
-       3. NOTIFICATION SYSTEM (IOS FLOATING PILL TOAST)
+       4. FLUID MORPHING NAVIGATION (METABALL SLIDER ENGINE)
+       ========================================================================== */
+    .liquid-nav-container {
+      position: relative;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Viscous Droplet Morphing Indicator */
+    .liquid-morph-pill {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      height: 46px;
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.25) 0%, rgba(10, 132, 255, 0.12) 100%);
+      backdrop-filter: var(--liquid-glass-refraction-index);
+      -webkit-backdrop-filter: var(--liquid-glass-refraction-index);
+      border: 1px solid rgba(10, 132, 255, 0.45);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--liquid-glass-rim-convex), var(--ios-blue-glow);
+      pointer-events: none;
+      z-index: 1;
+      transition: top var(--liquid-spring-rebound), height var(--liquid-spring-rebound), transform var(--liquid-spring-rebound);
+      will-change: top, height, transform;
+    }
+
+    /* Chromatic Edge Dispersion Fringe */
+    .liquid-morph-pill::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      box-shadow: var(--dispersion-shadow);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .liquid-nav-item-btn {
+      position: relative;
+      width: 100%;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 18px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      z-index: 2;
+      transition: color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .liquid-nav-item-btn:hover {
+      color: var(--text-main);
+    }
+
+    .liquid-nav-item-btn.active {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .sidebar-nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       5. NOTIFICATION TOAST ENGINE
        ========================================================================== */
     #toast-container {
       position: fixed;
@@ -209,8 +328,8 @@
       pointer-events: auto;
       width: 100%;
       background: rgba(18, 24, 38, 0.88);
-      backdrop-filter: var(--glass-blur-strength);
-      -webkit-backdrop-filter: var(--glass-blur-strength);
+      backdrop-filter: var(--liquid-glass-refraction-index);
+      -webkit-backdrop-filter: var(--liquid-glass-refraction-index);
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: var(--radius-full);
       padding: 12px 22px;
@@ -243,7 +362,7 @@
     }
 
     /* ==========================================================================
-       4. SECURITY GATE & PRIVILEGE SIGN-IN VIEWS
+       6. SECURITY GATE & PRIVILEGE SIGN-IN OVERLAYS
        ========================================================================== */
     .glass-auth-overlay {
       position: fixed;
@@ -253,7 +372,7 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background: rgba(5, 8, 17, 0.78);
+      background: rgba(5, 8, 17, 0.82);
       backdrop-filter: blur(38px) saturate(200%);
       -webkit-backdrop-filter: blur(38px) saturate(200%);
     }
@@ -261,8 +380,8 @@
     .glass-auth-card {
       width: 100%;
       max-width: 440px;
-      background: var(--glass-panel-bg);
-      border: 1px solid var(--glass-panel-border);
+      background: var(--liquid-glass-substrate);
+      border: var(--liquid-glass-edge-border);
       border-radius: var(--radius-lg);
       padding: 44px 34px;
       box-shadow: var(--shadow-glass);
@@ -326,7 +445,7 @@
       height: 48px;
       padding: 0 18px;
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--glass-panel-border);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: var(--radius-md);
       color: var(--text-main);
       font-size: 14.5px;
@@ -343,7 +462,7 @@
       width: 100%;
       padding: 14px 18px;
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--glass-panel-border);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: var(--radius-md);
       color: var(--text-main);
       font-size: 14px;
@@ -358,29 +477,8 @@
       box-shadow: var(--ios-blue-glow);
     }
 
-    .btn-ios-primary {
-      width: 100%;
-      height: 48px;
-      background: var(--ios-blue);
-      color: #ffffff;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: var(--ios-blue-glow);
-      transition: background-color var(--transition-fast);
-    }
-
-    .btn-ios-primary:hover {
-      background-color: var(--ios-blue-hover);
-    }
-
     /* ==========================================================================
-       5. MAIN APPLICATION SHELL (SIDEBAR & BOTTOM DOCK)
+       7. MAIN APPLICATION STRUCTURE (SIDEBAR & BOTTOM DOCK)
        ========================================================================== */
     #admin-app-container {
       display: none;
@@ -388,7 +486,6 @@
       position: relative;
     }
 
-    /* Desktop Sidebar Component */
     .ios-sidebar {
       position: fixed;
       top: 0;
@@ -396,9 +493,9 @@
       bottom: 0;
       width: var(--sidebar-width);
       background: rgba(15, 23, 42, 0.58);
-      backdrop-filter: var(--glass-blur-strength);
-      -webkit-backdrop-filter: var(--glass-blur-strength);
-      border-right: 1px solid var(--glass-panel-border);
+      backdrop-filter: var(--liquid-glass-refraction-index);
+      -webkit-backdrop-filter: var(--liquid-glass-refraction-index);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
       display: flex;
       flex-direction: column;
       z-index: 100;
@@ -440,53 +537,9 @@
     }
 
     .sidebar-nav-list {
-      list-style: none;
       padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
       flex: 1;
       overflow-y: auto;
-    }
-
-    .sidebar-nav-item-btn {
-      width: 100%;
-      height: 46px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 0 18px;
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      text-align: left;
-      transition: all var(--transition-fast);
-    }
-
-    .sidebar-nav-item-btn:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-main);
-    }
-
-    .sidebar-nav-item-btn.active {
-      background: rgba(10, 132, 255, 0.18);
-      color: #ffffff;
-      font-weight: 600;
-      border: 1px solid rgba(10, 132, 255, 0.32);
-    }
-
-    .sidebar-nav-item-btn.music-btn.active {
-      background: var(--ios-purple-soft);
-      color: #f3e8ff;
-      border-color: rgba(191, 90, 242, 0.38);
-    }
-
-    .sidebar-nav-icon {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
     }
 
     .sidebar-footer-card {
@@ -521,7 +574,7 @@
       background: var(--ios-red-soft);
     }
 
-    /* Mobile Bottom Glass Dock */
+    /* Mobile Bottom Liquid Glass Dock */
     .ios-bottom-dock {
       display: none;
       position: fixed;
@@ -530,18 +583,35 @@
       right: 16px;
       height: var(--bottom-nav-height);
       background: rgba(15, 23, 42, 0.72);
-      backdrop-filter: var(--glass-blur-strength);
-      -webkit-backdrop-filter: var(--glass-blur-strength);
-      border: 1px solid var(--glass-panel-border);
+      backdrop-filter: var(--liquid-glass-refraction-index);
+      -webkit-backdrop-filter: var(--liquid-glass-refraction-index);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: var(--radius-full);
       z-index: 100;
       box-shadow: var(--shadow-float);
       justify-content: space-around;
       align-items: center;
       padding: 0 14px;
+      position: fixed;
+    }
+
+    .liquid-dock-pill {
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      width: calc((100% - 28px) / 4);
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.35) 0%, rgba(10, 132, 255, 0.15) 100%);
+      border: 1px solid rgba(10, 132, 255, 0.5);
+      border-radius: var(--radius-full);
+      box-shadow: var(--liquid-glass-rim-convex), var(--ios-blue-glow);
+      pointer-events: none;
+      z-index: 1;
+      transition: transform var(--liquid-spring-rebound);
+      will-change: transform;
     }
 
     .dock-nav-item {
+      position: relative;
       flex: 1;
       height: 100%;
       display: flex;
@@ -552,16 +622,13 @@
       color: var(--text-muted);
       font-size: 11.5px;
       cursor: pointer;
+      z-index: 2;
       transition: color var(--transition-fast);
     }
 
     .dock-nav-item.active {
-      color: var(--ios-blue);
+      color: #ffffff;
       font-weight: 600;
-    }
-
-    .dock-nav-item.music-btn.active {
-      color: var(--ios-purple);
     }
 
     .dock-nav-icon {
@@ -587,14 +654,8 @@
     }
 
     @keyframes springFade {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .pane-header-titlebar {
@@ -620,10 +681,10 @@
 
     /* Glass Panels */
     .glass-card-panel {
-      background: var(--glass-panel-bg);
+      background: var(--liquid-glass-substrate);
       backdrop-filter: var(--glass-blur-subtle);
       -webkit-backdrop-filter: var(--glass-blur-subtle);
-      border: 1px solid var(--glass-panel-border);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: var(--radius-lg);
       padding: 28px;
       box-shadow: var(--shadow-glass);
@@ -674,7 +735,7 @@
       padding: 16px 18px;
       font-weight: 600;
       color: var(--text-muted);
-      border-bottom: 1px solid var(--glass-panel-border);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
       white-space: nowrap;
     }
 
@@ -688,7 +749,7 @@
       background: rgba(255, 255, 255, 0.025);
     }
 
-    /* Status Badges */
+    /* Badges */
     .ios-status-badge {
       display: inline-flex;
       align-items: center;
@@ -700,37 +761,12 @@
       white-space: nowrap;
     }
 
-    .badge-blue {
-      background: rgba(10, 132, 255, 0.15);
-      color: #60a5fa;
-      border: 1px solid rgba(10, 132, 255, 0.32);
-    }
+    .badge-blue { background: rgba(10, 132, 255, 0.15); color: #60a5fa; border: 1px solid rgba(10, 132, 255, 0.32); }
+    .badge-green { background: var(--ios-emerald-soft); color: var(--ios-emerald); border: 1px solid rgba(48, 209, 88, 0.32); }
+    .badge-amber { background: var(--ios-amber-soft); color: var(--ios-amber); border: 1px solid rgba(255, 214, 10, 0.32); }
+    .badge-purple { background: var(--ios-purple-soft); color: #d8b4fe; border: 1px solid rgba(191, 90, 242, 0.32); }
+    .badge-red { background: var(--ios-red-soft); color: var(--ios-red); border: 1px solid rgba(255, 69, 58, 0.32); }
 
-    .badge-green {
-      background: var(--ios-emerald-soft);
-      color: var(--ios-emerald);
-      border: 1px solid rgba(48, 209, 88, 0.32);
-    }
-
-    .badge-amber {
-      background: var(--ios-amber-soft);
-      color: var(--ios-amber);
-      border: 1px solid rgba(255, 214, 10, 0.32);
-    }
-
-    .badge-purple {
-      background: var(--ios-purple-soft);
-      color: #d8b4fe;
-      border: 1px solid rgba(191, 90, 242, 0.32);
-    }
-
-    .badge-red {
-      background: var(--ios-red-soft);
-      color: var(--ios-red);
-      border: 1px solid rgba(255, 69, 58, 0.32);
-    }
-
-    /* Strict Non-wrapping Indicator for Financial Rewards */
     .reward-indicator {
       font-family: var(--font-mono);
       font-weight: 700;
@@ -745,7 +781,7 @@
       word-break: keep-all;
     }
 
-    /* Table Action Buttons */
+    /* Action Buttons in Tables */
     .btn-cell-action {
       padding: 7px 14px;
       border-radius: var(--radius-sm);
@@ -759,50 +795,15 @@
       white-space: nowrap;
     }
 
-    .btn-cell-danger {
-      background: var(--ios-red-soft);
-      color: var(--ios-red);
-      border: 1px solid rgba(255, 69, 58, 0.32);
-    }
+    .btn-cell-danger { background: var(--ios-red-soft); color: var(--ios-red); border: 1px solid rgba(255, 69, 58, 0.32); }
+    .btn-cell-danger:hover { background: rgba(255, 69, 58, 0.28); }
+    .btn-cell-success { background: var(--ios-emerald-soft); color: var(--ios-emerald); border: 1px solid rgba(48, 209, 88, 0.32); margin-right: 6px; }
+    .btn-cell-success:hover { background: rgba(48, 209, 88, 0.28); }
+    .btn-cell-amber { background: var(--ios-amber-soft); color: var(--ios-amber); border: 1px solid rgba(255, 214, 10, 0.32); margin-right: 6px; }
+    .btn-cell-amber:hover { background: rgba(255, 214, 10, 0.28); }
+    .btn-cell-edit { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.16); margin-right: 6px; }
+    .btn-cell-edit:hover { background: rgba(255, 255, 255, 0.15); }
 
-    .btn-cell-danger:hover {
-      background: rgba(255, 69, 58, 0.28);
-    }
-
-    .btn-cell-success {
-      background: var(--ios-emerald-soft);
-      color: var(--ios-emerald);
-      border: 1px solid rgba(48, 209, 88, 0.32);
-      margin-right: 6px;
-    }
-
-    .btn-cell-success:hover {
-      background: rgba(48, 209, 88, 0.28);
-    }
-
-    .btn-cell-amber {
-      background: var(--ios-amber-soft);
-      color: var(--ios-amber);
-      border: 1px solid rgba(255, 214, 10, 0.32);
-      margin-right: 6px;
-    }
-
-    .btn-cell-amber:hover {
-      background: rgba(255, 214, 10, 0.28);
-    }
-
-    .btn-cell-edit {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-main);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      margin-right: 6px;
-    }
-
-    .btn-cell-edit:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    /* JRmusic Frame Container */
     .music-frame-container {
       width: 100%;
       height: calc(100vh - 210px);
@@ -810,7 +811,7 @@
       border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow-glass);
-      border: 1px solid var(--glass-panel-border);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       background-color: #000000;
     }
 
@@ -834,17 +835,15 @@
       padding: 24px;
     }
 
-    .glass-modal-backdrop.open {
-      display: flex;
-    }
+    .glass-modal-backdrop.open { display: flex; }
 
     .glass-modal-sheet {
       width: 100%;
       max-width: 600px;
       background: rgba(20, 28, 48, 0.92);
-      backdrop-filter: var(--glass-blur-strength);
-      -webkit-backdrop-filter: var(--glass-blur-strength);
-      border: 1px solid var(--glass-panel-border);
+      backdrop-filter: var(--liquid-glass-refraction-index);
+      -webkit-backdrop-filter: var(--liquid-glass-refraction-index);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: var(--radius-lg);
       padding: 34px;
       box-shadow: var(--shadow-float);
@@ -853,14 +852,8 @@
     }
 
     @keyframes sheetPop {
-      from {
-        opacity: 0;
-        transform: scale(0.94) translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+      from { opacity: 0; transform: scale(0.94) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .modal-sheet-header {
@@ -882,11 +875,7 @@
       cursor: pointer;
     }
 
-    .file-pill-tip {
-      font-size: 11.5px;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
+    .file-pill-tip { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
 
     .switch-control-label {
       display: flex;
@@ -918,17 +907,11 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
-    input[type="checkbox"]:checked + .ios-switch {
-      background: var(--ios-blue);
-    }
+    input[type="checkbox"]:checked + .ios-switch { background: var(--ios-blue); }
+    input[type="checkbox"]:checked + .ios-switch::after { transform: translateX(18px); }
 
-    input[type="checkbox"]:checked + .ios-switch::after {
-      transform: translateX(18px);
-    }
-
-    /* Bulk Assignee Container */
     .bulk-assign-container {
-      border: 1px solid var(--glass-panel-border);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: var(--radius-md);
       background: rgba(255, 255, 255, 0.04);
       padding: 14px 16px;
@@ -954,7 +937,6 @@
       cursor: pointer;
     }
 
-    /* Deliverable Download Item in Tables */
     .deliverable-link-pill {
       display: inline-flex;
       align-items: center;
@@ -971,11 +953,9 @@
       transition: background var(--transition-fast);
     }
 
-    .deliverable-link-pill:hover {
-      background: rgba(10, 132, 255, 0.22);
-    }
+    .deliverable-link-pill:hover { background: rgba(10, 132, 255, 0.22); }
 
-    /* Native Action Dialog Styles */
+    /* Dialog Engine */
     .dialog-icon-badge {
       width: 54px;
       height: 54px;
@@ -985,28 +965,11 @@
       justify-content: center;
       margin-bottom: 16px;
     }
-    .dialog-icon-badge.warning {
-      background: var(--ios-amber-soft);
-      border: 1px solid rgba(255, 214, 10, 0.3);
-      color: var(--ios-amber);
-    }
-    .dialog-icon-badge.danger {
-      background: var(--ios-red-soft);
-      border: 1px solid rgba(255, 69, 58, 0.3);
-      color: var(--ios-red);
-    }
-    .dialog-icon-badge.success {
-      background: var(--ios-emerald-soft);
-      border: 1px solid rgba(48, 209, 88, 0.3);
-      color: var(--ios-emerald);
-    }
+    .dialog-icon-badge.warning { background: var(--ios-amber-soft); border: 1px solid rgba(255, 214, 10, 0.3); color: var(--ios-amber); }
+    .dialog-icon-badge.danger { background: var(--ios-red-soft); border: 1px solid rgba(255, 69, 58, 0.3); color: var(--ios-red); }
+    .dialog-icon-badge.success { background: var(--ios-emerald-soft); border: 1px solid rgba(48, 209, 88, 0.3); color: var(--ios-emerald); }
 
-    .dialog-btn-group {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
-
+    .dialog-btn-group { display: flex; gap: 12px; margin-top: 24px; }
     .dialog-btn-cancel {
       flex: 1;
       height: 44px;
@@ -1020,10 +983,6 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: background var(--transition-fast);
-    }
-    .dialog-btn-cancel:hover {
-      background: rgba(255, 255, 255, 0.14);
     }
 
     .dialog-btn-confirm {
@@ -1037,22 +996,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: background var(--transition-fast);
     }
-    .dialog-btn-confirm.danger {
-      background: var(--ios-red);
-      box-shadow: 0 0 20px rgba(255, 69, 58, 0.4);
-    }
-    .dialog-btn-confirm.danger:hover {
-      background: var(--ios-red-hover);
-    }
-    .dialog-btn-confirm.success {
-      background: var(--ios-emerald);
-      box-shadow: 0 0 20px rgba(48, 209, 88, 0.4);
-    }
-    .dialog-btn-confirm.success:hover {
-      background: var(--ios-emerald-hover);
-    }
+    .dialog-btn-confirm.danger { background: var(--ios-red); box-shadow: 0 0 20px rgba(255, 69, 58, 0.4); }
+    .dialog-btn-confirm.success { background: var(--ios-emerald); box-shadow: 0 0 20px rgba(48, 209, 88, 0.4); }
 
     @media (max-width: 768px) {
       .ios-sidebar { display: none; }
@@ -1063,6 +1009,17 @@
   </style>
 </head>
 <body>
+
+  <!-- SVG Filter Definition for Organic Liquid Gooey Dispersion -->
+  <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="liquid-goo-filter">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+        <feBlend in="SourceGraphic" in2="goo" />
+      </filter>
+    </defs>
+  </svg>
 
   <!-- Toast Notification Dock -->
   <div id="toast-container" aria-live="polite"></div>
@@ -1085,7 +1042,7 @@
         <div class="glass-form-group">
           <input type="password" id="gate-password-input" class="glass-input-field" placeholder="Enter Access Code (e.g. congcong2012)" style="text-align:center; letter-spacing:2px;" required autofocus>
         </div>
-        <button type="submit" id="btn-gate-submit" class="btn-ios-primary pressable" style="margin-top:10px;">
+        <button type="submit" id="btn-gate-submit" class="liquid-glass-btn primary" style="width:100%; height:48px; margin-top:10px;">
           <span>Unlock & Proceed</span>
         </button>
       </form>
@@ -1114,7 +1071,7 @@
           <label class="glass-label">Password</label>
           <input type="password" id="admin-pass-input" class="glass-input-field" placeholder="Admin password" autocomplete="current-password" required>
         </div>
-        <button type="submit" id="btn-admin-login-submit" class="btn-ios-primary pressable" style="margin-top:14px;">
+        <button type="submit" id="btn-admin-login-submit" class="liquid-glass-btn primary" style="width:100%; height:48px; margin-top:14px;">
           <span>Sign In to Console</span>
         </button>
       </form>
@@ -1135,10 +1092,13 @@
         </div>
       </div>
 
-      <ul class="sidebar-nav-list">
+      <ul class="sidebar-nav-list liquid-nav-container" id="desktop-sidebar-nav">
+        <!-- Floating Fluid Pill -->
+        <div class="liquid-morph-pill" id="sidebar-morph-pill"></div>
+
         <li>
-          <button type="button" class="sidebar-nav-item-btn pressable active" data-target-pane="pane-tasks-management">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="liquid-nav-item-btn active" data-target-pane="pane-tasks-management" data-nav-index="0">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 11l3 3L22 4"></path>
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
@@ -1146,8 +1106,8 @@
           </button>
         </li>
         <li>
-          <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-requests-audit">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="liquid-nav-item-btn" data-target-pane="pane-requests-audit" data-nav-index="1">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -1157,17 +1117,19 @@
           </button>
         </li>
         <li>
-          <button type="button" class="sidebar-nav-item-btn pressable" data-target-pane="pane-employees-registry">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="liquid-nav-item-btn" data-target-pane="pane-employees-registry" data-nav-index="2">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
             <span>Accounts & Balance</span>
           </button>
         </li>
         <li>
-          <button type="button" class="sidebar-nav-item-btn music-btn pressable" data-target-pane="pane-jrmusic-player">
-            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="liquid-nav-item-btn" data-target-pane="pane-jrmusic-player" data-nav-index="3">
+            <svg class="sidebar-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M9 18V5l12-2v13"></path>
               <circle cx="6" cy="18" r="3"></circle>
               <circle cx="18" cy="16" r="3"></circle>
@@ -1183,21 +1145,23 @@
       </div>
     </aside>
 
-    <!-- Mobile Bottom Navigation Dock -->
-    <nav class="ios-bottom-dock">
-      <button type="button" class="dock-nav-item pressable active" data-target-pane="pane-tasks-management">
+    <!-- Mobile Bottom Liquid Glass Navigation Dock -->
+    <nav class="ios-bottom-dock" id="mobile-bottom-dock">
+      <div class="liquid-dock-pill" id="dock-morph-pill"></div>
+
+      <button type="button" class="dock-nav-item active" data-target-pane="pane-tasks-management" data-dock-index="0">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
         <span>Tasks</span>
       </button>
-      <button type="button" class="dock-nav-item pressable" data-target-pane="pane-requests-audit">
+      <button type="button" class="dock-nav-item" data-target-pane="pane-requests-audit" data-dock-index="1">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
         <span>Requests</span>
       </button>
-      <button type="button" class="dock-nav-item pressable" data-target-pane="pane-employees-registry">
+      <button type="button" class="dock-nav-item" data-target-pane="pane-employees-registry" data-dock-index="2">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
         <span>Accounts</span>
       </button>
-      <button type="button" class="dock-nav-item music-btn pressable" data-target-pane="pane-jrmusic-player">
+      <button type="button" class="dock-nav-item" data-target-pane="pane-jrmusic-player" data-dock-index="3">
         <svg class="dock-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle></svg>
         <span>Music</span>
       </button>
@@ -1213,7 +1177,7 @@
             <h1>Task Orchestration & Dispatch</h1>
             <p>Assign tasks in bulk or individually, set reward values, review deliverable attachments, and mark completed for automatic payout.</p>
           </div>
-          <button type="button" id="btn-open-task-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 24px;">
+          <button type="button" id="btn-open-task-sheet" class="liquid-glass-btn primary" style="padding: 0 24px; height: 44px;">
             <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span>+ Bulk / Single Assign Task</span>
           </button>
@@ -1285,7 +1249,7 @@
             <h1>Employee Directory & Reward Balances</h1>
             <p>Manage staff authentication profiles, monitor earnings, and edit reward balances.</p>
           </div>
-          <button type="button" id="btn-open-employee-sheet" class="btn-ios-primary pressable" style="width:auto; padding:0 24px;">
+          <button type="button" id="btn-open-employee-sheet" class="liquid-glass-btn primary" style="padding: 0 24px; height: 44px;">
             <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span>+ Register Employee</span>
           </button>
@@ -1325,7 +1289,7 @@
           </div>
         </div>
         <div class="music-frame-container">
-          <iframe class="music-frame" src="https://musicplayer-jr-pro.vercel.app" allow="autoplay; encrypted-media; fullscreen" loading="lazy"></iframe>
+          <iframe class="music-frame" src="https://musicplayer-ruby-delta.vercel.app" allow="autoplay; encrypted-media; fullscreen" loading="lazy"></iframe>
         </div>
       </section>
 
@@ -1333,7 +1297,7 @@
   </div>
 
   <!-- ==========================================================================
-       MODAL SHEETS: BULK TASK / REGISTER / BALANCE / NATIVE DIALOG
+       MODAL SHEETS
        ========================================================================== -->
 
   <!-- BULK TASK MODAL SHEET -->
@@ -1390,7 +1354,7 @@
           <div class="file-pill-tip">Stored as separate binary chunks and shared across all selected assignees.</div>
         </div>
 
-        <button type="submit" id="btn-submit-task-action" class="btn-ios-primary pressable" style="margin-top:14px;">
+        <button type="submit" id="btn-submit-task-action" class="liquid-glass-btn primary" style="width:100%; height:48px; margin-top:14px;">
           <span>Dispatch Task(s)</span>
         </button>
       </form>
@@ -1430,7 +1394,7 @@
           <label class="glass-label">Initial Reward Balance (¥)</label>
           <input type="number" step="0.01" id="emp-balance-input" class="glass-input-field" value="0.00">
         </div>
-        <button type="submit" id="btn-submit-emp-action" class="btn-ios-primary pressable" style="margin-top:14px;">
+        <button type="submit" id="btn-submit-emp-action" class="liquid-glass-btn primary" style="width:100%; height:48px; margin-top:14px;">
           <span>Register Account</span>
         </button>
       </form>
@@ -1455,14 +1419,14 @@
           <label class="glass-label">New Reward Balance (¥)</label>
           <input type="number" step="0.01" id="balance-value-input" class="glass-input-field" required>
         </div>
-        <button type="submit" id="btn-submit-balance-action" class="btn-ios-primary pressable" style="margin-top:14px;">
+        <button type="submit" id="btn-submit-balance-action" class="liquid-glass-btn primary" style="width:100%; height:48px; margin-top:14px;">
           <span>Update Balance</span>
         </button>
       </form>
     </div>
   </div>
 
-  <!-- NATIVE CONFIRMATION / ACTION DIALOG SHEET (Replaces window.confirm & alert) -->
+  <!-- NATIVE CONFIRMATION / ACTION DIALOG SHEET (Zero Alert / Confirm Windows) -->
   <div class="glass-modal-backdrop" id="modal-dialog-backdrop">
     <div class="glass-modal-sheet" style="max-width:440px; text-align:center;">
       <div id="dialog-icon-container"></div>
@@ -1477,36 +1441,48 @@
   </div>
 
   <!-- ==========================================================================
-       7. CLIENT JAVASCRIPT CONTROLLER & STATE ENGINE
+       8. CLIENT CONTROLLER & LIQUID GLASS INTERACTION ENGINE
        ========================================================================== -->
   <script>
     (function (window, document) {
       'use strict';
 
       // ------------------------------------------------------------------------
+      // OPTICAL LIQUID GLASS POINTER TRACKER (PHASE 1 & PHASE 3)
+      // ------------------------------------------------------------------------
+      function initLiquidGlassOptics() {
+        document.addEventListener('pointerdown', function (e) {
+          const btn = e.target.closest('.liquid-glass-btn, .dialog-btn-confirm, .dialog-btn-cancel');
+          if (!btn) return;
+          
+          const rect = btn.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          
+          btn.style.setProperty('--flare-x', `${x}%`);
+          btn.style.setProperty('--flare-y', `${y}%`);
+          btn.classList.add('liquid-pressed');
+        });
+
+        document.addEventListener('pointerup', function (e) {
+          const pressedBtns = document.querySelectorAll('.liquid-pressed');
+          pressedBtns.forEach(btn => btn.classList.remove('liquid-pressed'));
+        });
+
+        document.addEventListener('pointercancel', function (e) {
+          const pressedBtns = document.querySelectorAll('.liquid-pressed');
+          pressedBtns.forEach(btn => btn.classList.remove('liquid-pressed'));
+        });
+      }
+
+      // ------------------------------------------------------------------------
       // HAPTIC FEEDBACK ENGINE
       // ------------------------------------------------------------------------
       const Haptics = {
-        light() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate(12); } catch (e) {}
-          }
-        },
-        medium() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate(25); } catch (e) {}
-          }
-        },
-        success() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate([15, 40, 20]); } catch (e) {}
-          }
-        },
-        error() {
-          if ('vibrate' in navigator) {
-            try { navigator.vibrate([40, 60, 40]); } catch (e) {}
-          }
-        }
+        light() { if ('vibrate' in navigator) { try { navigator.vibrate(12); } catch (e) {} } },
+        medium() { if ('vibrate' in navigator) { try { navigator.vibrate(25); } catch (e) {} } },
+        success() { if ('vibrate' in navigator) { try { navigator.vibrate([15, 40, 20]); } catch (e) {} } },
+        error() { if ('vibrate' in navigator) { try { navigator.vibrate([40, 60, 40]); } catch (e) {} } }
       };
 
       // ------------------------------------------------------------------------
@@ -1537,7 +1513,10 @@
         appContainer: document.getElementById('admin-app-container'),
         sidebarAdminFullname: document.getElementById('sidebar-admin-fullname'),
         btnDesktopLogout: document.getElementById('btn-desktop-logout'),
-        navButtons: document.querySelectorAll('.sidebar-nav-item-btn, .dock-nav-item'),
+        navButtons: document.querySelectorAll('.liquid-nav-item-btn'),
+        dockButtons: document.querySelectorAll('.dock-nav-item'),
+        sidebarMorphPill: document.getElementById('sidebar-morph-pill'),
+        dockMorphPill: document.getElementById('dock-morph-pill'),
         panes: document.querySelectorAll('.view-content-pane'),
         
         // Tasks UI
@@ -1595,12 +1574,7 @@
       const Utils = {
         escapeHtml(str) {
           if (!str) return '';
-          return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+          return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         },
         
         formatDate(dateString) {
@@ -1632,8 +1606,8 @@
               ${type === 'success' 
                 ? '<polyline points="20 6 9 17 4 12"></polyline>' 
                 : (type === 'error' 
-                  ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>' 
-                  : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>')}
+                  ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line>' 
+                  : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line>')}
             </svg>
             <div class="toast-message">${Utils.escapeHtml(message)}</div>
           `;
@@ -1651,15 +1625,12 @@
           }, duration);
         },
 
-        // Native In-UI Confirmation Dialog (Zero Native Window Popups)
         confirm({ title, message, confirmText = 'Confirm', type = 'danger' }) {
           return new Promise((resolve) => {
             Haptics.medium();
             DOM.dialogTitle.textContent = title;
             DOM.dialogMessage.textContent = message;
             DOM.btnDialogConfirm.textContent = confirmText;
-
-            // Type theme configuration
             DOM.btnDialogConfirm.className = `dialog-btn-confirm pressable ${type}`;
             
             let iconMarkup = '';
@@ -1686,15 +1657,8 @@
             DOM.dialogIconContainer.innerHTML = iconMarkup;
             DOM.modalDialogBackdrop.classList.add('open');
 
-            const handleCancel = () => {
-              cleanup();
-              resolve(false);
-            };
-
-            const handleConfirm = () => {
-              cleanup();
-              resolve(true);
-            };
+            const handleCancel = () => { cleanup(); resolve(false); };
+            const handleConfirm = () => { cleanup(); resolve(true); };
 
             const cleanup = () => {
               DOM.modalDialogBackdrop.classList.remove('open');
@@ -1812,19 +1776,35 @@
       };
 
       // ------------------------------------------------------------------------
-      // UI CONTROLLERS & EVENT LISTENERS
+      // FLUID METABALL MORPHING & VIEW ROUTING (PHASE 2)
       // ------------------------------------------------------------------------
+      function updateMorphingPill(targetPaneId) {
+        // Desktop Morphing Pill Sync
+        const activeSidebarBtn = Array.from(DOM.navButtons).find(btn => btn.getAttribute('data-target-pane') === targetPaneId);
+        if (activeSidebarBtn && DOM.sidebarMorphPill) {
+          const offsetTop = activeSidebarBtn.offsetTop;
+          const height = activeSidebarBtn.offsetHeight;
+          DOM.sidebarMorphPill.style.top = `${offsetTop}px`;
+          DOM.sidebarMorphPill.style.height = `${height}px`;
+        }
+
+        // Mobile Dock Morphing Pill Sync
+        const activeDockBtn = Array.from(DOM.dockButtons).find(btn => btn.getAttribute('data-target-pane') === targetPaneId);
+        if (activeDockBtn && DOM.dockMorphPill) {
+          const index = parseInt(activeDockBtn.getAttribute('data-dock-index') || '0', 10);
+          DOM.dockMorphPill.style.transform = `translateX(${index * 100}%)`;
+        }
+      }
+
       function switchPane(targetPaneId) {
         Haptics.light();
         State.currentPaneId = targetPaneId;
         
-        DOM.navButtons.forEach(btn => {
-          btn.classList.toggle('active', btn.getAttribute('data-target-pane') === targetPaneId);
-        });
-        
-        DOM.panes.forEach(p => {
-          p.classList.toggle('active-pane', p.id === targetPaneId);
-        });
+        DOM.navButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-target-pane') === targetPaneId));
+        DOM.dockButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-target-pane') === targetPaneId));
+        DOM.panes.forEach(p => p.classList.toggle('active-pane', p.id === targetPaneId));
+
+        updateMorphingPill(targetPaneId);
 
         if (targetPaneId === 'pane-tasks-management') loadTasks();
         if (targetPaneId === 'pane-requests-audit') loadRequests();
@@ -1895,7 +1875,6 @@
           if (isSubmitted) statusBadge = '<span class="ios-status-badge badge-purple">Submitted (Review)</span>';
           if (isCompleted) statusBadge = '<span class="ios-status-badge badge-green">✓ Completed</span>';
 
-          // Admin Reference Files List
           let adminFilesHtml = '';
           if (t.attachments && t.attachments.length > 0) {
             adminFilesHtml = `
@@ -1910,7 +1889,6 @@
             `;
           }
 
-          // User Submitted Deliverables Download Links
           let userSubmissionsHtml = '';
           if (t.submissions && t.submissions.length > 0) {
             userSubmissionsHtml = `
@@ -2125,18 +2103,11 @@
           `;
 
           tr.querySelector('[data-edit-balance-id]').addEventListener('click', function () {
-            openBalanceModal(
-              this.getAttribute('data-edit-balance-id'),
-              this.getAttribute('data-name'),
-              this.getAttribute('data-balance')
-            );
+            openBalanceModal(this.getAttribute('data-edit-balance-id'), this.getAttribute('data-name'), this.getAttribute('data-balance'));
           });
 
           tr.querySelector('[data-delete-emp-id]').addEventListener('click', function () {
-            deregisterEmployee(
-              this.getAttribute('data-delete-emp-id'),
-              this.getAttribute('data-name')
-            );
+            deregisterEmployee(this.getAttribute('data-delete-emp-id'), this.getAttribute('data-name'));
           });
 
           DOM.employeesTbody.appendChild(tr);
@@ -2187,7 +2158,6 @@
       // EVENT BINDINGS
       // ------------------------------------------------------------------------
       function bindEvents() {
-        // Navigation Switching
         DOM.navButtons.forEach(btn => {
           btn.addEventListener('click', () => {
             const target = btn.getAttribute('data-target-pane');
@@ -2195,7 +2165,13 @@
           });
         });
 
-        // Gate Verification Submit
+        DOM.dockButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-target-pane');
+            if (target) switchPane(target);
+          });
+        });
+
         DOM.gateForm.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -2222,7 +2198,6 @@
           }
         });
 
-        // Admin Credentials Login Submit
         DOM.adminLoginForm.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -2248,7 +2223,6 @@
           }
         });
 
-        // Desktop Logout
         DOM.btnDesktopLogout.addEventListener('click', async () => {
           Haptics.medium();
           await AdminApi.logout();
@@ -2257,7 +2231,6 @@
           Utils.showToast('Admin session terminated', 'info');
         });
 
-        // Modal Sheet Open / Close Controls
         DOM.btnOpenTaskSheet.addEventListener('click', () => {
           Haptics.light();
           DOM.modalTaskBackdrop.classList.add('open');
@@ -2278,13 +2251,11 @@
           DOM.modalBalanceBackdrop.classList.remove('open');
         });
 
-        // Select All Assignees Toggle
         DOM.selectAllAssignees.addEventListener('change', function () {
           const boxes = DOM.bulkAssigneesContainer.querySelectorAll('input[name="bulk_assignee"]');
           boxes.forEach(b => b.checked = this.checked);
         });
 
-        // Bulk / Single Task Dispatch Submission
         DOM.formDispatchTask.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -2345,7 +2316,6 @@
           }
         });
 
-        // Register Employee Submission
         DOM.formRegisterEmployee.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -2380,7 +2350,6 @@
           }
         });
 
-        // Modify Balance Submission
         DOM.formModifyBalance.addEventListener('submit', async (e) => {
           e.preventDefault();
           Haptics.light();
@@ -2407,12 +2376,17 @@
             DOM.btnSubmitBalanceAction.innerHTML = '<span>Update Balance</span>';
           }
         });
+
+        window.addEventListener('resize', () => {
+          updateMorphingPill(State.currentPaneId);
+        });
       }
 
       // ------------------------------------------------------------------------
       // APPLICATION BOOTSTRAP
       // ------------------------------------------------------------------------
       window.addEventListener('DOMContentLoaded', () => {
+        initLiquidGlassOptics();
         bindEvents();
         initializeSession();
       });
