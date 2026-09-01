@@ -2,11 +2,12 @@
  * ============================================================================
  * CORPORATE TASK & RESOURCE MANAGEMENT PLATFORM - BACKEND ENGINE
  * ============================================================================
- * Architecture: Node.js / Express.js / MongoDB Mongoose
+ * Architecture: Node.js / Express.js / MongoDB Mongoose / Cloudflare R2
  * Deployment Target: Render Web Service & Alibaba Cloud ECS VPS
  * 
  * Core Features:
- *  - High-Volume File Streaming (Bypassing MongoDB 16MB BSON Document Limit)
+ *  - Cloudflare R2 Integration for Task Deliverables
+ *  - MongoDB High-Volume Binary Storage for Admin Attachments
  *  - Dual Token-Based Authentication Engine (RBAC: Employee / Administrator)
  *  - Environment Gate Password Protection Layer
  *  - Automated Balance & Financial Ledger Credit Engine
@@ -28,6 +29,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 
+// Cloudflare R2 (S3 Compatible SDK)
+const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
+
 // ============================================================================
 // 1. GLOBAL CONSTANTS & RUNTIME CONFIGURATION
 // ============================================================================
@@ -47,6 +51,12 @@ const GATE_SECRET = process.env.GATE_SECRET ||
 
 // Site Gate Unlock Code
 const SITE_GATE_PASSWORD = process.env.SITE_GATE_PASSWORD || 'congcong2012';
+
+// Cloudflare R2 Credentials
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || '';
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '';
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
+const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'corp-task-deliverables';
 
 // Cookie Lifespan Constants (8 Hours standard corporate session)
 const SESSION_EXPIRATION_MS = 8 * 60 * 60 * 1000;
@@ -77,6 +87,19 @@ const Logger = {
     }
   }
 };
+
+// ============================================================================
+// 2.1 CLOUDFLARE R2 S3 CLIENT INITIALIZATION
+// ============================================================================
+
+const r2Client = new S3Client({
+  region: 'auto',
+  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: R2_ACCESS_KEY_ID,
+    secretAccessKey: R2_SECRET_ACCESS_KEY
+  }
+});
 
 // ============================================================================
 // 3. EXPRESS APPLICATION INITIALIZATION & MIDDLEWARES
@@ -231,7 +254,7 @@ const CorporateApplicationRequestSchema = new mongoose.Schema({
 }, { collection: 'corp_app_staff_requests' });
 
 /**
- * Stored Binary File Schema (Decoupled to eliminate MongoDB 16MB BSON ceiling)
+ * Stored Binary File Schema (Used for Admin Attachments in MongoDB)
  */
 const StoredFileSchema = new mongoose.Schema({
   task_id: {
@@ -294,6 +317,15 @@ const FileMetadataSchema = new mongoose.Schema({
   size: {
     type: Number,
     required: true
+  },
+  storage_type: {
+    type: String,
+    enum: ['mongodb', 'r2'],
+    default: 'mongodb'
+  },
+  r2_key: {
+    type: String,
+    default: null
   }
 }, { _id: false });
 
@@ -767,7 +799,7 @@ app.post('/api/tasks/claim/:id', authenticateEmployeeToken, async (req, res) => 
 
 /**
  * POST /api/tasks/submit-deliverables/:id
- * Uploads Deliverables to MongoDB (Supports up to 5 files <= 30MB each)
+ * Uploads Deliverables to Cloudflare R2 (Supports up to 5 files <= 30MB each)
  */
 app.post('/api/tasks/submit-deliverables/:id', 
   authenticateEmployeeToken, 
@@ -806,34 +838,62 @@ app.post('/api/tasks/submit-deliverables/:id',
         });
       }
 
-      // Purge prior user deliverable files if resubmitting
+      // Purge prior user deliverable files from R2 & MongoDB if resubmitting
       if (uploadedFiles.length > 0 && task.submissions && task.submissions.length > 0) {
-        const priorIds = task.submissions.map(s => s.file_id);
-        await StoredFile.deleteMany({ _id: { $in: priorIds } });
+        const priorMongoIds = [];
+        const priorR2Objects = [];
+
+        for (const s of task.submissions) {
+          if (s.storage_type === 'r2' && s.r2_key) {
+            priorR2Objects.push({ Key: s.r2_key });
+          } else if (s.file_id) {
+            priorMongoIds.push(s.file_id);
+          }
+        }
+
+        if (priorMongoIds.length > 0) {
+          await StoredFile.deleteMany({ _id: { $in: priorMongoIds } });
+        }
+
+        if (priorR2Objects.length > 0 && R2_BUCKET_NAME) {
+          try {
+            await r2Client.send(new DeleteObjectsCommand({
+              Bucket: R2_BUCKET_NAME,
+              Delete: { Objects: priorR2Objects }
+            }));
+          } catch (r2DelErr) {
+            Logger.warn(`Failed to cleanup previous R2 deliverables: ${r2DelErr.message}`, 'DELIVERABLES');
+          }
+        }
       }
 
       const metadataList = [];
 
       for (const file of uploadedFiles) {
         const decodedFilename = Buffer.from(file.originalname, 'latin1').toString('utf8');
-        
-        const newBinaryFile = new StoredFile({
-          task_id: task._id,
-          file_type: 'user_submission',
-          filename: decodedFilename,
-          mimetype: file.mimetype,
-          size: file.size,
-          data: file.buffer,
-          uploader: req.user.username
-        });
+        const generatedFileId = new mongoose.Types.ObjectId();
+        const r2ObjectKey = `submissions/${task._id}/${generatedFileId}_${encodeURIComponent(decodedFilename)}`;
 
-        await newBinaryFile.save();
+        // Upload directly to Cloudflare R2
+        await r2Client.send(new PutObjectCommand({
+          Bucket: R2_BUCKET_NAME,
+          Key: r2ObjectKey,
+          Body: file.buffer,
+          ContentType: file.mimetype || 'application/octet-stream',
+          Metadata: {
+            task_id: String(task._id),
+            uploader: req.user.username,
+            original_filename: encodeURIComponent(decodedFilename)
+          }
+        }));
 
         metadataList.push({
-          file_id: newBinaryFile._id,
-          filename: newBinaryFile.filename,
-          mimetype: newBinaryFile.mimetype,
-          size: newBinaryFile.size
+          file_id: generatedFileId,
+          filename: decodedFilename,
+          mimetype: file.mimetype || 'application/octet-stream',
+          size: file.size,
+          storage_type: 'r2',
+          r2_key: r2ObjectKey
         });
       }
 
@@ -846,15 +906,15 @@ app.post('/api/tasks/submit-deliverables/:id',
       task.submitted_at = new Date();
       await task.save();
 
-      Logger.info(`Deliverables submitted for task [${task.task_title}] by [${req.user.username}]`, 'DELIVERABLES');
+      Logger.info(`Deliverables submitted to Cloudflare R2 for task [${task.task_title}] by [${req.user.username}]`, 'DELIVERABLES');
 
       return res.json({
         success: true,
-        message: 'Deliverables and files uploaded successfully to cloud cluster!',
+        message: 'Deliverables and files uploaded successfully to Cloudflare R2!',
         data: task
       });
     } catch (error) {
-      Logger.error('Failed to save deliverable file stream to database.', error, 'DELIVERABLES');
+      Logger.error('Failed to save deliverable file stream to Cloudflare R2.', error, 'DELIVERABLES');
       return res.status(500).json({
         success: false,
         message: 'Failed to process deliverable upload.'
@@ -932,7 +992,7 @@ app.get('/api/requests/mine', authenticateEmployeeToken, async (req, res) => {
 
 /**
  * GET /api/files/download/:fileId
- * Universal secure streaming endpoint with RBAC inspection
+ * Universal secure streaming endpoint with RBAC inspection (R2 & MongoDB hybrid support)
  */
 app.get('/api/files/download/:fileId', async (req, res) => {
   try {
@@ -968,12 +1028,48 @@ app.get('/api/files/download/:fileId', async (req, res) => {
       }
     }
 
+    // Attempt to locate file in Task submissions metadata (R2 Storage Route)
+    const taskWithSubmission = await TaskItem.findOne({ 'submissions.file_id': fileId });
+
+    if (taskWithSubmission) {
+      const fileMeta = taskWithSubmission.submissions.find(s => s.file_id.toString() === fileId);
+
+      // Ownership authorization check
+      if (!isAuthorized) {
+        if (!authUser) {
+          return res.status(401).json({ success: false, message: 'Access denied: Please authenticate.' });
+        }
+        if (taskWithSubmission.assigned_to_username.toLowerCase() !== authUser.username.toLowerCase()) {
+          return res.status(403).json({ success: false, message: 'Access forbidden: Task does not belong to you.' });
+        }
+      }
+
+      // If stored in Cloudflare R2
+      if (fileMeta && fileMeta.storage_type === 'r2' && fileMeta.r2_key) {
+        try {
+          const r2Response = await r2Client.send(new GetObjectCommand({
+            Bucket: R2_BUCKET_NAME,
+            Key: fileMeta.r2_key
+          }));
+
+          res.setHeader('Content-Type', fileMeta.mimetype || 'application/octet-stream');
+          if (fileMeta.size) res.setHeader('Content-Length', fileMeta.size);
+          res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(fileMeta.filename)}`);
+
+          return r2Response.Body.pipe(res);
+        } catch (r2FetchErr) {
+          Logger.error('Failed to stream file directly from Cloudflare R2.', r2FetchErr, 'DOWNLOAD');
+          return res.status(404).json({ success: false, message: 'Target file not found in R2 storage.' });
+        }
+      }
+    }
+
+    // Fallback: Check MongoDB Binary Storage (Admin attachments & legacy deliverables)
     const fileDoc = await StoredFile.findById(fileId);
     if (!fileDoc) {
       return res.status(404).json({ success: false, message: 'Target file binary not found.' });
     }
 
-    // If not superuser, verify ownership
     if (!isAuthorized) {
       if (!authUser) {
         return res.status(401).json({ success: false, message: 'Access denied: Please authenticate.' });
@@ -1114,7 +1210,7 @@ app.get('/api/admin/tasks/all', checkGateAccess, authenticateAdminToken, async (
 
 /**
  * POST /api/admin/tasks/create-bulk
- * Dispatches Task and Attachments to Single or Multiple Assignees
+ * Dispatches Task and Attachments to Single or Multiple Assignees (Attachments Stored in MongoDB)
  */
 app.post('/api/admin/tasks/create-bulk', 
   checkGateAccess, 
@@ -1186,7 +1282,8 @@ app.post('/api/admin/tasks/create-bulk',
             file_id: newFileDoc._id,
             filename: newFileDoc.filename,
             mimetype: newFileDoc.mimetype,
-            size: newFileDoc.size
+            size: newFileDoc.size,
+            storage_type: 'mongodb'
           });
         }
 
@@ -1265,11 +1362,31 @@ app.post('/api/admin/tasks/complete/:id', checkGateAccess, authenticateAdminToke
 
 /**
  * DELETE /api/admin/tasks/delete/:id
- * Purges Task and Associated Binary Files
+ * Purges Task and Associated Binary Files (MongoDB & R2)
  */
 app.delete('/api/admin/tasks/delete/:id', checkGateAccess, authenticateAdminToken, async (req, res) => {
   try {
     const taskId = req.params.id;
+    
+    // Check if task has R2 deliverable files to clean up
+    const task = await TaskItem.findById(taskId);
+    if (task && task.submissions && task.submissions.length > 0) {
+      const r2Objects = task.submissions
+        .filter(s => s.storage_type === 'r2' && s.r2_key)
+        .map(s => ({ Key: s.r2_key }));
+
+      if (r2Objects.length > 0 && R2_BUCKET_NAME) {
+        try {
+          await r2Client.send(new DeleteObjectsCommand({
+            Bucket: R2_BUCKET_NAME,
+            Delete: { Objects: r2Objects }
+          }));
+        } catch (r2Err) {
+          Logger.warn(`Failed to clean up R2 deliverables on task delete: ${r2Err.message}`, 'ADMIN_TASKS');
+        }
+      }
+    }
+
     await StoredFile.deleteMany({ task_id: taskId });
     const result = await TaskItem.findByIdAndDelete(taskId);
 
