@@ -50,13 +50,13 @@ const GATE_SECRET = process.env.GATE_SECRET ||
   'CORP_ADMIN_GATE_AUTH_SIGNING_KEY_2026_MASTER_SECRET';
 
 // Site Gate Unlock Code
-const SITE_GATE_PASSWORD = process.env.SITE_GATE_PASSWORD || 'congcong2012';
+const SITE_GATE_PASSWORD = process.env.SITE_GATE_PASSWORD || 'CONGcong20121009@';
 
 // Cloudflare R2 Credentials
-const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || '';
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '';
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
-const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'corp-task-deliverables';
+const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID || 'd4a8681c0dea2b27cae5a77d3e300573';
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '952d1b97778079caaa5d438a6f72ba98';
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '1afdb8a1fd86dc0724b5d810090b7cdb198e2558f1d9f6d0508e8761866e6b94';
+const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'musics';
 
 // Cookie Lifespan Constants (8 Hours standard corporate session)
 const SESSION_EXPIRATION_MS = 8 * 60 * 60 * 1000;
